@@ -98,7 +98,7 @@ window.__ModuleLoader__.load({
     // src/client.js
     var inject = ["slots", "settingsScope", "remote", "remote.credentials"];
     var NS = "dsh-balance-monitor";
-    var VERSION = "v0.1.3";
+    var VERSION = "v0.1.4";
     var FEEDBACK_DURATION_MS = 2400;
     var MAX_SIDEBAR_CHANNELS = 3;
     var CHANNEL_OPTIONS = Object.freeze([
