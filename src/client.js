@@ -1,5 +1,4 @@
 import React, { useEffect, useSyncExternalStore, useState } from 'react'
-import { createUpdateStore } from './update-store.js'
 
 export const inject = ['slots', 'settingsScope', 'remote', 'remote.credentials']
 
@@ -86,15 +85,40 @@ async function api(path, options) {
   return body
 }
 
-const updateStore = createUpdateStore({
-  currentVersion: VERSION,
-  request: action => api('/api/dsh-balance-monitor/update', {
+function installUpdate() {
+  return api('/api/dsh-balance-monitor/update', {
     method: 'POST',
-    body: JSON.stringify({ action }),
-  }),
-})
+    body: JSON.stringify({ action: 'install' }),
+  })
+}
+
+function triggerUpdate() {
+  void installUpdate().catch(() => {})
+}
+
+function subscribeUpdateState(listener) {
+  let active = true
+  api('/api/dsh-balance-monitor/update')
+    .then(snapshot => {
+      if (active) listener(snapshot)
+    })
+    .catch(error => console.error('[dsh-balance-monitor] update state failed:', error))
+  const events = new EventSource('/api/dsh-balance-monitor/update/events')
+  events.onmessage = event => {
+    try {
+      listener(JSON.parse(event.data))
+    } catch (error) {
+      console.error('[dsh-balance-monitor] update event decode failed:', error)
+    }
+  }
+  return () => {
+    active = false
+    events.close()
+  }
+}
 
 function updatePresentation(update) {
+  if (!update) return undefined
   if (update.status === 'restart-required') {
     return { label: '重启后生效', state: 'restart-required', disabled: true }
   }
@@ -120,7 +144,7 @@ function updatePresentation(update) {
   return undefined
 }
 
-function updateButton(update) {
+function updateButton(update, onInstall) {
   const presentation = updatePresentation(update)
   if (!presentation) return undefined
   const control = document.createElement(
@@ -136,7 +160,7 @@ function updateButton(update) {
     control.addEventListener('click', event => {
       event.preventDefault()
       event.stopPropagation()
-      void updateStore.install()
+      void onInstall()
     })
   }
   return control
@@ -299,6 +323,7 @@ function mountMonitor(scope) {
   document.body.append(popup)
 
   let snapshot = { revision: -1, channels: [] }
+  let updateSnapshot
   let root
   const refreshing = new Set()
   const feedback = new Map()
@@ -423,7 +448,7 @@ function mountMonitor(scope) {
     version.className = 'bm-version'
     version.textContent = VERSION
     heading.append(title, version)
-    const update = updateButton(updateStore.getSnapshot())
+    const update = updateButton(updateSnapshot, triggerUpdate)
     if (update) heading.append(update)
     const actions = document.createElement('span')
     actions.className = 'bm-actions'
@@ -479,7 +504,14 @@ function mountMonitor(scope) {
   const observer = new MutationObserver(place)
   observer.observe(document.body, { childList: true, subtree: true })
   const unsubscribe = scope.subscribe(renderSummary)
-  const unsubscribeUpdates = updateStore.subscribe(render)
+  const unsubscribeUpdates = subscribeUpdateState(next => {
+    updateSnapshot = next
+    if (next.status === 'updating' || next.status === 'restart-required') {
+      popup.hidden = false
+      entry.dataset.active = 'true'
+    }
+    render()
+  })
   const outside = event => {
     if (!popup.hidden && !popup.contains(event.target) && !entry.contains(event.target)) {
       popup.hidden = true
@@ -549,7 +581,7 @@ function createSettingsCard(ctx, scope) {
       listener => scope.subscribe(listener),
       () => scope.getSnapshot(),
     )
-    const update = useSyncExternalStore(updateStore.subscribe, updateStore.getSnapshot)
+    const [update, setUpdate] = useState()
     const values = snapshot.status === 'ready' ? snapshot.value ?? {} : {}
     const [open, setOpen] = useState(false)
     const [pickerOpen, setPickerOpen] = useState(false)
@@ -578,6 +610,8 @@ function createSettingsCard(ctx, scope) {
     useEffect(() => {
       if (!open) setPickerOpen(false)
     }, [open])
+
+    useEffect(() => subscribeUpdateState(setUpdate), [])
 
     const readCredentials = async () => {
       try {
@@ -822,7 +856,7 @@ function createSettingsCard(ctx, scope) {
             'data-state': updateStatus.state,
             disabled: updateStatus.disabled,
             title: updateStatus.title ?? updateStatus.label,
-            onClick: () => void updateStore.install(),
+            onClick: triggerUpdate,
           },
           updateStatus.label,
         ),
@@ -877,7 +911,6 @@ function createSettingsCard(ctx, scope) {
 
 export function apply(ctx) {
   installStyle()
-  void updateStore.check()
   const scope = ctx.settingsScope.bind({ namespace: NS })
   const SettingsCard = createSettingsCard(ctx, scope)
   ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({

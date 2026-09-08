@@ -96,7 +96,7 @@ Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，
 
 ## 插件更新
 
-插件启动时会异步检查 npm `latest` 版本，不阻塞 DSH 启动。发现更新后，余额弹窗和设置页会显示由同一状态源驱动的更新入口；任一入口点击后，两处会同步展示更新状态。Host 使用固定包名和 Registry 返回的精确 SemVer 调用当前 DSH CLI，安装结果会再次从 profile 校验，成功后显示“重启后生效”，但不会自动重启 DSH。
+插件启动时及之后每 10 分钟会由 Host 异步检查 npm `latest` 版本，不阻塞 DSH 运行。更新状态由 Host 中的全局单例维护，余额弹窗和设置页只通过 HTTP/SSE 读取同一状态；任一入口点击后，两处会同步展示更新进度。Host 使用固定包名和 Registry 返回的精确 SemVer 调用当前 DSH CLI，安装结果会再次从 profile 校验，成功后显示“重启后生效”，但不会自动重启 DSH。
 
 本地 `link:`、`file:`、Git 和 workspace 安装不会被自动替换，也不会显示 Registry 更新入口。
 

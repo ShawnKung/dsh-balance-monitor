@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  getUpdateService,
   installExactVersion,
   isRegistryDependency,
   UpdateService,
@@ -19,12 +20,15 @@ function registryResponse(version) {
 }
 
 function updater(overrides = {}) {
+  let installedVersion = '1.2.3'
   return new UpdateService({
     currentVersion: '1.2.3',
     readDependencySpec: async () => '^1.2.3',
-    readInstalledVersion: async () => '1.3.0',
+    readInstalledVersion: async () => installedVersion,
     fetchImpl: async () => registryResponse('1.3.0'),
-    runInstall: async () => {},
+    runInstall: async ({ version }) => {
+      installedVersion = version
+    },
     ...overrides,
   })
 }
@@ -74,6 +78,67 @@ test('update checks compare the installed package with npm latest', async () => 
   assert.equal(state.updateAvailable, true)
 })
 
+test('update service is process-global across plugin reloads', () => {
+  const registry = {}
+  const first = getUpdateService({ currentVersion: '1.2.3' }, registry)
+  const second = getUpdateService({ currentVersion: '9.9.9' }, registry)
+
+  assert.equal(second, first)
+  assert.equal(second.snapshot().currentVersion, '1.2.3')
+})
+
+test('backend update state is published identically to every subscriber', async () => {
+  const service = updater()
+  const first = []
+  const second = []
+  service.subscribe(snapshot => first.push(snapshot.status))
+  service.subscribe(snapshot => second.push(snapshot.status))
+
+  await service.check()
+  await service.install()
+
+  assert.deepEqual(first, ['checking', 'available', 'updating', 'restart-required'])
+  assert.deepEqual(second, first)
+})
+
+test('an installed newer version remains restart-required after reload', async () => {
+  let fetched = false
+  const service = updater({
+    readInstalledVersion: async () => '1.3.0',
+    fetchImpl: async () => {
+      fetched = true
+      return registryResponse('1.3.0')
+    },
+  })
+
+  const state = await service.check()
+
+  assert.equal(state.status, 'restart-required')
+  assert.equal(state.installedVersion, '1.3.0')
+  assert.equal(state.updateAvailable, false)
+  assert.equal(fetched, false)
+})
+
+test('update checks refresh after ten minutes', async () => {
+  let now = 0
+  let checks = 0
+  const service = updater({
+    now: () => now,
+    fetchImpl: async () => {
+      checks += 1
+      return registryResponse('1.3.0')
+    },
+  })
+
+  await service.check()
+  await service.check()
+  assert.equal(checks, 1)
+
+  now = 10 * 60_000
+  await service.check()
+  assert.equal(checks, 2)
+})
+
 test('linked development installs do not offer registry replacement', async () => {
   let fetched = false
   const service = updater({
@@ -93,8 +158,13 @@ test('linked development installs do not offer registry replacement', async () =
 
 test('updates install an exact version and require restart after verification', async () => {
   const calls = []
+  let installedVersion = '1.2.3'
   const service = updater({
-    runInstall: async input => calls.push(input),
+    runInstall: async input => {
+      calls.push(input)
+      installedVersion = input.version
+    },
+    readInstalledVersion: async () => installedVersion,
   })
 
   const state = await service.install()
