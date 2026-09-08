@@ -46,6 +46,9 @@ export const teamoChannel = {
   credentialRef(config) {
     return config.teamoApiKeyRef
   },
+  credentialEndpoint(config) {
+    return config.teamoBaseUrl
+  },
   async fetch({ apiKey, config, fetchImpl = fetch }) {
     const baseUrl = config.teamoBaseUrl
     const now = Math.floor(Date.now() / 1000)

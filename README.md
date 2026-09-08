@@ -76,11 +76,11 @@ dsh plugin --profile web add @shawnkung/dsh-balance-monitor@latest
 - **TeamoRouter API 地址**：余额与用量接口地址。
 - **统计天数**：TeamoRouter 区间统计范围，支持 2 至 90 天。
 
-API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏览器。
+API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏览器。插件优先使用自身配置的凭据；未配置时，会按 provider 的实际 API 域名查找唯一匹配渠道，并通过该 provider 的 `apiKeyEnv` 凭据引用自动复用模型 Key。只有插件请求端点仍属于同一受支持渠道域名时才会复用；若同一渠道存在多个不同的 provider 凭据，插件不会擅自选择。
 
 ## 自动刷新
 
-插件启动时会刷新全部已配置渠道。此后：
+插件启动时会刷新全部可解析到凭据的渠道。此后：
 
 - 点击顶部刷新按钮：刷新全部渠道。
 - 点击渠道刷新按钮：只刷新该渠道。
@@ -92,6 +92,7 @@ Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，
 ## 安全设计
 
 - API Key 只存在于 DSH credentials 服务和 Host 请求链路。
+- 自动复用模型 Key 时只读取 provider 的凭据引用，并调用 `ctx.credentials.resolve()`；插件不直接读取环境变量或凭据文件。
 - 浏览器只接收凭据是否已配置、来源和是否可写等元数据。
 - HTTP 与 SSE 接口仅接受 loopback 且同源的请求。
 - provider 识别使用 `URL.hostname` 做精确域名或子域名匹配，不使用字符串包含判断。

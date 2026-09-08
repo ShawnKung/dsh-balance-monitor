@@ -30,6 +30,9 @@ export const deepseekChannel = {
   credentialRef(config) {
     return config.deepseekApiKeyRef
   },
+  credentialEndpoint() {
+    return BALANCE_URL
+  },
   async fetch({ apiKey, fetchImpl = fetch }) {
     const response = await fetchImpl(BALANCE_URL, {
       headers: {

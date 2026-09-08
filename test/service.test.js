@@ -48,6 +48,63 @@ test('refresh resolves credentials for every operation', async () => {
   assert.equal(service.snapshot().channels[0].balance, 12.5)
 })
 
+test('explicit plugin credentials take precedence over provider discovery', async () => {
+  let discoveries = 0
+  const service = new BalanceService({
+    channels: [channel(async ({ apiKey }) => {
+      assert.equal(apiKey, 'explicit-secret')
+      return { currency: 'USD', balance: 12.5, detail: [], periods: [] }
+    })],
+    credentials: credentials('explicit-secret'),
+    credentialRefs: () => {
+      discoveries += 1
+      return ['PROVIDER_API_KEY']
+    },
+    config: () => ({}),
+  })
+
+  await service.refresh('example')
+
+  assert.equal(discoveries, 0)
+  assert.equal(service.snapshot().channels[0].credential.origin, 'plugin')
+})
+
+test('missing plugin credentials fall back to a discovered provider reference', async () => {
+  const resolved = []
+  const provider = {
+    async resolve(ref) {
+      resolved.push(ref)
+      return ref === 'PROVIDER_API_KEY'
+        ? { value: 'provider-secret', source: 'file' }
+        : undefined
+    },
+    async describe(ref) {
+      return {
+        configured: ref === 'PROVIDER_API_KEY',
+        source: ref === 'PROVIDER_API_KEY' ? 'file' : undefined,
+        writable: true,
+      }
+    },
+  }
+  const service = new BalanceService({
+    channels: [channel(async ({ apiKey }) => {
+      assert.equal(apiKey, 'provider-secret')
+      return { currency: 'USD', balance: 9, detail: [], periods: [] }
+    })],
+    credentials: provider,
+    credentialRefs: () => ['PROVIDER_API_KEY'],
+    config: () => ({}),
+  })
+
+  await service.refresh('example')
+  const state = service.snapshot().channels[0]
+
+  assert.deepEqual(resolved, ['EXAMPLE_API_KEY', 'PROVIDER_API_KEY'])
+  assert.equal(state.status, 'ready')
+  assert.equal(state.credential.origin, 'provider')
+  assert.equal(JSON.stringify(state).includes('provider-secret'), false)
+})
+
 test('unconfigured credentials produce a safe public snapshot', async () => {
   const service = new BalanceService({
     channels: [channel(() => assert.fail('channel fetch must not run'))],

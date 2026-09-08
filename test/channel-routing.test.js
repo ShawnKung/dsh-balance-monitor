@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   channelForBaseURL,
+  providerCredentialRefsForChannel,
   providerForSession,
   providerRoute,
   refreshTargetForSession,
@@ -62,7 +63,96 @@ test('provider route follows the configurable-provider settings address', () => 
       declared: true,
     },
     baseURL: 'https://api.teamorouter.cn/v1',
+    credentialRef: undefined,
   })
+})
+
+test('provider credentials are discovered by channel domain', () => {
+  const services = runtime({
+    teamorouter: {
+      apiKeyEnv: 'TEAMOROUTER_API_KEY',
+      baseURL: 'https://api.teamorouter.cn/v1',
+    },
+    unrelated: {
+      apiKeyEnv: 'UNRELATED_API_KEY',
+      baseURL: 'https://gateway.example.org/v1',
+    },
+  })
+
+  assert.deepEqual(
+    providerCredentialRefsForChannel(
+      'teamo',
+      'https://teamorouter.cn',
+      services.llm,
+      services.settings,
+    ),
+    ['TEAMOROUTER_API_KEY'],
+  )
+})
+
+test('duplicate provider routes may share one credential reference', () => {
+  const services = runtime({
+    primary: {
+      apiKeyEnv: 'TEAMOROUTER_API_KEY',
+      baseURL: 'https://api.teamorouter.cn/v1',
+    },
+    secondary: {
+      apiKeyEnv: 'TEAMOROUTER_API_KEY',
+      baseURL: 'https://backup.teamorouter.cn/v1',
+    },
+  })
+
+  assert.deepEqual(
+    providerCredentialRefsForChannel(
+      'teamo',
+      'https://teamorouter.cn',
+      services.llm,
+      services.settings,
+    ),
+    ['TEAMOROUTER_API_KEY'],
+  )
+})
+
+test('ambiguous provider credentials are not selected automatically', () => {
+  const services = runtime({
+    primary: {
+      apiKeyEnv: 'PRIMARY_API_KEY',
+      baseURL: 'https://api.teamorouter.cn/v1',
+    },
+    secondary: {
+      apiKeyEnv: 'SECONDARY_API_KEY',
+      baseURL: 'https://backup.teamorouter.cn/v1',
+    },
+  })
+
+  assert.deepEqual(
+    providerCredentialRefsForChannel(
+      'teamo',
+      'https://teamorouter.cn',
+      services.llm,
+      services.settings,
+    ),
+    [],
+  )
+})
+
+test('provider credentials are not reused for an unrelated request endpoint', () => {
+  const services = runtime({
+    teamorouter: {
+      apiKeyEnv: 'TEAMOROUTER_API_KEY',
+      baseURL: 'https://api.teamorouter.cn/v1',
+    },
+  })
+
+  assert.deepEqual(
+    providerCredentialRefsForChannel(
+      'teamo',
+      'https://gateway.example.org',
+      services.llm,
+      services.settings,
+    ),
+    [],
+  )
 })
 
 test('custom provider id routes by configured URL hostname', () => {

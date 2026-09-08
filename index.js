@@ -1,6 +1,9 @@
 import z from '@deepseek-ai/schemastery'
 import { channels } from './channels/index.js'
-import { refreshTargetForSession } from './lib/channel-routing.js'
+import {
+  providerCredentialRefsForChannel,
+  refreshTargetForSession,
+} from './lib/channel-routing.js'
 import { createRoutes } from './lib/http.js'
 import { BalanceService } from './lib/service.js'
 
@@ -29,10 +32,16 @@ function withDefaults(value = {}) {
 
 export function apply(ctx, entry = {}) {
   let source = () => withDefaults(entry)
+  const noProviderCredentials = () => []
+  let providerCredentialRefs = noProviderCredentials
   const service = new BalanceService({
     channels,
     credentials: ctx.credentials,
     config: () => withDefaults(source()),
+    credentialRefs: (channel, config) => providerCredentialRefs(
+      channel.id,
+      channel.credentialEndpoint?.(config),
+    ),
   })
 
   ctx.inject(['settings'], settingsCtx => {
@@ -61,6 +70,15 @@ export function apply(ctx, entry = {}) {
 
   ctx.inject(['llm', 'settings'], routingCtx => {
     routingCtx.effect(() => {
+      const resolver = (channel, targetBaseURL) => providerCredentialRefsForChannel(
+        channel,
+        targetBaseURL,
+        routingCtx.llm,
+        routingCtx.settings,
+      )
+      providerCredentialRefs = resolver
+      void service.refreshAll()
+
       const offEvent = routingCtx.on('session/event', (session, event) => {
         if (event?.type !== 'turn/end') return
         const target = refreshTargetForSession(session, {
@@ -72,11 +90,12 @@ export function apply(ctx, entry = {}) {
           console.error('[dsh-balance-monitor] turn-end refresh failed:', error)
         })
       }, { global: true })
-      return offEvent
+      return () => {
+        if (providerCredentialRefs === resolver) {
+          providerCredentialRefs = noProviderCredentials
+        }
+        offEvent()
+      }
     }, 'dsh-balance-monitor: turn-end refresh')
-  })
-
-  void service.refreshAll().catch(error => {
-    console.error('[dsh-balance-monitor] initial refresh failed:', error)
   })
 }

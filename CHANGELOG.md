@@ -2,6 +2,16 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.1.2] - 2026-09-08
+
+### 新增
+
+- 插件凭据未配置时，可通过 DSH provider 的 `apiKeyEnv` 自动复用唯一匹配渠道的模型凭据。
+
+### 安全
+
+- 模型凭据仅通过 DSH credentials 服务在 Host 端解析；多个不同凭据匹配同一渠道时不自动选择。
+
 ## [0.1.1] - 2026-09-08
 
 ### 修复
@@ -26,5 +36,6 @@
 - API Key 不返回浏览器。
 - provider 域名使用解析后的 hostname 精确匹配。
 
+[0.1.2]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ShawnKung/dsh-balance-monitor/releases/tag/v0.1.0
