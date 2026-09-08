@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path'
 
 const root = resolve(import.meta.dirname, '..')
 const temporary = resolve(root, '.build/client.cjs')
+const manifest = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'))
 await mkdir(dirname(temporary), { recursive: true })
 
 await build({
@@ -20,7 +21,7 @@ await build({
 
 const body = await readFile(temporary, 'utf8')
 const output = `window.__ModuleLoader__.load({
-  id: "dsh-balance-monitor",
+  id: ${JSON.stringify(manifest.name)},
   factory: (require) => {
     var module = { exports: {} };
     var exports = module.exports;

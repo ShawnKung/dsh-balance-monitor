@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: "dsh-balance-monitor",
+  id: "@shawnkung/dsh-balance-monitor",
   factory: (require) => {
     var module = { exports: {} };
     var exports = module.exports;

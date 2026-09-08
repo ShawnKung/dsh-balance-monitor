@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.1.1] - 2026-09-08
+
+### 修复
+
+- 使用 scoped npm 包名注册浏览器模块，修复从 npm 安装后 DSH 无法加载插件的问题。
+
 ## [0.1.0] - 2026-09-08
 
 ### 新增
@@ -20,4 +26,5 @@
 - API Key 不返回浏览器。
 - provider 域名使用解析后的 hostname 精确匹配。
 
+[0.1.1]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ShawnKung/dsh-balance-monitor/releases/tag/v0.1.0

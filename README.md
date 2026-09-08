@@ -4,7 +4,6 @@
   <strong>在 DSH Web 侧边栏中查看多渠道余额与用量</strong>
   <br /><br />
   <a href="https://www.npmjs.com/package/%40shawnkung%2Fdsh-balance-monitor"><img alt="npm version" src="https://img.shields.io/npm/v/%40shawnkung%2Fdsh-balance-monitor" /></a>
-  <a href="https://www.npmjs.com/package/%40shawnkung%2Fdsh-balance-monitor"><img alt="npm downloads" src="https://img.shields.io/npm/dm/%40shawnkung%2Fdsh-balance-monitor" /></a>
   <a href="https://github.com/ShawnKung/dsh-balance-monitor/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/ShawnKung/dsh-balance-monitor/actions/workflows/ci.yml/badge.svg" /></a>
   <a href="https://github.com/ShawnKung/dsh-balance-monitor/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ShawnKung/dsh-balance-monitor" /></a>
   <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
