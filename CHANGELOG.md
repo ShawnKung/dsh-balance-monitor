@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.1.3] - 2026-09-08
+
+### 修复
+
+- npm 安装与更新流程改为解析并安装精确版本，避免 pnpm 沿用旧 lockfile 或因新版本冷却策略保留旧包。
+
 ## [0.1.2] - 2026-09-08
 
 ### 新增
@@ -36,6 +42,7 @@
 - API Key 不返回浏览器。
 - provider 域名使用解析后的 hostname 精确匹配。
 
+[0.1.3]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ShawnKung/dsh-balance-monitor/releases/tag/v0.1.0
