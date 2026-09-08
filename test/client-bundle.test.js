@@ -16,4 +16,5 @@ test('client bundle registers the published package name', async () => {
   )?.[1]
 
   assert.equal(loaderId, manifest.name)
+  assert.equal(clientBundle.includes(`v${manifest.version}`), true)
 })

@@ -15,6 +15,9 @@ await build({
   platform: 'browser',
   target: 'es2022',
   external: ['react'],
+  define: {
+    __DSH_BALANCE_MONITOR_VERSION_LABEL__: JSON.stringify(`v${manifest.version}`),
+  },
   minify: false,
   legalComments: 'none',
 })
