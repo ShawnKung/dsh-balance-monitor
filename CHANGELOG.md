@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.1.4] - 2026-09-09
+
+### 修复
+
+- 侧边栏收起时采用与任务看板一致的入口尺寸和居中规则，避免余额图标发生偏移。
+
 ## [0.1.3] - 2026-09-09
 
 ### 新增
@@ -47,6 +53,7 @@
 - API Key 不返回浏览器。
 - provider 域名使用解析后的 hostname 精确匹配。
 
+[0.1.4]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.0...v0.1.1
