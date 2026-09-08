@@ -39,63 +39,6 @@ window.__ModuleLoader__.load({
     });
     module.exports = __toCommonJS(client_exports);
     var import_react = __toESM(require("react"), 1);
-
-    // src/update-store.js
-    function createUpdateStore({ currentVersion, request }) {
-      let snapshot = {
-        status: "idle",
-        currentVersion,
-        latestVersion: null,
-        installedVersion: currentVersion,
-        updateAvailable: false,
-        error: null
-      };
-      let operation = null;
-      const listeners = /* @__PURE__ */ new Set();
-      const publish = (next) => {
-        snapshot = next;
-        for (const listener of listeners) listener();
-        return snapshot;
-      };
-      const run = (action) => {
-        if (operation) return operation;
-        const previous = snapshot;
-        publish({
-          ...snapshot,
-          status: action === "install" ? "updating" : "checking",
-          error: null
-        });
-        const pending = request(action).then((result) => {
-          const { ok: _ok, ...next } = result;
-          return publish(next);
-        }).catch((error) => publish({
-          ...previous,
-          status: "error",
-          error: String(error?.message ?? error)
-        })).finally(() => {
-          if (operation === pending) operation = null;
-        });
-        operation = pending;
-        return operation;
-      };
-      return {
-        subscribe(listener) {
-          listeners.add(listener);
-          return () => listeners.delete(listener);
-        },
-        getSnapshot() {
-          return snapshot;
-        },
-        check() {
-          return run("check");
-        },
-        install() {
-          return run("install");
-        }
-      };
-    }
-
-    // src/client.js
     var inject = ["slots", "settingsScope", "remote", "remote.credentials"];
     var NS = "dsh-balance-monitor";
     var VERSION = "v0.1.4";
@@ -175,14 +118,36 @@ window.__ModuleLoader__.load({
       if (!response.ok || !body.ok) throw new Error(body.error || `HTTP ${response.status}`);
       return body;
     }
-    var updateStore = createUpdateStore({
-      currentVersion: VERSION,
-      request: (action) => api("/api/dsh-balance-monitor/update", {
+    function installUpdate() {
+      return api("/api/dsh-balance-monitor/update", {
         method: "POST",
-        body: JSON.stringify({ action })
-      })
-    });
+        body: JSON.stringify({ action: "install" })
+      });
+    }
+    function triggerUpdate() {
+      void installUpdate().catch(() => {
+      });
+    }
+    function subscribeUpdateState(listener) {
+      let active = true;
+      api("/api/dsh-balance-monitor/update").then((snapshot) => {
+        if (active) listener(snapshot);
+      }).catch((error) => console.error("[dsh-balance-monitor] update state failed:", error));
+      const events = new EventSource("/api/dsh-balance-monitor/update/events");
+      events.onmessage = (event) => {
+        try {
+          listener(JSON.parse(event.data));
+        } catch (error) {
+          console.error("[dsh-balance-monitor] update event decode failed:", error);
+        }
+      };
+      return () => {
+        active = false;
+        events.close();
+      };
+    }
     function updatePresentation(update) {
+      if (!update) return void 0;
       if (update.status === "restart-required") {
         return { label: "\u91CD\u542F\u540E\u751F\u6548", state: "restart-required", disabled: true };
       }
@@ -207,7 +172,7 @@ window.__ModuleLoader__.load({
       }
       return void 0;
     }
-    function updateButton(update) {
+    function updateButton(update, onInstall) {
       const presentation = updatePresentation(update);
       if (!presentation) return void 0;
       const control = document.createElement(
@@ -223,7 +188,7 @@ window.__ModuleLoader__.load({
         control.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          void updateStore.install();
+          void onInstall();
         });
       }
       return control;
@@ -365,6 +330,7 @@ window.__ModuleLoader__.load({
       popup.setAttribute("aria-label", "\u4F59\u989D\u8BE6\u60C5");
       document.body.append(popup);
       let snapshot = { revision: -1, channels: [] };
+      let updateSnapshot;
       let root;
       const refreshing = /* @__PURE__ */ new Set();
       const feedback = /* @__PURE__ */ new Map();
@@ -475,7 +441,7 @@ window.__ModuleLoader__.load({
         version.className = "bm-version";
         version.textContent = VERSION;
         heading.append(title, version);
-        const update = updateButton(updateStore.getSnapshot());
+        const update = updateButton(updateSnapshot, triggerUpdate);
         if (update) heading.append(update);
         const actions = document.createElement("span");
         actions.className = "bm-actions";
@@ -528,7 +494,14 @@ window.__ModuleLoader__.load({
       const observer = new MutationObserver(place);
       observer.observe(document.body, { childList: true, subtree: true });
       const unsubscribe = scope.subscribe(renderSummary);
-      const unsubscribeUpdates = updateStore.subscribe(render);
+      const unsubscribeUpdates = subscribeUpdateState((next) => {
+        updateSnapshot = next;
+        if (next.status === "updating" || next.status === "restart-required") {
+          popup.hidden = false;
+          entry.dataset.active = "true";
+        }
+        render();
+      });
       const outside = (event) => {
         if (!popup.hidden && !popup.contains(event.target) && !entry.contains(event.target)) {
           popup.hidden = true;
@@ -595,7 +568,7 @@ window.__ModuleLoader__.load({
           (listener) => scope.subscribe(listener),
           () => scope.getSnapshot()
         );
-        const update = (0, import_react.useSyncExternalStore)(updateStore.subscribe, updateStore.getSnapshot);
+        const [update, setUpdate] = (0, import_react.useState)();
         const values = snapshot.status === "ready" ? snapshot.value ?? {} : {};
         const [open, setOpen] = (0, import_react.useState)(false);
         const [pickerOpen, setPickerOpen] = (0, import_react.useState)(false);
@@ -621,6 +594,7 @@ window.__ModuleLoader__.load({
         (0, import_react.useEffect)(() => {
           if (!open) setPickerOpen(false);
         }, [open]);
+        (0, import_react.useEffect)(() => subscribeUpdateState(setUpdate), []);
         const readCredentials = async () => {
           try {
             const result = unwrap(
@@ -851,7 +825,7 @@ window.__ModuleLoader__.load({
               "data-state": updateStatus.state,
               disabled: updateStatus.disabled,
               title: updateStatus.title ?? updateStatus.label,
-              onClick: () => void updateStore.install()
+              onClick: triggerUpdate
             },
             updateStatus.label
           )
@@ -904,7 +878,6 @@ window.__ModuleLoader__.load({
     }
     function apply(ctx) {
       installStyle();
-      void updateStore.check();
       const scope = ctx.settingsScope.bind({ namespace: NS });
       const SettingsCard = createSettingsCard(ctx, scope);
       ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
