@@ -1,6 +1,6 @@
 {
   "name": "@shawnkung/dsh-balance-monitor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "DSH Web 侧边栏余额与用量监控插件，支持 DeepSeek 官方 API 和 TeamoRouter。",
   "type": "module",
   "main": "index.js",
