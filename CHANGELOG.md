@@ -2,6 +2,13 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.1.6] - 2026-09-09
+
+### 改进
+
+- 点击“刷新全部”时同步触发一次插件更新检查，单渠道刷新不受影响。
+- 为余额弹窗增加淡入淡出动画，并移除右上角关闭按钮。
+
 ## [0.1.5] - 2026-09-09
 
 ### 修复
@@ -60,6 +67,7 @@
 - API Key 不返回浏览器。
 - provider 域名使用解析后的 hostname 精确匹配。
 
+[0.1.6]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/ShawnKung/dsh-balance-monitor/compare/v0.1.2...v0.1.3
