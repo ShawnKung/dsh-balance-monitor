@@ -1,0 +1,30 @@
+name: 功能建议
+description: 建议新渠道或交互改进
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 使用场景
+      description: 说明当前遇到的问题，而不只是期望的实现方式。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: 渠道 API 资料
+      description: 新渠道请附公开 API 文档；不要粘贴 API Key 或真实响应。
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 参与贡献
+      options:
+        - label: 我愿意提交 Pull Request
