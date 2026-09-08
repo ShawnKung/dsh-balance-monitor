@@ -31,8 +31,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          cache: npm
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - run: npm ci
 
       - name: Verify tag matches package version
@@ -57,7 +57,7 @@ jobs:
           if npm view "$package@$version" version >/dev/null 2>&1; then
             echo "$package@$version is already published; skipping npm publish."
           else
-            npm publish --access public --provenance
+            npm publish --access public
           fi
 
       - name: Create GitHub Release

@@ -130,8 +130,8 @@ docs: clarify local installation
 
 1. 更新 `package.json` 和 `CHANGELOG.md` 中的版本。
 2. 合并通过 CI 的 Conventional Commit。
-3. 创建并发布 GitHub Release，Tag 格式为 `vX.Y.Z`。
-4. `release.yml` 校验 Tag 与包版本一致后，通过 npm Trusted Publishing 自动发布。
+3. 创建并推送格式为 `vX.Y.Z` 的 Tag。
+4. `release.yml` 校验 Tag 与包版本一致后，通过 npm Trusted Publishing 自动发布，并创建 GitHub Release。
 
 ## 许可证
 
