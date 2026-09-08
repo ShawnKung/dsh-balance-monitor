@@ -23,6 +23,7 @@
 - 会话结束后，根据当前模型 provider 的实际 API 域名定向刷新对应渠道。
 - 支持浅色、深色和跟随系统主题。
 - 在插件设置中选择侧边栏展示渠道、配置凭据引用和 TeamoRouter 查询范围。
+- 启动时检查 npm 新版本，并可在插件内完成精确版本更新。
 
 ## 支持渠道
 
@@ -93,11 +94,18 @@ API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏�
 
 Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，避免启动阶段的 `loading` 覆盖已完成结果。
 
+## 插件更新
+
+插件启动时会异步检查 npm `latest` 版本，不阻塞 DSH 启动。发现更新后，余额弹窗和设置页会显示由同一状态源驱动的更新入口；任一入口点击后，两处会同步展示更新状态。Host 使用固定包名和 Registry 返回的精确 SemVer 调用当前 DSH CLI，安装结果会再次从 profile 校验，成功后显示“重启后生效”，但不会自动重启 DSH。
+
+本地 `link:`、`file:`、Git 和 workspace 安装不会被自动替换，也不会显示 Registry 更新入口。
+
 ## 安全设计
 
 - API Key 只存在于 DSH credentials 服务和 Host 请求链路。
 - 自动复用模型 Key 时只读取 provider 的凭据引用，并调用 `ctx.credentials.resolve()`；插件不直接读取环境变量或凭据文件。
 - 浏览器只接收凭据是否已配置、来源和是否可写等元数据。
+- 自动更新只接受固定 npm 包名与合法的更高 SemVer，不执行浏览器提供的包名、版本或 Shell 命令。
 - HTTP 与 SSE 接口仅接受 loopback 且同源的请求。
 - provider 识别使用 `URL.hostname` 做精确域名或子域名匹配，不使用字符串包含判断。
 - npm 发布内容由 `package.json#files` 白名单控制，并在 CI 中执行 tarball 审计。

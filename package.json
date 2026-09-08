@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "node scripts/build-client.mjs",
-    "check": "node --check index.js && node --check client.js && node --check lib/channel-routing.js && node --check lib/http.js && node --check lib/service.js",
+    "check": "node --check index.js && node --check client.js && node --check lib/channel-routing.js && node --check lib/http.js && node --check lib/service.js && node --check lib/updater.js",
     "test": "node --test",
     "commitlint": "commitlint",
     "ci": "npm run check && npm test && npm run build",
@@ -67,7 +67,8 @@
     "provenance": true
   },
   "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.2"
+    "@deepseek-ai/schemastery": "^3.18.2",
+    "semver": "^7.8.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.2",

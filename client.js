@@ -30,7 +30,7 @@ window.__ModuleLoader__.load({
       mod
     ));
     var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-    
+
     // src/client.js
     var client_exports = {};
     __export(client_exports, {
@@ -39,6 +39,63 @@ window.__ModuleLoader__.load({
     });
     module.exports = __toCommonJS(client_exports);
     var import_react = __toESM(require("react"), 1);
+
+    // src/update-store.js
+    function createUpdateStore({ currentVersion, request }) {
+      let snapshot = {
+        status: "idle",
+        currentVersion,
+        latestVersion: null,
+        installedVersion: currentVersion,
+        updateAvailable: false,
+        error: null
+      };
+      let operation = null;
+      const listeners = /* @__PURE__ */ new Set();
+      const publish = (next) => {
+        snapshot = next;
+        for (const listener of listeners) listener();
+        return snapshot;
+      };
+      const run = (action) => {
+        if (operation) return operation;
+        const previous = snapshot;
+        publish({
+          ...snapshot,
+          status: action === "install" ? "updating" : "checking",
+          error: null
+        });
+        const pending = request(action).then((result) => {
+          const { ok: _ok, ...next } = result;
+          return publish(next);
+        }).catch((error) => publish({
+          ...previous,
+          status: "error",
+          error: String(error?.message ?? error)
+        })).finally(() => {
+          if (operation === pending) operation = null;
+        });
+        operation = pending;
+        return operation;
+      };
+      return {
+        subscribe(listener) {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+        getSnapshot() {
+          return snapshot;
+        },
+        check() {
+          return run("check");
+        },
+        install() {
+          return run("install");
+        }
+      };
+    }
+
+    // src/client.js
     var inject = ["slots", "settingsScope", "remote", "remote.credentials"];
     var NS = "dsh-balance-monitor";
     var VERSION = "v0.1.3";
@@ -64,7 +121,7 @@ window.__ModuleLoader__.load({
     [data-dsh-balance-monitor-entry] .bm-value{--bm-feedback-rest:var(--dsw-alias-label-secondary,#61666b);white-space:nowrap;font-variant-numeric:tabular-nums}[data-dsh-balance-monitor-entry]:hover .bm-value,[data-dsh-balance-monitor-entry][data-active] .bm-value{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115)}
     .bm-popover{position:fixed;z-index:10000;width:min(390px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 24px));overflow:auto;border:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#0f1115);box-shadow:var(--dsw-elevation-prominent,0 12px 32px rgba(0,0,0,.14));font-family:inherit}
     .bm-popover[hidden]{display:none}.bm-popover-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;padding:12px 14px;border-bottom:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16));background:inherit}
-    .bm-popover-heading{display:flex;align-items:baseline;gap:6px;min-width:0;flex:1}.bm-popover-title{font-size:14px;font-weight:600}.bm-version{font-size:10px;font-weight:400;line-height:1;color:var(--dsw-alias-label-tertiary,#9ca3af);white-space:nowrap}.bm-actions{display:flex;gap:4px}.bm-icon-button{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);width:30px;height:30px;border:0;border-radius:6px;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
+    .bm-popover-heading{display:flex;align-items:center;gap:6px;min-width:0;flex:1}.bm-popover-title{font-size:14px;font-weight:600}.bm-version{font-size:10px;font-weight:400;line-height:1;color:var(--dsw-alias-label-tertiary,#9ca3af);white-space:nowrap}.bm-update-pill{-webkit-appearance:none;appearance:none;box-sizing:border-box;height:20px;border:0;border-radius:5px;outline:0;background:#d09a00;box-shadow:none;color:#fff;padding:3px 8px;font:inherit;font-size:10px;font-weight:600;line-height:14px;white-space:nowrap}.bm-update-pill:not(span){cursor:pointer}.bm-update-pill:not(span):hover{background:#b98200}.bm-update-pill:focus-visible{outline:2px solid var(--dsw-alias-focus-ring,#4d6bfe);outline-offset:2px}.bm-update-pill:disabled{cursor:wait;opacity:.72}.bm-update-pill[data-state=restart-required]{background:#16803d}.bm-update-pill[data-state=error]{background:#b42318}.bm-actions{display:flex;gap:4px}.bm-icon-button{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);width:30px;height:30px;border:0;border-radius:6px;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
     .bm-icon-button{transition:color .35s ease,background .12s ease}.bm-icon-button:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}.bm-icon-button:disabled{opacity:.45;cursor:default}.bm-spinning svg{animation:bm-spin 1.1s linear infinite}.bm-refresh-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-refresh-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-refresh-success svg,.bm-refresh-error svg{animation:bm-stroke-feedback 2.4s cubic-bezier(.4,0,.2,1)}
     .bm-channel{padding:14px}.bm-channel+.bm-channel{border-top:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16))}.bm-channel-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
     .bm-channel-name{font-size:13px;font-weight:600;flex:1}.bm-status{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-balance{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);font-size:24px;line-height:1.2;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:12px}.bm-value-success,.bm-balance-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-value-error,.bm-balance-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}
@@ -73,7 +130,7 @@ window.__ModuleLoader__.load({
     .bm-details{display:grid;gap:7px}.bm-detail{display:flex;justify-content:space-between;gap:14px;font-size:12px}.bm-detail-value{text-align:right;font-variant-numeric:tabular-nums}.bm-error{color:var(--dsw-alias-state-error-primary,#ef4444)}
     .bm-note{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:10px}.bm-empty{padding:16px;font-size:12px;color:var(--dsw-alias-label-tertiary,#9ca3af)}
     .bm-settings{list-style:none;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:12px;background:var(--dsw-alias-bg-layer-3,transparent);color:inherit;transition:border-color .16s,background .16s}.bm-settings:hover{border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}.bm-settings[data-open=true]{background:var(--dsw-alias-bg-layer-2,transparent);border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}
-    .bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}
+    .bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 2px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
     .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}
     .bm-multi{position:relative}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex!important;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;font-weight:400!important;cursor:pointer}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45;cursor:default}
     .bm-badge{font-size:10px;padding:2px 6px;border-radius:999px;background:var(--dsw-alias-bg-layer-2,rgba(127,127,127,.12));color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-badge[data-set=true]{color:var(--dsw-alias-state-success-primary,#22c55e)}
@@ -115,6 +172,59 @@ window.__ModuleLoader__.load({
       const body = await response.json();
       if (!response.ok || !body.ok) throw new Error(body.error || `HTTP ${response.status}`);
       return body;
+    }
+    var updateStore = createUpdateStore({
+      currentVersion: VERSION,
+      request: (action) => api("/api/dsh-balance-monitor/update", {
+        method: "POST",
+        body: JSON.stringify({ action })
+      })
+    });
+    function updatePresentation(update) {
+      if (update.status === "restart-required") {
+        return { label: "\u91CD\u542F\u540E\u751F\u6548", state: "restart-required", disabled: true };
+      }
+      if (update.status === "updating") {
+        return { label: "\u6B63\u5728\u66F4\u65B0", state: "updating", disabled: true };
+      }
+      if (update.status === "error" && update.updateAvailable) {
+        return {
+          label: "\u66F4\u65B0\u5931\u8D25",
+          state: "error",
+          disabled: false,
+          title: update.error || "\u70B9\u51FB\u91CD\u8BD5"
+        };
+      }
+      if (update.status === "available") {
+        return {
+          label: "\u53D1\u73B0\u65B0\u7248\u672C",
+          state: "available",
+          disabled: false,
+          title: update.error || `\u66F4\u65B0\u81F3 v${update.latestVersion}`
+        };
+      }
+      return void 0;
+    }
+    function updateButton(update) {
+      const presentation = updatePresentation(update);
+      if (!presentation) return void 0;
+      const control = document.createElement(
+        presentation.state === "restart-required" ? "span" : "button"
+      );
+      control.className = "bm-update-pill";
+      control.dataset.state = presentation.state;
+      control.textContent = presentation.label;
+      control.title = presentation.title ?? presentation.label;
+      if (control instanceof HTMLButtonElement) {
+        control.type = "button";
+        control.disabled = presentation.disabled;
+        control.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          void updateStore.install();
+        });
+      }
+      return control;
     }
     function sidebarRoot() {
       const column = document.querySelector('[data-pane="sidebar"], [class*="sidebarCol"]');
@@ -363,6 +473,8 @@ window.__ModuleLoader__.load({
         version.className = "bm-version";
         version.textContent = VERSION;
         heading.append(title, version);
+        const update = updateButton(updateStore.getSnapshot());
+        if (update) heading.append(update);
         const actions = document.createElement("span");
         actions.className = "bm-actions";
         const refreshAll = iconButton(REFRESH_ICON, "\u5237\u65B0\u5168\u90E8", () => {
@@ -414,6 +526,7 @@ window.__ModuleLoader__.load({
       const observer = new MutationObserver(place);
       observer.observe(document.body, { childList: true, subtree: true });
       const unsubscribe = scope.subscribe(renderSummary);
+      const unsubscribeUpdates = updateStore.subscribe(render);
       const outside = (event) => {
         if (!popup.hidden && !popup.contains(event.target) && !entry.contains(event.target)) {
           popup.hidden = true;
@@ -457,6 +570,7 @@ window.__ModuleLoader__.load({
         observer.disconnect();
         events.close();
         unsubscribe();
+        unsubscribeUpdates();
         for (const timeout of feedbackTimers.values()) window.clearTimeout(timeout);
         document.removeEventListener("pointerdown", outside);
         document.removeEventListener("keydown", escape);
@@ -479,6 +593,7 @@ window.__ModuleLoader__.load({
           (listener) => scope.subscribe(listener),
           () => scope.getSnapshot()
         );
+        const update = (0, import_react.useSyncExternalStore)(updateStore.subscribe, updateStore.getSnapshot);
         const values = snapshot.status === "ready" ? snapshot.value ?? {} : {};
         const [open, setOpen] = (0, import_react.useState)(false);
         const [pickerOpen, setPickerOpen] = (0, import_react.useState)(false);
@@ -713,6 +828,32 @@ window.__ModuleLoader__.load({
             )
           )
         );
+        const updateStatus = updatePresentation(update);
+        const updateNotice = updateStatus ? import_react.default.createElement(
+          "div",
+          { className: "bm-settings-update" },
+          import_react.default.createElement("span", null, `\u5F53\u524D\u7248\u672C ${VERSION}`),
+          updateStatus.state === "restart-required" ? import_react.default.createElement(
+            "span",
+            {
+              className: "bm-update-pill",
+              "data-state": updateStatus.state,
+              title: updateStatus.title ?? updateStatus.label
+            },
+            updateStatus.label
+          ) : import_react.default.createElement(
+            "button",
+            {
+              type: "button",
+              className: "bm-update-pill",
+              "data-state": updateStatus.state,
+              disabled: updateStatus.disabled,
+              title: updateStatus.title ?? updateStatus.label,
+              onClick: () => void updateStore.install()
+            },
+            updateStatus.label
+          )
+        ) : null;
         return import_react.default.createElement(
           "li",
           {
@@ -750,12 +891,18 @@ window.__ModuleLoader__.load({
               import_react.default.createElement("path", { d: "m3 5.25 4 4 4-4" })
             )
           ),
-          open ? import_react.default.createElement("div", { className: "bm-settings-body" }, form) : null
+          open ? import_react.default.createElement(
+            "div",
+            { className: "bm-settings-body" },
+            updateNotice,
+            form
+          ) : null
         );
       };
     }
     function apply(ctx) {
       installStyle();
+      void updateStore.check();
       const scope = ctx.settingsScope.bind({ namespace: NS });
       const SettingsCard = createSettingsCard(ctx, scope);
       ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
@@ -765,7 +912,7 @@ window.__ModuleLoader__.load({
       }, SettingsCard));
       ctx.effect(() => mountMonitor(scope), "dsh-balance-monitor: sidebar");
     }
-    
+
     return module.exports;
   }
 });

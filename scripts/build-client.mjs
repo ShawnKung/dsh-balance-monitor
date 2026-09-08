@@ -28,7 +28,7 @@ const output = `window.__ModuleLoader__.load({
   factory: (require) => {
     var module = { exports: {} };
     var exports = module.exports;
-${body.split('\n').map(line => `    ${line}`).join('\n')}
+${body.split('\n').map(line => line ? `    ${line}` : '').join('\n')}
     return module.exports;
   }
 });

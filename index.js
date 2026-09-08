@@ -6,6 +6,7 @@ import {
 } from './lib/channel-routing.js'
 import { createRoutes } from './lib/http.js'
 import { BalanceService } from './lib/service.js'
+import { UpdateService } from './lib/updater.js'
 
 export const name = 'dsh-balance-monitor'
 export const inject = ['webServer', 'credentials']
@@ -43,6 +44,7 @@ export function apply(ctx, entry = {}) {
       channel.credentialEndpoint?.(config),
     ),
   })
+  const updater = new UpdateService()
 
   ctx.inject(['settings'], settingsCtx => {
     settingsCtx.settings.installSection(
@@ -62,7 +64,8 @@ export function apply(ctx, entry = {}) {
   })
 
   ctx.effect(() => {
-    const dispose = createRoutes(service).map(route => ctx.webServer.register(route))
+    const dispose = createRoutes(service, updater).map(route => ctx.webServer.register(route))
+    void updater.check()
     return () => {
       for (const unregister of dispose) unregister()
     }
