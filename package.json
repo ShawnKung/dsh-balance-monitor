@@ -1,7 +1,7 @@
 {
   "name": "@shawnkung/dsh-balance-monitor",
   "version": "0.1.9",
-  "description": "DSH Web 侧边栏余额与用量监控插件，支持 DeepSeek 官方 API、TeamoRouter 和 Kimi 官方 API。",
+  "description": "DSH Web 侧边栏余额与用量监控插件，支持 DeepSeek、Kimi、智谱 GLM 和 TeamoRouter。",
   "type": "module",
   "main": "index.js",
   "exports": {
@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "node scripts/build-client.mjs",
-    "check": "node --check index.js && node --check client.js && node --check channels/deepseek.js && node --check channels/index.js && node --check channels/kimi.js && node --check channels/teamo.js && node --check lib/channel-routing.js && node --check lib/http.js && node --check lib/service.js && node --check lib/updater.js",
+    "check": "node --check index.js && node --check client.js && node --check channels/deepseek.js && node --check channels/index.js && node --check channels/kimi.js && node --check channels/teamo.js && node --check channels/zhipu.js && node --check lib/channel-routing.js && node --check lib/http.js && node --check lib/service.js && node --check lib/updater.js",
     "test": "node --test",
     "commitlint": "commitlint",
     "ci": "npm run check && npm test && npm run build",
@@ -61,6 +61,8 @@
     "deepseek",
     "kimi",
     "moonshot",
+    "zhipu",
+    "glm",
     "balance",
     "usage-monitor"
   ],

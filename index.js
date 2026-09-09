@@ -16,11 +16,12 @@ export const inject = ['webServer', 'credentials']
 
 export const Config = z.object({
   showSidebar: z.boolean().default(true),
-  sidebarChannels: z.array(z.union(['deepseek', 'teamo', 'kimi'])).min(1).max(3).default(['deepseek', 'teamo']),
-  channelOrder: z.array(z.union(['deepseek', 'teamo', 'kimi'])).min(1).max(3).default(['deepseek', 'teamo', 'kimi']),
+  sidebarChannels: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(3).default(['deepseek', 'teamo']),
+  channelOrder: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(4).default(['deepseek', 'kimi', 'zhipu', 'teamo']),
   deepseekApiKeyRef: z.string().role('credential-ref').default('DEEPSEEK_API_KEY'),
-  teamoApiKeyRef: z.string().role('credential-ref').default('TEAMO_API_KEY'),
   kimiApiKeyRef: z.string().role('credential-ref').default('KIMI_API_KEY'),
+  zhipuApiKeyRef: z.string().role('credential-ref').default('ZAI_API_KEY'),
+  teamoApiKeyRef: z.string().role('credential-ref').default('TEAMO_API_KEY'),
   teamoBaseUrl: z.string().default('https://teamorouter.cn'),
   teamoRangeDays: z.number().step(1).min(2).max(90).default(7),
 })
@@ -28,10 +29,11 @@ export const Config = z.object({
 const DEFAULT_CONFIG = Object.freeze({
   showSidebar: true,
   sidebarChannels: ['deepseek', 'teamo'],
-  channelOrder: ['deepseek', 'teamo', 'kimi'],
+  channelOrder: ['deepseek', 'kimi', 'zhipu', 'teamo'],
   deepseekApiKeyRef: 'DEEPSEEK_API_KEY',
-  teamoApiKeyRef: 'TEAMO_API_KEY',
   kimiApiKeyRef: 'KIMI_API_KEY',
+  zhipuApiKeyRef: 'ZAI_API_KEY',
+  teamoApiKeyRef: 'TEAMO_API_KEY',
   teamoBaseUrl: 'https://teamorouter.cn',
   teamoRangeDays: 7,
 })
@@ -44,8 +46,9 @@ export function balanceSourceSignature(value = {}) {
   const config = withDefaults(value)
   return JSON.stringify({
     deepseekApiKeyRef: config.deepseekApiKeyRef,
-    teamoApiKeyRef: config.teamoApiKeyRef,
     kimiApiKeyRef: config.kimiApiKeyRef,
+    zhipuApiKeyRef: config.zhipuApiKeyRef,
+    teamoApiKeyRef: config.teamoApiKeyRef,
     teamoBaseUrl: config.teamoBaseUrl,
     teamoRangeDays: config.teamoRangeDays,
   })

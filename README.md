@@ -30,8 +30,9 @@
 | 渠道 | 余额 | 每日/区间消费 | Token 用量 | 自动刷新识别 |
 | --- | --- | --- | --- | --- |
 | DeepSeek 官方 API | 是 | 否 | 否 | `deepseek.com` |
-| TeamoRouter | 是 | 是 | 是 | `teamorouter.cn` |
 | Kimi 官方 API | 是 | 否 | 否 | `moonshot.cn` |
+| 智谱 GLM | 是 | 否 | 否 | `bigmodel.cn` |
+| TeamoRouter | 是 | 是 | 是 | `teamorouter.cn` |
 
 未知域名、缺失 provider 或无效 URL 不会触发兜底全量刷新。
 
@@ -78,12 +79,12 @@ dsh plugin --profile web list
 
 - **侧边栏展示渠道**：可多选，最多展示 3 个渠道。
 - **DeepSeek API Key**：默认凭据引用为 `DEEPSEEK_API_KEY`。
-- **TeamoRouter API Key**：默认凭据引用为 `TEAMO_API_KEY`。
 - **Kimi API Key**：默认凭据引用为 `KIMI_API_KEY`，调用 CN Host `https://api.moonshot.cn/v1/users/me/balance`。
-- **TeamoRouter API 地址**：余额与用量接口地址。
+- **智谱 GLM API Key**：默认凭据引用为 `ZAI_API_KEY`，通过智谱官方域名的账户接口查询按量余额。
+- **TeamoRouter API Key**：默认凭据引用为 `TEAMO_API_KEY`。
 - **统计天数**：TeamoRouter 区间统计范围，支持 2 至 90 天。
 
-API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏览器。插件优先使用自身配置的凭据；未配置时，会按 provider 的实际 API 域名查找唯一匹配渠道，并通过该 provider 的 `apiKeyEnv` 凭据引用自动复用模型 Key。只有插件请求端点仍属于同一受支持渠道域名时才会复用；若同一渠道存在多个不同的 provider 凭据，插件不会擅自选择。
+API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏览器。凭据优先级为环境变量、模型 Provider 配置、用户配置；模型凭据按 provider 的实际 API 域名匹配，并通过 `apiKeyEnv` 凭据引用复用。只有插件请求端点仍属于同一受支持渠道域名时才会复用；若同一渠道存在多个不同的 Provider 凭据，插件不会擅自选择。
 
 ## 自动刷新
 

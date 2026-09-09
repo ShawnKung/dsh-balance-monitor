@@ -3,6 +3,7 @@ import test from 'node:test'
 import { deepseekChannel } from '../channels/deepseek.js'
 import { kimiChannel } from '../channels/kimi.js'
 import { teamoChannel } from '../channels/teamo.js'
+import { zhipuChannel } from '../channels/zhipu.js'
 
 function json(value, status = 200) {
   return new Response(JSON.stringify(value), {
@@ -95,4 +96,35 @@ test('Kimi adapter maps Moonshot CN balance fields', async () => {
   assert.equal(result.balance, 41.71543)
   assert.equal(result.detail.length, 3)
   assert.equal(result.detail[0].value, '¥41.71543')
+})
+
+
+test('Zhipu adapter maps BigModel account fields', async () => {
+  const result = await zhipuChannel.fetch({
+    apiKey: 'secret',
+    fetchImpl: async (url, options) => {
+      assert.equal(
+        String(url),
+        'https://www.bigmodel.cn/api/biz/account/query-customer-account-report',
+      )
+      assert.equal(options.headers.Authorization, 'Bearer secret')
+      return json({
+        code: 200,
+        success: true,
+        message: '操作成功',
+        data: {
+          availableBalance: 92.246524285,
+          rechargeAmount: 100,
+          giveAmount: 0.094904,
+          todaySpendAmount: 0.25,
+          totalSpendAmount: 7.848379715,
+        },
+      })
+    },
+  })
+
+  assert.equal(result.currency, 'CNY')
+  assert.equal(result.balance, 92.246524285)
+  assert.equal(result.detail.length, 5)
+  assert.equal(result.detail[0].value, '¥92.24652')
 })

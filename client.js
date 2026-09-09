@@ -2238,8 +2238,9 @@ window.__ModuleLoader__.load({
     var MAX_SIDEBAR_CHANNELS = 3;
     var CHANNEL_OPTIONS = Object.freeze([
       { id: "deepseek", label: "DeepSeek \u5B98\u65B9" },
-      { id: "teamo", label: "TeamoRouter" },
-      { id: "kimi", label: "Kimi \u5B98\u65B9" }
+      { id: "kimi", label: "Kimi \u5B98\u65B9" },
+      { id: "zhipu", label: "\u667A\u8C31 GLM" },
+      { id: "teamo", label: "TeamoRouter" }
     ]);
     var CHANNEL_IDS = CHANNEL_OPTIONS.map((channel) => channel.id);
     var WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>';
@@ -2280,7 +2281,7 @@ window.__ModuleLoader__.load({
     .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
     .bm-source-settings{position:relative;margin-left:auto}.bm-source-settings-trigger{box-sizing:border-box;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-source-settings-trigger:hover,.bm-source-settings-trigger[data-open=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-source-settings-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.bm-source-popover{position:absolute;z-index:20;top:calc(100% + 5px);right:0;width:min(340px,calc(100vw - 64px));padding:14px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 10px 30px rgba(0,0,0,.16));display:grid;gap:12px;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}.bm-source-popover-title{font-size:13px;font-weight:600}.bm-source-popover-field{display:grid;gap:6px}.bm-source-popover-field label{font-size:11px;color:var(--dsw-alias-label-secondary,#6b7280)}.bm-source-popover-field input{width:100%}.bm-source-popover-actions{display:flex;justify-content:flex-end;gap:8px}
-    .bm-multi{position:relative;width:min(504px,100%);max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;user-select:none}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+    .bm-multi{position:relative;width:min(504px,100%);max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{position:relative}.bm-multi-option[data-disabled=true]>.bm-multi-option-select,.bm-multi-option[data-disabled=true]>.bm-drag-handle{opacity:.45}.bm-limit-tooltip{position:fixed;z-index:10001;padding:5px 7px;border-radius:5px;background:var(--dsw-alias-bg-tooltip,#1f2937);color:var(--dsw-alias-label-primary-foreground,#fff);box-shadow:0 4px 12px rgba(0,0,0,.18);font-size:11px;font-weight:400;line-height:16px;white-space:nowrap;pointer-events:none}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;user-select:none}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
     .bm-credential-dot{width:7px;height:7px;border-radius:50%;flex:none}.bm-credential-dot[data-status=success]{background:var(--dsw-alias-state-success-primary,#16a34a)}.bm-credential-dot[data-status=error]{background:var(--dsw-alias-state-error-primary,#dc2626)}
     .bm-buttons{display:flex;justify-content:flex-end;gap:8px}.bm-button{height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.25));border-radius:6px;padding:0 12px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.bm-button-primary{background:var(--dsw-alias-button-info-fill,#2563eb);border-color:transparent;color:var(--dsw-alias-label-primary-foreground,#fff)}.bm-button:disabled{opacity:.5;cursor:default}.bm-message{font-size:11px}.bm-message[data-error=true]{color:var(--dsw-alias-state-error-primary,#ef4444)}
     @keyframes bm-spin{to{transform:rotate(360deg)}}@keyframes bm-popover-in{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}@keyframes bm-popover-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px) scale(.985)}}@keyframes bm-success-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-success)}}@keyframes bm-error-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-error)}}@keyframes bm-stroke-feedback{0%,100%{stroke-width:1.8}35%,65%{stroke-width:3}}@media(prefers-reduced-motion:reduce){.bm-popover{animation:none}}`;
@@ -2889,10 +2890,12 @@ window.__ModuleLoader__.load({
         );
         const [channelOrder, setChannelOrder] = (0, import_react.useState)(() => normalizeChannelOrder(values.channelOrder));
         const pickerMenu = (0, import_react.useRef)();
+        const limitTooltip = (0, import_react.useRef)();
         const [teamoRangeDays, setTeamoRangeDays] = (0, import_react.useState)(values.teamoRangeDays ?? 7);
         const [deepseekKey, setDeepseekKey] = (0, import_react.useState)("");
-        const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
         const [kimiKey, setKimiKey] = (0, import_react.useState)("");
+        const [zhipuKey, setZhipuKey] = (0, import_react.useState)("");
+        const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
         const [balanceSnapshot, setBalanceSnapshot] = (0, import_react.useState)();
         const [saving, setSaving] = (0, import_react.useState)(false);
         const [refreshingChannels, setRefreshingChannels] = (0, import_react.useState)(() => /* @__PURE__ */ new Set());
@@ -3116,6 +3119,28 @@ window.__ModuleLoader__.load({
         const optionsById = new Map(CHANNEL_OPTIONS.map((channel) => [channel.id, channel]));
         const orderedOptions = channelOrder.map((id) => optionsById.get(id)).filter(Boolean);
         const selectedLabels = orderedOptions.filter((channel) => sidebarChannels.includes(channel.id)).map((channel) => channel.label).join("\u3001");
+        const moveLimitTooltip = (event) => {
+          const tooltip = limitTooltip.current;
+          if (!tooltip) return;
+          tooltip.textContent = event.currentTarget.dataset.limitMessage ?? "";
+          tooltip.hidden = false;
+          const gap = 12;
+          const edge = 8;
+          const rect = tooltip.getBoundingClientRect();
+          let left = event.clientX + gap;
+          let top = event.clientY + gap;
+          if (left + rect.width > window.innerWidth - edge) {
+            left = event.clientX - rect.width - gap;
+          }
+          if (top + rect.height > window.innerHeight - edge) {
+            top = event.clientY - rect.height - gap;
+          }
+          tooltip.style.left = `${Math.max(edge, left)}px`;
+          tooltip.style.top = `${Math.max(edge, top)}px`;
+        };
+        const hideLimitTooltip = () => {
+          if (limitTooltip.current) limitTooltip.current.hidden = true;
+        };
         const channelPicker = import_react.default.createElement(
           "div",
           { className: "bm-multi", "data-open": String(pickerOpen) },
@@ -3157,7 +3182,11 @@ window.__ModuleLoader__.load({
                   key: channel.id,
                   className: "bm-multi-option",
                   "data-channel-id": channel.id,
-                  "data-disabled": String(disabled)
+                  "data-disabled": String(disabled),
+                  "aria-disabled": disabled,
+                  "data-limit-message": disabled ? "\u4FA7\u8FB9\u680F\u6700\u591A\u4EC5\u5C55\u793A 3 \u4E2A" : void 0,
+                  onPointerMove: disabled ? moveLimitTooltip : void 0,
+                  onPointerLeave: disabled ? hideLimitTooltip : void 0
                 },
                 import_react.default.createElement(
                   "label",
@@ -3182,7 +3211,13 @@ window.__ModuleLoader__.load({
                 )
               );
             })
-          ) : null
+          ) : null,
+          pickerOpen ? import_react.default.createElement("div", {
+            className: "bm-limit-tooltip",
+            ref: limitTooltip,
+            role: "tooltip",
+            hidden: true
+          }) : null
         );
         const teamoSettings = import_react.default.createElement(
           "div",
@@ -3323,18 +3358,25 @@ window.__ModuleLoader__.load({
             setValue: setDeepseekKey
           }),
           credentialField({
-            channel: "teamo",
-            label: "TeamoRouter API Key",
-            placeholder: "sk-teamo-...",
-            value: teamoKey,
-            setValue: setTeamoKey
-          }),
-          credentialField({
             channel: "kimi",
             label: "Kimi API Key",
             placeholder: "sk-...",
             value: kimiKey,
             setValue: setKimiKey
+          }),
+          credentialField({
+            channel: "zhipu",
+            label: "\u667A\u8C31 GLM API Key",
+            placeholder: "\u8BF7\u8F93\u5165 API Key",
+            value: zhipuKey,
+            setValue: setZhipuKey
+          }),
+          credentialField({
+            channel: "teamo",
+            label: "TeamoRouter API Key",
+            placeholder: "sk-teamo-...",
+            value: teamoKey,
+            setValue: setTeamoKey
           }),
           message ? import_react.default.createElement(
             "div",
