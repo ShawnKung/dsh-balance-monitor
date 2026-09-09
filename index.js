@@ -15,6 +15,7 @@ export const name = 'dsh-balance-monitor'
 export const inject = ['webServer', 'credentials']
 
 export const Config = z.object({
+  showSidebar: z.boolean().default(true),
   sidebarChannels: z.array(z.union(['deepseek', 'teamo', 'kimi'])).min(1).max(3).default(['deepseek', 'teamo']),
   channelOrder: z.array(z.union(['deepseek', 'teamo', 'kimi'])).min(1).max(3).default(['deepseek', 'teamo', 'kimi']),
   deepseekApiKeyRef: z.string().role('credential-ref').default('DEEPSEEK_API_KEY'),
@@ -25,6 +26,7 @@ export const Config = z.object({
 })
 
 const DEFAULT_CONFIG = Object.freeze({
+  showSidebar: true,
   sidebarChannels: ['deepseek', 'teamo'],
   channelOrder: ['deepseek', 'teamo', 'kimi'],
   deepseekApiKeyRef: 'DEEPSEEK_API_KEY',
@@ -38,8 +40,20 @@ function withDefaults(value = {}) {
   return { ...DEFAULT_CONFIG, ...value }
 }
 
+export function balanceSourceSignature(value = {}) {
+  const config = withDefaults(value)
+  return JSON.stringify({
+    deepseekApiKeyRef: config.deepseekApiKeyRef,
+    teamoApiKeyRef: config.teamoApiKeyRef,
+    kimiApiKeyRef: config.kimiApiKeyRef,
+    teamoBaseUrl: config.teamoBaseUrl,
+    teamoRangeDays: config.teamoRangeDays,
+  })
+}
+
 export function apply(ctx, entry = {}) {
   let source = () => withDefaults(entry)
+  let sourceSignature = balanceSourceSignature(entry)
   const noProviderCredentials = () => []
   let providerCredentialRefs = noProviderCredentials
   const service = new BalanceService({
@@ -107,6 +121,9 @@ export function apply(ctx, entry = {}) {
           source = next
         },
         onChange() {
+          const nextSignature = balanceSourceSignature(source())
+          if (nextSignature === sourceSignature) return
+          sourceSignature = nextSignature
           void service.refreshAllAfterCurrent()
         },
       },
