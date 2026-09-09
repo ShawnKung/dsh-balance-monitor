@@ -7,7 +7,7 @@ test('presentation settings do not change the balance source signature', () => {
   const presentationOnly = balanceSourceSignature({
     showSidebar: false,
     sidebarChannels: ['kimi'],
-    channelOrder: ['kimi', 'teamo', 'deepseek'],
+    channelOrder: ['zhipu', 'kimi', 'teamo', 'deepseek'],
   })
 
   assert.equal(presentationOnly, base)
@@ -22,6 +22,10 @@ test('channel data settings change the balance source signature', () => {
   )
   assert.notEqual(
     balanceSourceSignature({ teamoRangeDays: 30 }),
+    base,
+  )
+  assert.notEqual(
+    balanceSourceSignature({ zhipuApiKeyRef: 'CUSTOM_ZHIPU_KEY' }),
     base,
   )
 })

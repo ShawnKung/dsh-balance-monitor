@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 新增
+
+- 支持智谱 GLM 按量账户余额查询，并自动复用 `ZAI_API_KEY` 或匹配 `bigmodel.cn` 的模型凭据。
+
 ## [0.1.7] - 2026-09-09
 
 ### 新增

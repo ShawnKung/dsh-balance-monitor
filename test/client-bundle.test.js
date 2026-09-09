@@ -21,9 +21,24 @@ test('client bundle registers the published package name', async () => {
 })
 
 test('client bundle uses credential status dots and inline channel actions', async () => {
-  const clientBundle = await readFile(resolve(root, 'client.js'), 'utf8')
+  const [clientBundle, clientSource] = await Promise.all([
+    readFile(resolve(root, 'client.js'), 'utf8'),
+    readFile(resolve(root, 'src/client.js'), 'utf8'),
+  ])
 
   assert.match(clientBundle, /bm-credential-dot/)
+  assert.match(clientSource, /侧边栏最多仅展示 3 个/)
+  assert.match(clientSource, /data-limit-message/)
+  assert.match(clientSource, /bm-limit-tooltip/)
+  assert.match(clientSource, /onPointerMove/)
+  assert.match(
+    clientSource,
+    /React\.createElement\('div', \{\s+className: 'bm-limit-tooltip'/,
+  )
+  assert.match(
+    clientSource,
+    /deepseek[\s\S]*kimi[\s\S]*zhipu[\s\S]*teamo/,
+  )
   assert.match(clientBundle, /bm-credential-clear/)
   assert.match(clientBundle, /bm-field-refresh/)
   assert.match(clientBundle, /bm-secret-input/)
@@ -32,6 +47,7 @@ test('client bundle uses credential status dots and inline channel actions', asy
   assert.match(clientBundle, /bm-sortable-ghost/)
   assert.match(clientBundle, /fallbackTolerance: 3/)
   assert.match(clientBundle, /channelOrder/)
+  assert.match(clientBundle, /channel: "zhipu"/)
   assert.match(clientBundle, /showSidebar/)
   assert.match(clientBundle, /persistSetting/)
   assert.match(clientBundle, /closest\("\.bm-multi"\)/)

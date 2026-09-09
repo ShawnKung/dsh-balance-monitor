@@ -33,10 +33,13 @@ function session(provider) {
 test('channel routing matches exact domains and their subdomains', () => {
   assert.equal(channelForBaseURL('https://api.teamorouter.cn/v1'), 'teamo')
   assert.equal(channelForBaseURL('https://api.moonshot.cn/v1'), 'kimi')
+  assert.equal(channelForBaseURL('https://open.bigmodel.cn/api/paas/v4'), 'zhipu')
+  assert.equal(channelForBaseURL('https://www.bigmodel.cn'), 'zhipu')
   assert.equal(channelForBaseURL('https://api.deepseek.com'), 'deepseek')
   assert.equal(channelForBaseURL('https://DEEPSEEK.COM./v1'), 'deepseek')
   assert.equal(channelForBaseURL('https://moonshot.cn.example.org'), undefined)
   assert.equal(channelForBaseURL('https://deepseek.com.example.org'), undefined)
+  assert.equal(channelForBaseURL('https://bigmodel.cn.example.org'), undefined)
   assert.equal(channelForBaseURL('not a URL'), undefined)
 })
 
@@ -210,4 +213,28 @@ test('unmatched, unknown, and missing providers do not refresh', () => {
   assert.deepEqual(refreshTargetForSession(session('unrelated'), services), { kind: 'skip' })
   assert.deepEqual(refreshTargetForSession(session('unknown'), services), { kind: 'skip' })
   assert.deepEqual(refreshTargetForSession(session(undefined), services), { kind: 'skip' })
+})
+
+
+test('Zhipu provider credentials are discovered by BigModel domain', () => {
+  const services = runtime({
+    glm: {
+      apiKeyEnv: 'ZAI_API_KEY',
+      baseURL: 'https://open.bigmodel.cn/api/paas/v4',
+    },
+  })
+
+  assert.deepEqual(
+    providerCredentialRefsForChannel(
+      'zhipu',
+      'https://www.bigmodel.cn/api/biz/account/query-customer-account-report',
+      services.llm,
+      services.settings,
+    ),
+    ['ZAI_API_KEY'],
+  )
+  assert.deepEqual(
+    refreshTargetForSession(session('glm'), services),
+    { kind: 'channel', channel: 'zhipu' },
+  )
 })
