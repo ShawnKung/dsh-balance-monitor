@@ -30,6 +30,9 @@ export const deepseekChannel = {
   credentialRef(config) {
     return config.deepseekApiKeyRef
   },
+  environmentRefs() {
+    return ['DEEPSEEK_API_KEY']
+  },
   credentialEndpoint() {
     return BALANCE_URL
   },

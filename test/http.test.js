@@ -33,6 +33,11 @@ function refreshRoute(service, updater) {
     .find(route => route.path === '/api/dsh-balance-monitor/refresh')
 }
 
+function credentialRoute(service) {
+  return createRoutes(service, {})
+    .find(route => route.path === '/api/dsh-balance-monitor/credential')
+}
+
 test('refreshing all channels also forces an update check', async () => {
   const calls = []
   const service = {
@@ -77,4 +82,39 @@ test('refreshing one channel does not check for plugin updates', async () => {
   assert.equal(updateChecks, 0)
   assert.equal(res.status, 200)
   assert.equal(res.payload.revision, 3)
+})
+
+test('credential writes are addressed by channel and return the refreshed snapshot', async () => {
+  const calls = []
+  const service = {
+    async setUserCredential(channel, value) {
+      calls.push(['set', channel, value])
+    },
+    async unsetUserCredential(channel) {
+      calls.push(['unset', channel])
+    },
+    snapshot() {
+      return { revision: calls.length, channels: [] }
+    },
+  }
+
+  const setResponse = response()
+  await credentialRoute(service).handler(request({
+    action: 'set',
+    channel: 'teamo',
+    value: 'secret',
+  }), setResponse)
+
+  const unsetResponse = response()
+  await credentialRoute(service).handler(request({
+    action: 'unset',
+    channel: 'teamo',
+  }), unsetResponse)
+
+  assert.deepEqual(calls, [
+    ['set', 'teamo', 'secret'],
+    ['unset', 'teamo'],
+  ])
+  assert.equal(setResponse.payload.revision, 1)
+  assert.equal(unsetResponse.payload.revision, 2)
 })
