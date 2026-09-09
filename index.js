@@ -15,9 +15,10 @@ export const name = 'dsh-balance-monitor'
 export const inject = ['webServer', 'credentials']
 
 export const Config = z.object({
-  sidebarChannels: z.array(z.union(['deepseek', 'teamo'])).min(1).max(3).default(['deepseek', 'teamo']),
+  sidebarChannels: z.array(z.union(['deepseek', 'teamo', 'kimi'])).min(1).max(3).default(['deepseek', 'teamo']),
   deepseekApiKeyRef: z.string().role('credential-ref').default('DEEPSEEK_API_KEY'),
   teamoApiKeyRef: z.string().role('credential-ref').default('TEAMO_API_KEY'),
+  kimiApiKeyRef: z.string().role('credential-ref').default('KIMI_API_KEY'),
   teamoBaseUrl: z.string().default('https://teamorouter.cn'),
   teamoRangeDays: z.number().step(1).min(2).max(90).default(7),
 })
@@ -26,6 +27,7 @@ const DEFAULT_CONFIG = Object.freeze({
   sidebarChannels: ['deepseek', 'teamo'],
   deepseekApiKeyRef: 'DEEPSEEK_API_KEY',
   teamoApiKeyRef: 'TEAMO_API_KEY',
+  kimiApiKeyRef: 'KIMI_API_KEY',
   teamoBaseUrl: 'https://teamorouter.cn',
   teamoRangeDays: 7,
 })

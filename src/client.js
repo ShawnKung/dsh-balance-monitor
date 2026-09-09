@@ -10,6 +10,7 @@ const MAX_SIDEBAR_CHANNELS = 3
 const CHANNEL_OPTIONS = Object.freeze([
   { id: 'deepseek', label: 'DeepSeek 官方' },
   { id: 'teamo', label: 'TeamoRouter' },
+  { id: 'kimi', label: 'Kimi 官方' },
 ])
 const WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>'
 const REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>'
@@ -604,6 +605,7 @@ function createSettingsCard(ctx, scope) {
     const [teamoRangeDays, setTeamoRangeDays] = useState(values.teamoRangeDays ?? 7)
     const [deepseekKey, setDeepseekKey] = useState('')
     const [teamoKey, setTeamoKey] = useState('')
+    const [kimiKey, setKimiKey] = useState('')
     const [credentials, setCredentials] = useState({})
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState('')
@@ -611,6 +613,7 @@ function createSettingsCard(ctx, scope) {
 
     const deepseekRef = credentialRef(snapshot, 'deepseekApiKeyRef', 'DEEPSEEK_API_KEY')
     const teamoRef = credentialRef(snapshot, 'teamoApiKeyRef', 'TEAMO_API_KEY')
+    const kimiRef = credentialRef(snapshot, 'kimiApiKeyRef', 'KIMI_API_KEY')
 
     useEffect(() => {
       if (snapshot.status !== 'ready') return
@@ -628,7 +631,7 @@ function createSettingsCard(ctx, scope) {
     const readCredentials = async () => {
       try {
         const result = unwrap(
-          await ctx.remote.credentials.describe([deepseekRef, teamoRef]),
+          await ctx.remote.credentials.describe([deepseekRef, teamoRef, kimiRef]),
           '读取凭据状态',
         )
         setCredentials(result)
@@ -640,7 +643,7 @@ function createSettingsCard(ctx, scope) {
 
     useEffect(() => {
       void readCredentials()
-    }, [deepseekRef, teamoRef])
+    }, [deepseekRef, teamoRef, kimiRef])
 
     const save = async () => {
       setSaving(true)
@@ -654,6 +657,9 @@ function createSettingsCard(ctx, scope) {
         if (teamoKey.trim()) {
           writes.push(ctx.remote.credentials.set(teamoRef, teamoKey.trim()))
         }
+        if (kimiKey.trim()) {
+          writes.push(ctx.remote.credentials.set(kimiRef, kimiKey.trim()))
+        }
         for (const response of await Promise.all(writes)) unwrap(response, '保存 API Key')
         await scope.mutate([
           { op: 'set', path: ['sidebarChannels'], value: sidebarChannels },
@@ -662,6 +668,7 @@ function createSettingsCard(ctx, scope) {
         ], snapshot.revision)
         setDeepseekKey('')
         setTeamoKey('')
+        setKimiKey('')
         await readCredentials()
         setMessage('已保存')
       } catch (error) {
@@ -811,6 +818,19 @@ function createSettingsCard(ctx, scope) {
         }),
         credentials[teamoRef]?.configured,
         teamoRef,
+      ),
+      field(
+        'Kimi API Key',
+        React.createElement('input', {
+          type: 'password',
+          value: kimiKey,
+          autoComplete: 'new-password',
+          placeholder: credentials[kimiRef]?.configured ? '输入新 Key 以替换' : 'sk-...',
+          disabled: credentials[kimiRef]?.writable === false,
+          onChange: event => setKimiKey(event.target.value),
+        }),
+        credentials[kimiRef]?.configured,
+        kimiRef,
       ),
       field('TeamoRouter 地址', React.createElement('input', {
         type: 'url',

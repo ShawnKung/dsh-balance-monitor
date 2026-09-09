@@ -41,13 +41,14 @@ window.__ModuleLoader__.load({
     var import_react = __toESM(require("react"), 1);
     var inject = ["slots", "settingsScope", "remote", "remote.credentials"];
     var NS = "dsh-balance-monitor";
-    var VERSION = "v0.1.6";
+    var VERSION = "v0.1.7";
     var FEEDBACK_DURATION_MS = 2400;
     var POPOVER_EXIT_MS = 160;
     var MAX_SIDEBAR_CHANNELS = 3;
     var CHANNEL_OPTIONS = Object.freeze([
       { id: "deepseek", label: "DeepSeek \u5B98\u65B9" },
-      { id: "teamo", label: "TeamoRouter" }
+      { id: "teamo", label: "TeamoRouter" },
+      { id: "kimi", label: "Kimi \u5B98\u65B9" }
     ]);
     var WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>';
     var REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>';
@@ -589,12 +590,14 @@ window.__ModuleLoader__.load({
         const [teamoRangeDays, setTeamoRangeDays] = (0, import_react.useState)(values.teamoRangeDays ?? 7);
         const [deepseekKey, setDeepseekKey] = (0, import_react.useState)("");
         const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
+        const [kimiKey, setKimiKey] = (0, import_react.useState)("");
         const [credentials, setCredentials] = (0, import_react.useState)({});
         const [saving, setSaving] = (0, import_react.useState)(false);
         const [message, setMessage] = (0, import_react.useState)("");
         const [failed, setFailed] = (0, import_react.useState)(false);
         const deepseekRef = credentialRef(snapshot, "deepseekApiKeyRef", "DEEPSEEK_API_KEY");
         const teamoRef = credentialRef(snapshot, "teamoApiKeyRef", "TEAMO_API_KEY");
+        const kimiRef = credentialRef(snapshot, "kimiApiKeyRef", "KIMI_API_KEY");
         (0, import_react.useEffect)(() => {
           if (snapshot.status !== "ready") return;
           setSidebarChannels(values.sidebarChannels ?? CHANNEL_OPTIONS.map((channel) => channel.id));
@@ -608,7 +611,7 @@ window.__ModuleLoader__.load({
         const readCredentials = async () => {
           try {
             const result = unwrap(
-              await ctx.remote.credentials.describe([deepseekRef, teamoRef]),
+              await ctx.remote.credentials.describe([deepseekRef, teamoRef, kimiRef]),
               "\u8BFB\u53D6\u51ED\u636E\u72B6\u6001"
             );
             setCredentials(result);
@@ -619,7 +622,7 @@ window.__ModuleLoader__.load({
         };
         (0, import_react.useEffect)(() => {
           void readCredentials();
-        }, [deepseekRef, teamoRef]);
+        }, [deepseekRef, teamoRef, kimiRef]);
         const save = async () => {
           setSaving(true);
           setFailed(false);
@@ -632,6 +635,9 @@ window.__ModuleLoader__.load({
             if (teamoKey.trim()) {
               writes.push(ctx.remote.credentials.set(teamoRef, teamoKey.trim()));
             }
+            if (kimiKey.trim()) {
+              writes.push(ctx.remote.credentials.set(kimiRef, kimiKey.trim()));
+            }
             for (const response of await Promise.all(writes)) unwrap(response, "\u4FDD\u5B58 API Key");
             await scope.mutate([
               { op: "set", path: ["sidebarChannels"], value: sidebarChannels },
@@ -640,6 +646,7 @@ window.__ModuleLoader__.load({
             ], snapshot.revision);
             setDeepseekKey("");
             setTeamoKey("");
+            setKimiKey("");
             await readCredentials();
             setMessage("\u5DF2\u4FDD\u5B58");
           } catch (error) {
@@ -780,6 +787,19 @@ window.__ModuleLoader__.load({
             }),
             credentials[teamoRef]?.configured,
             teamoRef
+          ),
+          field(
+            "Kimi API Key",
+            import_react.default.createElement("input", {
+              type: "password",
+              value: kimiKey,
+              autoComplete: "new-password",
+              placeholder: credentials[kimiRef]?.configured ? "\u8F93\u5165\u65B0 Key \u4EE5\u66FF\u6362" : "sk-...",
+              disabled: credentials[kimiRef]?.writable === false,
+              onChange: (event) => setKimiKey(event.target.value)
+            }),
+            credentials[kimiRef]?.configured,
+            kimiRef
           ),
           field("TeamoRouter \u5730\u5740", import_react.default.createElement("input", {
             type: "url",
