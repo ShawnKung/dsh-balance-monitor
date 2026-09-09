@@ -2232,7 +2232,7 @@ window.__ModuleLoader__.load({
     // src/client.js
     var inject = ["slots", "settingsScope"];
     var NS = "dsh-balance-monitor";
-    var VERSION = "v0.1.8";
+    var VERSION = "v0.1.9";
     var FEEDBACK_DURATION_MS = 2400;
     var POPOVER_EXIT_MS = 160;
     var MAX_SIDEBAR_CHANNELS = 3;
