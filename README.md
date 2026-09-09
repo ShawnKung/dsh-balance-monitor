@@ -46,12 +46,11 @@
 ### 从 npm 安装
 
 ```bash
-version="$(npm view @shawnkung/dsh-balance-monitor version)"
-dsh plugin --profile web add "@shawnkung/dsh-balance-monitor@$version"
+dsh plugin --profile web add @shawnkung/dsh-balance-monitor@latest
 dsh plugin --profile web list
 ```
 
-使用精确版本可以避免 pnpm 的现有 lockfile 或新版本冷却策略继续保留旧版本。安装后先在列表中确认实际版本，再重启 DSH Web 进程并硬刷新浏览器（macOS：`Cmd+Shift+R`；Windows/Linux：`Ctrl+Shift+R`）。
+安装后先在列表中确认实际版本，再重启 DSH Web 进程并硬刷新浏览器（macOS：`Cmd+Shift+R`；Windows/Linux：`Ctrl+Shift+R`）。
 
 ### 从源码安装
 
@@ -68,8 +67,7 @@ dsh plugin --profile web add link:"$(pwd)"
 ### 更新
 
 ```bash
-version="$(npm view @shawnkung/dsh-balance-monitor version)"
-dsh plugin --profile web add "@shawnkung/dsh-balance-monitor@$version"
+dsh plugin --profile web add @shawnkung/dsh-balance-monitor@latest
 dsh plugin --profile web list
 ```
 
