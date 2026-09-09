@@ -48,61 +48,167 @@ test('refresh resolves credentials for every operation', async () => {
   assert.equal(service.snapshot().channels[0].balance, 12.5)
 })
 
-test('explicit plugin credentials take precedence over provider discovery', async () => {
-  let discoveries = 0
-  const service = new BalanceService({
-    channels: [channel(async ({ apiKey }) => {
-      assert.equal(apiKey, 'explicit-secret')
-      return { currency: 'USD', balance: 12.5, detail: [], periods: [] }
-    })],
-    credentials: credentials('explicit-secret'),
-    credentialRefs: () => {
-      discoveries += 1
-      return ['PROVIDER_API_KEY']
+test('environment credentials take precedence over model and user configuration', async () => {
+  const resolved = []
+  const provider = {
+    async resolve(ref) {
+      resolved.push(ref)
+      if (ref === 'EXAMPLE_API_KEY') return { value: 'user-secret', source: 'file' }
+      if (ref === 'ENVIRONMENT_API_KEY') {
+        return { value: 'environment-secret', source: 'user-env' }
+      }
+      if (ref === 'MODEL_API_KEY') return { value: 'model-secret', source: 'file' }
+      return undefined
     },
+    async describe(ref) {
+      return {
+        configured: true,
+        source: ref === 'ENVIRONMENT_API_KEY' ? 'user-env' : 'file',
+        writable: ref !== 'ENVIRONMENT_API_KEY',
+      }
+    },
+  }
+  const target = channel(async ({ apiKey }) => {
+    assert.equal(apiKey, 'environment-secret')
+    return { currency: 'USD', balance: 12.5, detail: [], periods: [] }
+  })
+  target.environmentRefs = () => ['ENVIRONMENT_API_KEY']
+  const service = new BalanceService({
+    channels: [target],
+    credentials: provider,
+    credentialRefs: () => ['MODEL_API_KEY'],
     config: () => ({}),
   })
 
   await service.refresh('example')
 
-  assert.equal(discoveries, 0)
-  assert.equal(service.snapshot().channels[0].credential.origin, 'plugin')
+  assert.deepEqual(resolved, ['EXAMPLE_API_KEY', 'ENVIRONMENT_API_KEY', 'MODEL_API_KEY'])
+  assert.equal(service.snapshot().channels[0].credential.origin, 'environment')
 })
 
-test('missing plugin credentials fall back to a discovered provider reference', async () => {
+test('model configuration takes precedence over user configuration', async () => {
   const resolved = []
   const provider = {
     async resolve(ref) {
       resolved.push(ref)
-      return ref === 'PROVIDER_API_KEY'
-        ? { value: 'provider-secret', source: 'file' }
-        : undefined
+      return {
+        value: ref === 'MODEL_API_KEY' ? 'model-secret' : 'user-secret',
+        source: 'file',
+      }
     },
     async describe(ref) {
       return {
-        configured: ref === 'PROVIDER_API_KEY',
-        source: ref === 'PROVIDER_API_KEY' ? 'file' : undefined,
+        configured: true,
+        source: 'file',
         writable: true,
       }
     },
   }
   const service = new BalanceService({
     channels: [channel(async ({ apiKey }) => {
-      assert.equal(apiKey, 'provider-secret')
+      assert.equal(apiKey, 'model-secret')
       return { currency: 'USD', balance: 9, detail: [], periods: [] }
     })],
     credentials: provider,
-    credentialRefs: () => ['PROVIDER_API_KEY'],
+    credentialRefs: () => ['MODEL_API_KEY'],
     config: () => ({}),
   })
 
   await service.refresh('example')
   const state = service.snapshot().channels[0]
 
-  assert.deepEqual(resolved, ['EXAMPLE_API_KEY', 'PROVIDER_API_KEY'])
+  assert.deepEqual(resolved, ['EXAMPLE_API_KEY', 'MODEL_API_KEY'])
   assert.equal(state.status, 'ready')
-  assert.equal(state.credential.origin, 'provider')
-  assert.equal(JSON.stringify(state).includes('provider-secret'), false)
+  assert.equal(state.credential.origin, 'model')
+  assert.equal(JSON.stringify(state).includes('model-secret'), false)
+})
+
+test('a user reference shared with a model is treated as model configuration', async () => {
+  const service = new BalanceService({
+    channels: [channel(async ({ apiKey }) => {
+      assert.equal(apiKey, 'shared-secret')
+      return { currency: 'USD', balance: 8, detail: [], periods: [] }
+    })],
+    credentials: credentials('shared-secret'),
+    credentialRefs: () => ['EXAMPLE_API_KEY'],
+    config: () => ({}),
+  })
+
+  await service.refresh('example')
+
+  assert.equal(service.snapshot().channels[0].credential.origin, 'model')
+})
+
+test('user configuration is used when automatic sources are unavailable', async () => {
+  const provider = {
+    async resolve(ref) {
+      return ref === 'EXAMPLE_API_KEY'
+        ? { value: 'user-secret', source: 'file' }
+        : undefined
+    },
+    async describe(ref) {
+      return {
+        configured: ref === 'EXAMPLE_API_KEY',
+        source: ref === 'EXAMPLE_API_KEY' ? 'file' : undefined,
+        writable: true,
+      }
+    },
+  }
+  const service = new BalanceService({
+    channels: [channel(async ({ apiKey }) => {
+      assert.equal(apiKey, 'user-secret')
+      return { currency: 'USD', balance: 7, detail: [], periods: [] }
+    })],
+    credentials: provider,
+    credentialRefs: () => ['MODEL_API_KEY'],
+    config: () => ({}),
+  })
+
+  await service.refresh('example')
+
+  assert.equal(service.snapshot().channels[0].credential.origin, 'user')
+})
+
+test('user credential writes are scoped by channel and refresh immediately', async () => {
+  let stored
+  let fetches = 0
+  const provider = {
+    async resolve() {
+      return stored ? { value: stored, source: 'file' } : undefined
+    },
+    async describe() {
+      return {
+        configured: Boolean(stored),
+        source: stored ? 'file' : undefined,
+        writable: true,
+      }
+    },
+    async set(ref, value) {
+      assert.equal(ref, 'EXAMPLE_API_KEY')
+      stored = value
+    },
+    async unset(ref) {
+      assert.equal(ref, 'EXAMPLE_API_KEY')
+      stored = undefined
+    },
+  }
+  const service = new BalanceService({
+    channels: [channel(async () => {
+      fetches += 1
+      return { currency: 'USD', balance: 6, detail: [], periods: [] }
+    })],
+    credentials: provider,
+    config: () => ({}),
+  })
+
+  await service.setUserCredential('example', ' new-secret ')
+  assert.equal(stored, 'new-secret')
+  assert.equal(service.snapshot().channels[0].status, 'ready')
+
+  await service.unsetUserCredential('example')
+  assert.equal(stored, undefined)
+  assert.equal(service.snapshot().channels[0].status, 'unconfigured')
+  assert.equal(fetches, 1)
 })
 
 test('unconfigured credentials produce a safe public snapshot', async () => {
@@ -117,6 +223,7 @@ test('unconfigured credentials produce a safe public snapshot', async () => {
 
   assert.equal(state.status, 'unconfigured')
   assert.equal(state.credential.configured, false)
+  assert.equal(state.credential.origin, 'none')
   assert.equal(JSON.stringify(state).includes('secret'), false)
 })
 

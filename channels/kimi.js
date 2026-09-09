@@ -17,6 +17,9 @@ export const kimiChannel = {
   credentialRef(config) {
     return config.kimiApiKeyRef
   },
+  environmentRefs() {
+    return ['KIMI_API_KEY']
+  },
   credentialEndpoint() {
     return BALANCE_URL
   },

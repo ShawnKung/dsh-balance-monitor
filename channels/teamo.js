@@ -46,6 +46,9 @@ export const teamoChannel = {
   credentialRef(config) {
     return config.teamoApiKeyRef
   },
+  environmentRefs() {
+    return ['TEAMOROUTER_API_KEY']
+  },
   credentialEndpoint(config) {
     return config.teamoBaseUrl
   },

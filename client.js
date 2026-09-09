@@ -39,7 +39,7 @@ window.__ModuleLoader__.load({
     });
     module.exports = __toCommonJS(client_exports);
     var import_react = __toESM(require("react"), 1);
-    var inject = ["slots", "settingsScope", "remote", "remote.credentials"];
+    var inject = ["slots", "settingsScope"];
     var NS = "dsh-balance-monitor";
     var VERSION = "v0.1.7";
     var FEEDBACK_DURATION_MS = 2400;
@@ -78,7 +78,9 @@ window.__ModuleLoader__.load({
     .bm-note{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:10px}.bm-empty{padding:16px;font-size:12px;color:var(--dsw-alias-label-tertiary,#9ca3af)}
     .bm-settings{list-style:none;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:12px;background:var(--dsw-alias-bg-layer-3,transparent);color:inherit;transition:border-color .16s,background .16s}.bm-settings:hover{border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}.bm-settings[data-open=true]{background:var(--dsw-alias-bg-layer-2,transparent);border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}
     .bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 2px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
-    .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}
+    .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}
+    .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
+    .bm-source-settings{position:relative;margin-left:auto}.bm-source-settings-trigger{box-sizing:border-box;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-source-settings-trigger:hover,.bm-source-settings-trigger[data-open=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-source-settings-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.bm-source-popover{position:absolute;z-index:20;top:calc(100% + 5px);right:0;width:min(340px,calc(100vw - 64px));padding:14px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 10px 30px rgba(0,0,0,.16));display:grid;gap:12px;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}.bm-source-popover-title{font-size:13px;font-weight:600}.bm-source-popover-field{display:grid;gap:6px}.bm-source-popover-field label{font-size:11px;color:var(--dsw-alias-label-secondary,#6b7280)}.bm-source-popover-field input{width:100%}.bm-source-popover-actions{display:flex;justify-content:flex-end;gap:8px}
     .bm-multi{position:relative}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex!important;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;font-weight:400!important;cursor:pointer}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45;cursor:default}
     .bm-badge{font-size:10px;padding:2px 6px;border-radius:999px;background:var(--dsw-alias-bg-layer-2,rgba(127,127,127,.12));color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-badge[data-set=true]{color:var(--dsw-alias-state-success-primary,#22c55e)}
     .bm-buttons{display:flex;justify-content:flex-end;gap:8px}.bm-button{height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.25));border-radius:6px;padding:0 12px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.bm-button-primary{background:var(--dsw-alias-button-info-fill,#2563eb);border-color:transparent;color:var(--dsw-alias-label-primary-foreground,#fff)}.bm-button:disabled{opacity:.5;cursor:default}.bm-message{font-size:11px}.bm-message[data-error=true]{color:var(--dsw-alias-state-error-primary,#ef4444)}
@@ -147,6 +149,53 @@ window.__ModuleLoader__.load({
         active = false;
         events.close();
       };
+    }
+    var balanceStateStore = /* @__PURE__ */ (() => {
+      const listeners = /* @__PURE__ */ new Set();
+      let snapshot;
+      let revision = -1;
+      let events;
+      let starting;
+      const publish = (next, channel = null) => {
+        if (!next || !Array.isArray(next.channels)) return;
+        const nextRevision = Number(next.revision);
+        if (Number.isFinite(nextRevision) && nextRevision < revision) return;
+        if (Number.isFinite(nextRevision)) revision = nextRevision;
+        snapshot = next;
+        for (const listener of listeners) listener({ snapshot, channel });
+      };
+      const start = () => {
+        if (starting || events) return;
+        starting = api("/api/dsh-balance-monitor/state").then((next) => publish(next)).catch((error) => console.error("[dsh-balance-monitor] state failed:", error)).finally(() => {
+          starting = void 0;
+          if (listeners.size > 0 && !events) start();
+        });
+        events = new EventSource("/api/dsh-balance-monitor/events");
+        events.onmessage = (event) => {
+          try {
+            const payload = JSON.parse(event.data);
+            publish(payload.snapshot, payload.channel);
+          } catch (error) {
+            console.error("[dsh-balance-monitor] state event decode failed:", error);
+          }
+        };
+      };
+      return {
+        subscribe(listener) {
+          listeners.add(listener);
+          if (snapshot) listener({ snapshot, channel: null });
+          start();
+          return () => {
+            listeners.delete(listener);
+            if (listeners.size > 0) return;
+            events?.close();
+            events = void 0;
+          };
+        }
+      };
+    })();
+    function subscribeBalanceState(listener) {
+      return balanceStateStore.subscribe(listener);
     }
     function updatePresentation(update) {
       if (!update) return void 0;
@@ -528,32 +577,22 @@ window.__ModuleLoader__.load({
       document.addEventListener("keydown", escape);
       window.addEventListener("resize", positionPopup);
       place();
-      api("/api/dsh-balance-monitor/state").then((value) => {
-        if (acceptSnapshot(value)) render();
-      }).catch(() => void refresh());
-      const events = new EventSource("/api/dsh-balance-monitor/events");
-      events.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          if (!acceptSnapshot(payload.snapshot)) return;
-          if (payload.channel) {
-            const channel = snapshot.channels.find((item) => item.id === payload.channel);
-            const result = channel?.status === "error" ? "error" : "success";
-            if (refreshing.has(payload.channel) || refreshing.has("all")) {
-              pendingFeedback.set(payload.channel, result);
-            } else {
-              showFeedback(payload.channel, result);
-            }
+      const unsubscribeBalance = subscribeBalanceState((payload) => {
+        if (!acceptSnapshot(payload.snapshot)) return;
+        if (payload.channel) {
+          const channel = snapshot.channels.find((item) => item.id === payload.channel);
+          const result = channel?.status === "error" ? "error" : "success";
+          if (refreshing.has(payload.channel) || refreshing.has("all")) {
+            pendingFeedback.set(payload.channel, result);
           } else {
-            render();
+            showFeedback(payload.channel, result);
           }
-        } catch (error) {
-          console.error("[dsh-balance-monitor] event decode failed:", error);
         }
-      };
+        render();
+      });
       return () => {
         observer.disconnect();
-        events.close();
+        unsubscribeBalance();
         unsubscribe();
         unsubscribeUpdates();
         window.clearTimeout(popupCloseTimer);
@@ -565,15 +604,33 @@ window.__ModuleLoader__.load({
         popup.remove();
       };
     }
-    function credentialRef(snapshot, field, fallback) {
-      const value = snapshot.status === "ready" ? snapshot.value?.[field] : void 0;
-      return typeof value === "string" && value ? value : fallback;
+    function credentialPresentation(snapshot, channelId) {
+      const credential = snapshot?.channels?.find((channel) => channel.id === channelId)?.credential;
+      if (credential?.origin === "environment") {
+        return { kind: "environment", label: "\u73AF\u5883\u53D8\u91CF", readonly: "\u6765\u81EA\u73AF\u5883\u53D8\u91CF\uFF08\u53EA\u8BFB\uFF09" };
+      }
+      if (credential?.origin === "model") {
+        return { kind: "model", label: "\u6A21\u578B\u914D\u7F6E", readonly: "\u6765\u81EA\u6A21\u578B\u914D\u7F6E\uFF08\u53EA\u8BFB\uFF09" };
+      }
+      if (credential?.origin === "user") {
+        return { kind: "user", label: "\u7528\u6237\u914D\u7F6E", configured: true };
+      }
+      if (credential?.origin === "none") {
+        return { kind: "none", label: "\u672A\u914D\u7F6E", configured: false };
+      }
+      return { kind: "loading", label: "\u68C0\u6D4B\u4E2D", readonly: "\u6B63\u5728\u68C0\u6D4B\u51ED\u636E\u6765\u6E90" };
     }
-    function unwrap(response, action) {
-      if (!response?.ok) throw new Error(response?.error?.message || `${action}\u5931\u8D25`);
-      return response.value;
+    function SettingsIcon() {
+      return import_react.default.createElement(
+        "svg",
+        { viewBox: "0 0 24 24", "aria-hidden": true },
+        import_react.default.createElement("path", {
+          d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"
+        }),
+        import_react.default.createElement("circle", { cx: 12, cy: 12, r: 3 })
+      );
     }
-    function createSettingsCard(ctx, scope) {
+    function createSettingsCard(scope) {
       return function DshBalanceMonitorSettings() {
         const snapshot = (0, import_react.useSyncExternalStore)(
           (listener) => scope.subscribe(listener),
@@ -583,6 +640,7 @@ window.__ModuleLoader__.load({
         const values = snapshot.status === "ready" ? snapshot.value ?? {} : {};
         const [open, setOpen] = (0, import_react.useState)(false);
         const [pickerOpen, setPickerOpen] = (0, import_react.useState)(false);
+        const [sourceSettingsOpen, setSourceSettingsOpen] = (0, import_react.useState)(false);
         const [sidebarChannels, setSidebarChannels] = (0, import_react.useState)(
           values.sidebarChannels ?? CHANNEL_OPTIONS.map((channel) => channel.id)
         );
@@ -591,13 +649,10 @@ window.__ModuleLoader__.load({
         const [deepseekKey, setDeepseekKey] = (0, import_react.useState)("");
         const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
         const [kimiKey, setKimiKey] = (0, import_react.useState)("");
-        const [credentials, setCredentials] = (0, import_react.useState)({});
+        const [balanceSnapshot, setBalanceSnapshot] = (0, import_react.useState)();
         const [saving, setSaving] = (0, import_react.useState)(false);
         const [message, setMessage] = (0, import_react.useState)("");
         const [failed, setFailed] = (0, import_react.useState)(false);
-        const deepseekRef = credentialRef(snapshot, "deepseekApiKeyRef", "DEEPSEEK_API_KEY");
-        const teamoRef = credentialRef(snapshot, "teamoApiKeyRef", "TEAMO_API_KEY");
-        const kimiRef = credentialRef(snapshot, "kimiApiKeyRef", "KIMI_API_KEY");
         (0, import_react.useEffect)(() => {
           if (snapshot.status !== "ready") return;
           setSidebarChannels(values.sidebarChannels ?? CHANNEL_OPTIONS.map((channel) => channel.id));
@@ -605,49 +660,70 @@ window.__ModuleLoader__.load({
           setTeamoRangeDays(values.teamoRangeDays ?? 7);
         }, [snapshot.revision]);
         (0, import_react.useEffect)(() => {
-          if (!open) setPickerOpen(false);
-        }, [open]);
-        (0, import_react.useEffect)(() => subscribeUpdateState(setUpdate), []);
-        const readCredentials = async () => {
-          try {
-            const result = unwrap(
-              await ctx.remote.credentials.describe([deepseekRef, teamoRef, kimiRef]),
-              "\u8BFB\u53D6\u51ED\u636E\u72B6\u6001"
-            );
-            setCredentials(result);
-          } catch (error) {
-            setFailed(true);
-            setMessage(error.message);
+          if (!open) {
+            setPickerOpen(false);
+            setSourceSettingsOpen(false);
           }
-        };
+        }, [open]);
         (0, import_react.useEffect)(() => {
-          void readCredentials();
-        }, [deepseekRef, teamoRef, kimiRef]);
+          if (!sourceSettingsOpen) return void 0;
+          const closeOutside = (event) => {
+            if (!event.target.closest("[data-bm-source-settings]")) setSourceSettingsOpen(false);
+          };
+          const closeOnEscape = (event) => {
+            if (event.key === "Escape") setSourceSettingsOpen(false);
+          };
+          document.addEventListener("pointerdown", closeOutside);
+          document.addEventListener("keydown", closeOnEscape);
+          return () => {
+            document.removeEventListener("pointerdown", closeOutside);
+            document.removeEventListener("keydown", closeOnEscape);
+          };
+        }, [sourceSettingsOpen]);
+        (0, import_react.useEffect)(() => subscribeUpdateState(setUpdate), []);
+        (0, import_react.useEffect)(() => subscribeBalanceState(({ snapshot: next }) => {
+          setBalanceSnapshot(next);
+        }), []);
         const save = async () => {
           setSaving(true);
           setFailed(false);
           setMessage("");
           try {
             const writes = [];
-            if (deepseekKey.trim()) {
-              writes.push(ctx.remote.credentials.set(deepseekRef, deepseekKey.trim()));
+            const deepseekEditable = ["user", "none"].includes(
+              credentialPresentation(balanceSnapshot, "deepseek").kind
+            );
+            const teamoEditable = ["user", "none"].includes(
+              credentialPresentation(balanceSnapshot, "teamo").kind
+            );
+            const kimiEditable = ["user", "none"].includes(
+              credentialPresentation(balanceSnapshot, "kimi").kind
+            );
+            if (deepseekEditable && deepseekKey.trim()) {
+              writes.push(api("/api/dsh-balance-monitor/credential", {
+                method: "POST",
+                body: JSON.stringify({ action: "set", channel: "deepseek", value: deepseekKey.trim() })
+              }));
             }
-            if (teamoKey.trim()) {
-              writes.push(ctx.remote.credentials.set(teamoRef, teamoKey.trim()));
+            if (teamoEditable && teamoKey.trim()) {
+              writes.push(api("/api/dsh-balance-monitor/credential", {
+                method: "POST",
+                body: JSON.stringify({ action: "set", channel: "teamo", value: teamoKey.trim() })
+              }));
             }
-            if (kimiKey.trim()) {
-              writes.push(ctx.remote.credentials.set(kimiRef, kimiKey.trim()));
+            if (kimiEditable && kimiKey.trim()) {
+              writes.push(api("/api/dsh-balance-monitor/credential", {
+                method: "POST",
+                body: JSON.stringify({ action: "set", channel: "kimi", value: kimiKey.trim() })
+              }));
             }
-            for (const response of await Promise.all(writes)) unwrap(response, "\u4FDD\u5B58 API Key");
+            await Promise.all(writes);
             await scope.mutate([
-              { op: "set", path: ["sidebarChannels"], value: sidebarChannels },
-              { op: "set", path: ["teamoBaseUrl"], value: teamoBaseUrl.trim() },
-              { op: "set", path: ["teamoRangeDays"], value: Number(teamoRangeDays) }
+              { op: "set", path: ["sidebarChannels"], value: sidebarChannels }
             ], snapshot.revision);
             setDeepseekKey("");
             setTeamoKey("");
             setKimiKey("");
-            await readCredentials();
             setMessage("\u5DF2\u4FDD\u5B58");
           } catch (error) {
             setFailed(true);
@@ -656,13 +732,46 @@ window.__ModuleLoader__.load({
             setSaving(false);
           }
         };
-        const removeCredential = async (ref) => {
+        const saveTeamoSettings = async () => {
           setSaving(true);
           setFailed(false);
           setMessage("");
           try {
-            unwrap(await ctx.remote.credentials.unset(ref), "\u79FB\u9664 API Key");
-            await readCredentials();
+            const baseUrl = teamoBaseUrl.trim();
+            const parsed = new URL(baseUrl);
+            if (!["http:", "https:"].includes(parsed.protocol)) {
+              throw new Error("TeamoRouter \u5730\u5740\u5FC5\u987B\u4F7F\u7528 HTTP \u6216 HTTPS");
+            }
+            const rangeDays = Number(teamoRangeDays);
+            if (!Number.isInteger(rangeDays) || rangeDays < 2 || rangeDays > 90) {
+              throw new Error("\u7EDF\u8BA1\u5929\u6570\u5FC5\u987B\u662F 2 \u5230 90 \u7684\u6574\u6570");
+            }
+            await scope.mutate([
+              { op: "set", path: ["teamoBaseUrl"], value: baseUrl },
+              { op: "set", path: ["teamoRangeDays"], value: rangeDays }
+            ], snapshot.revision);
+            await api("/api/dsh-balance-monitor/refresh", {
+              method: "POST",
+              body: JSON.stringify({ channel: "teamo" })
+            });
+            setSourceSettingsOpen(false);
+            setMessage("TeamoRouter \u8BBE\u7F6E\u5DF2\u4FDD\u5B58");
+          } catch (error) {
+            setFailed(true);
+            setMessage(error.message);
+          } finally {
+            setSaving(false);
+          }
+        };
+        const removeCredential = async (channel) => {
+          setSaving(true);
+          setFailed(false);
+          setMessage("");
+          try {
+            await api("/api/dsh-balance-monitor/credential", {
+              method: "POST",
+              body: JSON.stringify({ action: "unset", channel })
+            });
             setMessage("\u5DF2\u79FB\u9664");
           } catch (error) {
             setFailed(true);
@@ -671,18 +780,23 @@ window.__ModuleLoader__.load({
             setSaving(false);
           }
         };
-        const field = (label, control, badge, remove) => import_react.default.createElement(
+        const field = (label, control, status, remove, action) => import_react.default.createElement(
           "div",
           { className: "bm-field" },
           import_react.default.createElement(
-            "label",
-            null,
-            label,
-            badge === void 0 ? null : import_react.default.createElement(
-              "span",
-              { className: "bm-badge", "data-set": String(Boolean(badge)) },
-              badge ? "\u5DF2\u914D\u7F6E" : "\u672A\u914D\u7F6E"
-            )
+            "div",
+            { className: "bm-field-label" },
+            import_react.default.createElement(
+              "label",
+              null,
+              label,
+              status === void 0 ? null : import_react.default.createElement(
+                "span",
+                { className: "bm-badge", "data-set": String(status !== "\u672A\u914D\u7F6E") },
+                status
+              )
+            ),
+            action
           ),
           import_react.default.createElement(
             "div",
@@ -693,7 +807,7 @@ window.__ModuleLoader__.load({
               {
                 className: "bm-button",
                 type: "button",
-                disabled: saving || !badge || credentials[remove]?.writable === false,
+                disabled: saving,
                 onClick: () => void removeCredential(remove)
               },
               "\u79FB\u9664"
@@ -758,62 +872,132 @@ window.__ModuleLoader__.load({
             })
           ) : null
         );
+        const teamoSettings = import_react.default.createElement(
+          "div",
+          { className: "bm-source-settings", "data-bm-source-settings": "" },
+          import_react.default.createElement(
+            "button",
+            {
+              type: "button",
+              className: "bm-source-settings-trigger",
+              title: "TeamoRouter \u8BBE\u7F6E",
+              "aria-label": "TeamoRouter \u8BBE\u7F6E",
+              "aria-expanded": sourceSettingsOpen,
+              "data-open": String(sourceSettingsOpen),
+              disabled: saving,
+              onClick: () => setSourceSettingsOpen((value) => !value)
+            },
+            import_react.default.createElement(SettingsIcon)
+          ),
+          sourceSettingsOpen ? import_react.default.createElement(
+            "div",
+            { className: "bm-source-popover", role: "dialog", "aria-label": "TeamoRouter \u8BBE\u7F6E" },
+            import_react.default.createElement("div", { className: "bm-source-popover-title" }, "TeamoRouter \u8BBE\u7F6E"),
+            import_react.default.createElement(
+              "div",
+              { className: "bm-source-popover-field" },
+              import_react.default.createElement("label", null, "\u670D\u52A1\u5730\u5740"),
+              import_react.default.createElement("input", {
+                type: "url",
+                value: teamoBaseUrl,
+                disabled: saving,
+                onChange: (event) => setTeamoBaseUrl(event.target.value)
+              })
+            ),
+            import_react.default.createElement(
+              "div",
+              { className: "bm-source-popover-field" },
+              import_react.default.createElement("label", null, "\u7EDF\u8BA1\u5929\u6570"),
+              import_react.default.createElement("input", {
+                type: "number",
+                min: 2,
+                max: 90,
+                step: 1,
+                value: teamoRangeDays,
+                disabled: saving,
+                onChange: (event) => setTeamoRangeDays(event.target.value)
+              })
+            ),
+            import_react.default.createElement(
+              "div",
+              { className: "bm-source-popover-actions" },
+              import_react.default.createElement(
+                "button",
+                {
+                  className: "bm-button",
+                  type: "button",
+                  disabled: saving,
+                  onClick: () => setSourceSettingsOpen(false)
+                },
+                "\u53D6\u6D88"
+              ),
+              import_react.default.createElement(
+                "button",
+                {
+                  className: "bm-button bm-button-primary",
+                  type: "button",
+                  disabled: saving || snapshot.status !== "ready" || !snapshot.writable,
+                  onClick: () => void saveTeamoSettings()
+                },
+                saving ? "\u4FDD\u5B58\u4E2D" : "\u4FDD\u5B58"
+              )
+            )
+          ) : null
+        );
+        const credentialField = ({
+          channel,
+          label,
+          placeholder,
+          value,
+          setValue
+        }) => {
+          const presentation = credentialPresentation(balanceSnapshot, channel);
+          const editable = presentation.kind === "user" || presentation.kind === "none";
+          const control = editable ? import_react.default.createElement("input", {
+            type: "password",
+            value,
+            autoComplete: "new-password",
+            placeholder: presentation.configured ? "\u8F93\u5165\u65B0 Key \u4EE5\u66FF\u6362" : placeholder,
+            disabled: saving,
+            onChange: (event) => setValue(event.target.value)
+          }) : import_react.default.createElement(
+            "div",
+            { className: "bm-credential-readonly", "aria-disabled": true },
+            presentation.readonly
+          );
+          return field(
+            label,
+            control,
+            presentation.label,
+            presentation.kind === "user" ? channel : void 0,
+            channel === "teamo" ? teamoSettings : void 0
+          );
+        };
         const form = import_react.default.createElement(
           "div",
           { className: "bm-form" },
           field("\u4FA7\u8FB9\u680F\u5C55\u793A", channelPicker),
-          field(
-            "DeepSeek API Key",
-            import_react.default.createElement("input", {
-              type: "password",
-              value: deepseekKey,
-              autoComplete: "new-password",
-              placeholder: credentials[deepseekRef]?.configured ? "\u8F93\u5165\u65B0 Key \u4EE5\u66FF\u6362" : "sk-...",
-              disabled: credentials[deepseekRef]?.writable === false,
-              onChange: (event) => setDeepseekKey(event.target.value)
-            }),
-            credentials[deepseekRef]?.configured,
-            deepseekRef
-          ),
-          field(
-            "TeamoRouter API Key",
-            import_react.default.createElement("input", {
-              type: "password",
-              value: teamoKey,
-              autoComplete: "new-password",
-              placeholder: credentials[teamoRef]?.configured ? "\u8F93\u5165\u65B0 Key \u4EE5\u66FF\u6362" : "sk-teamo-...",
-              disabled: credentials[teamoRef]?.writable === false,
-              onChange: (event) => setTeamoKey(event.target.value)
-            }),
-            credentials[teamoRef]?.configured,
-            teamoRef
-          ),
-          field(
-            "Kimi API Key",
-            import_react.default.createElement("input", {
-              type: "password",
-              value: kimiKey,
-              autoComplete: "new-password",
-              placeholder: credentials[kimiRef]?.configured ? "\u8F93\u5165\u65B0 Key \u4EE5\u66FF\u6362" : "sk-...",
-              disabled: credentials[kimiRef]?.writable === false,
-              onChange: (event) => setKimiKey(event.target.value)
-            }),
-            credentials[kimiRef]?.configured,
-            kimiRef
-          ),
-          field("TeamoRouter \u5730\u5740", import_react.default.createElement("input", {
-            type: "url",
-            value: teamoBaseUrl,
-            onChange: (event) => setTeamoBaseUrl(event.target.value)
-          })),
-          field("TeamoRouter \u7EDF\u8BA1\u5929\u6570", import_react.default.createElement("input", {
-            type: "number",
-            min: 2,
-            max: 90,
-            step: 1,
-            value: teamoRangeDays,
-            onChange: (event) => setTeamoRangeDays(event.target.value)
-          })),
+          credentialField({
+            channel: "deepseek",
+            label: "DeepSeek API Key",
+            placeholder: "sk-...",
+            value: deepseekKey,
+            setValue: setDeepseekKey
+          }),
+          credentialField({
+            channel: "teamo",
+            label: "TeamoRouter API Key",
+            placeholder: "sk-teamo-...",
+            value: teamoKey,
+            setValue: setTeamoKey
+          }),
+          credentialField({
+            channel: "kimi",
+            label: "Kimi API Key",
+            placeholder: "sk-...",
+            value: kimiKey,
+            setValue: setKimiKey
+          }),
           message ? import_react.default.createElement(
             "div",
             { className: "bm-message", "data-error": String(failed) },
@@ -909,7 +1093,7 @@ window.__ModuleLoader__.load({
     function apply(ctx) {
       installStyle();
       const scope = ctx.settingsScope.bind({ namespace: NS });
-      const SettingsCard = createSettingsCard(ctx, scope);
+      const SettingsCard = createSettingsCard(scope);
       ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
         name: "settings.plugin.item",
         key: NS,
