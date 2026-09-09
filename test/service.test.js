@@ -123,6 +123,49 @@ test('model configuration takes precedence over user configuration', async () =>
   assert.equal(JSON.stringify(state).includes('model-secret'), false)
 })
 
+test('provider initialization reruns credential resolution after an active refresh', async () => {
+  let modelReady = false
+  let releaseFirst
+  let markFirstStarted
+  const firstStarted = new Promise(resolve => {
+    markFirstStarted = resolve
+  })
+  const firstPending = new Promise(resolve => {
+    releaseFirst = resolve
+  })
+  const used = []
+  const service = new BalanceService({
+    channels: [channel(async ({ apiKey }) => {
+      used.push(apiKey)
+      if (used.length === 1) {
+        markFirstStarted()
+        await firstPending
+      }
+      return { currency: 'USD', balance: 9, detail: [], periods: [] }
+    })],
+    credentials: {
+      async resolve(ref) {
+        return { value: ref === 'MODEL_API_KEY' ? 'model-secret' : 'user-secret', source: 'file' }
+      },
+      async describe() {
+        return { configured: true, source: 'file', writable: true }
+      },
+    },
+    credentialRefs: () => modelReady ? ['MODEL_API_KEY'] : [],
+    config: () => ({}),
+  })
+
+  const initial = service.refresh('example')
+  await firstStarted
+  modelReady = true
+  const afterProviderReady = service.refreshAllAfterCurrent()
+  releaseFirst()
+  await Promise.all([initial, afterProviderReady])
+
+  assert.deepEqual(used, ['user-secret', 'model-secret'])
+  assert.equal(service.snapshot().channels[0].credential.origin, 'model')
+})
+
 test('a user reference shared with a model is treated as model configuration', async () => {
   const service = new BalanceService({
     channels: [channel(async ({ apiKey }) => {
@@ -209,6 +252,37 @@ test('user credential writes are scoped by channel and refresh immediately', asy
   assert.equal(stored, undefined)
   assert.equal(service.snapshot().channels[0].status, 'unconfigured')
   assert.equal(fetches, 1)
+})
+
+test('failed validation keeps the configured user credential metadata', async () => {
+  let stored
+  const service = new BalanceService({
+    channels: [channel(async () => {
+      throw new Error('接口返回 HTTP 401')
+    })],
+    credentials: {
+      async resolve() {
+        return stored ? { value: stored, source: 'file' } : undefined
+      },
+      async describe() {
+        return { configured: Boolean(stored), source: stored ? 'file' : undefined, writable: true }
+      },
+      async set(ref, value) {
+        assert.equal(ref, 'EXAMPLE_API_KEY')
+        stored = value
+      },
+    },
+    config: () => ({}),
+  })
+
+  await service.setUserCredential('example', 'invalid-secret')
+  const state = service.snapshot().channels[0]
+
+  assert.equal(state.status, 'error')
+  assert.equal(state.credential.configured, true)
+  assert.equal(state.credential.origin, 'user')
+  assert.equal(state.error, '接口返回 HTTP 401')
+  assert.equal(JSON.stringify(state).includes('invalid-secret'), false)
 })
 
 test('unconfigured credentials produce a safe public snapshot', async () => {

@@ -51,23 +51,6 @@ export function apply(ctx, entry = {}) {
   })
   const updater = getUpdateService()
 
-  ctx.inject(['settings'], settingsCtx => {
-    settingsCtx.settings.installSection(
-      ctx,
-      'dsh-balance-monitor',
-      Config,
-      withDefaults(entry),
-      {
-        setSource(next) {
-          source = next
-        },
-        onChange() {
-          void service.refreshAll()
-        },
-      },
-    )
-  })
-
   ctx.effect(() => {
     const dispose = createRoutes(service, updater).map(route => ctx.webServer.register(route))
     void updater.check()
@@ -89,7 +72,7 @@ export function apply(ctx, entry = {}) {
         routingCtx.settings,
       )
       providerCredentialRefs = resolver
-      void service.refreshAll()
+      void service.refreshAllAfterCurrent()
 
       const offEvent = routingCtx.on('session/event', (session, event) => {
         if (event?.type !== 'turn/end') return
@@ -109,5 +92,22 @@ export function apply(ctx, entry = {}) {
         offEvent()
       }
     }, 'dsh-balance-monitor: turn-end refresh')
+  })
+
+  ctx.inject(['settings'], settingsCtx => {
+    settingsCtx.settings.installSection(
+      ctx,
+      'dsh-balance-monitor',
+      Config,
+      withDefaults(entry),
+      {
+        setSource(next) {
+          source = next
+        },
+        onChange() {
+          void service.refreshAllAfterCurrent()
+        },
+      },
+    )
   })
 }

@@ -41,11 +41,11 @@ body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-pri
 .bm-note{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:10px}.bm-empty{padding:16px;font-size:12px;color:var(--dsw-alias-label-tertiary,#9ca3af)}
 .bm-settings{list-style:none;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:12px;background:var(--dsw-alias-bg-layer-3,transparent);color:inherit;transition:border-color .16s,background .16s}.bm-settings:hover{border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}.bm-settings[data-open=true]{background:var(--dsw-alias-bg-layer-2,transparent);border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}
 .bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 2px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
-.bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}
+.bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
 .bm-source-settings{position:relative;margin-left:auto}.bm-source-settings-trigger{box-sizing:border-box;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-source-settings-trigger:hover,.bm-source-settings-trigger[data-open=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-source-settings-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.bm-source-popover{position:absolute;z-index:20;top:calc(100% + 5px);right:0;width:min(340px,calc(100vw - 64px));padding:14px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 10px 30px rgba(0,0,0,.16));display:grid;gap:12px;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}.bm-source-popover-title{font-size:13px;font-weight:600}.bm-source-popover-field{display:grid;gap:6px}.bm-source-popover-field label{font-size:11px;color:var(--dsw-alias-label-secondary,#6b7280)}.bm-source-popover-field input{width:100%}.bm-source-popover-actions{display:flex;justify-content:flex-end;gap:8px}
 .bm-multi{position:relative}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex!important;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;font-weight:400!important;cursor:pointer}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45;cursor:default}
-.bm-badge{font-size:10px;padding:2px 6px;border-radius:999px;background:var(--dsw-alias-bg-layer-2,rgba(127,127,127,.12));color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-badge[data-set=true]{color:var(--dsw-alias-state-success-primary,#22c55e)}
+.bm-credential-dot{width:7px;height:7px;border-radius:50%;flex:none}.bm-credential-dot[data-status=success]{background:var(--dsw-alias-state-success-primary,#16a34a)}.bm-credential-dot[data-status=error]{background:var(--dsw-alias-state-error-primary,#dc2626)}
 .bm-buttons{display:flex;justify-content:flex-end;gap:8px}.bm-button{height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.25));border-radius:6px;padding:0 12px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.bm-button-primary{background:var(--dsw-alias-button-info-fill,#2563eb);border-color:transparent;color:var(--dsw-alias-label-primary-foreground,#fff)}.bm-button:disabled{opacity:.5;cursor:default}.bm-message{font-size:11px}.bm-message[data-error=true]{color:var(--dsw-alias-state-error-primary,#ef4444)}
 @keyframes bm-spin{to{transform:rotate(360deg)}}@keyframes bm-popover-in{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}@keyframes bm-popover-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px) scale(.985)}}@keyframes bm-success-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-success)}}@keyframes bm-error-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-error)}}@keyframes bm-stroke-feedback{0%,100%{stroke-width:1.8}35%,65%{stroke-width:3}}@media(prefers-reduced-motion:reduce){.bm-popover{animation:none}}`
 
@@ -626,20 +626,26 @@ function mountMonitor(scope) {
 }
 
 function credentialPresentation(snapshot, channelId) {
-  const credential = snapshot?.channels?.find(channel => channel.id === channelId)?.credential
+  const channel = snapshot?.channels?.find(candidate => candidate.id === channelId)
+  const credential = channel?.credential
+  const indicator = credential?.configured && channel.status === 'ready'
+    ? 'success'
+    : credential?.configured && channel.status === 'error'
+      ? 'error'
+      : undefined
   if (credential?.origin === 'environment') {
-    return { kind: 'environment', label: '环境变量', readonly: '来自环境变量（只读）' }
+    return { kind: 'environment', indicator, readonly: '来自环境变量（只读）' }
   }
   if (credential?.origin === 'model') {
-    return { kind: 'model', label: '模型配置', readonly: '来自模型配置（只读）' }
+    return { kind: 'model', indicator, readonly: '来自模型配置（只读）' }
   }
   if (credential?.origin === 'user') {
-    return { kind: 'user', label: '用户配置', configured: true }
+    return { kind: 'user', indicator, configured: true }
   }
   if (credential?.origin === 'none') {
-    return { kind: 'none', label: '未配置', configured: false }
+    return { kind: 'none', configured: false }
   }
-  return { kind: 'loading', label: '检测中', readonly: '正在检测凭据来源' }
+  return { kind: 'loading', readonly: '正在检测凭据来源' }
 }
 
 function SettingsIcon() {
@@ -650,6 +656,15 @@ function SettingsIcon() {
       d: 'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z',
     }),
     React.createElement('circle', { cx: 12, cy: 12, r: 3 }),
+  )
+}
+
+function RefreshIcon() {
+  return React.createElement(
+    'svg',
+    { viewBox: '0 0 24 24', 'aria-hidden': true },
+    React.createElement('path', { d: 'M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5' }),
+    React.createElement('path', { d: 'M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5' }),
   )
 }
 
@@ -674,6 +689,7 @@ function createSettingsCard(scope) {
     const [kimiKey, setKimiKey] = useState('')
     const [balanceSnapshot, setBalanceSnapshot] = useState()
     const [saving, setSaving] = useState(false)
+    const [refreshingChannels, setRefreshingChannels] = useState(() => new Set())
     const [message, setMessage] = useState('')
     const [failed, setFailed] = useState(false)
 
@@ -793,7 +809,7 @@ function createSettingsCard(scope) {
       }
     }
 
-    const removeCredential = async channel => {
+    const removeCredential = async (channel, clearValue) => {
       setSaving(true)
       setFailed(false)
       setMessage('')
@@ -802,6 +818,7 @@ function createSettingsCard(scope) {
           method: 'POST',
           body: JSON.stringify({ action: 'unset', channel }),
         })
+        clearValue()
         setMessage('已移除')
       } catch (error) {
         setFailed(true)
@@ -811,7 +828,40 @@ function createSettingsCard(scope) {
       }
     }
 
-    const field = (label, control, status, remove, action) => React.createElement(
+    const refreshCredential = async (channel, value, clearValue) => {
+      if (refreshingChannels.has(channel)) return
+      setRefreshingChannels(current => new Set(current).add(channel))
+      setFailed(false)
+      setMessage('')
+      try {
+        const credential = value.trim()
+        const next = credential
+          ? await api('/api/dsh-balance-monitor/credential', {
+            method: 'POST',
+            body: JSON.stringify({ action: 'set', channel, value: credential }),
+          })
+          : await api('/api/dsh-balance-monitor/refresh', {
+            method: 'POST',
+            body: JSON.stringify({ channel }),
+          })
+        if (credential) {
+          clearValue()
+          setMessage('已保存并刷新')
+        }
+        setBalanceSnapshot(next)
+      } catch (error) {
+        setFailed(true)
+        setMessage(error.message)
+      } finally {
+        setRefreshingChannels(current => {
+          const next = new Set(current)
+          next.delete(channel)
+          return next
+        })
+      }
+    }
+
+    const field = (label, control, indicator, action, refresh) => React.createElement(
       'div',
       { className: 'bm-field' },
       React.createElement(
@@ -821,10 +871,15 @@ function createSettingsCard(scope) {
           'label',
           null,
           label,
-          status === undefined ? null : React.createElement(
+          indicator === undefined ? null : React.createElement(
             'span',
-            { className: 'bm-badge', 'data-set': String(status !== '未配置') },
-            status,
+            {
+              className: 'bm-credential-dot',
+              'data-status': indicator,
+              role: 'img',
+              'aria-label': indicator === 'success' ? '数据获取正常' : '数据获取失败',
+              title: indicator === 'success' ? '数据获取正常' : '数据获取失败',
+            },
           ),
         ),
         action,
@@ -833,15 +888,17 @@ function createSettingsCard(scope) {
         'div',
         { className: 'bm-field-row' },
         control,
-        remove ? React.createElement(
+        refresh ? React.createElement(
           'button',
           {
-            className: 'bm-button',
+            className: `bm-field-refresh${refreshingChannels.has(refresh.channel) ? ' bm-spinning' : ''}`,
             type: 'button',
-            disabled: saving,
-            onClick: () => void removeCredential(remove),
+            title: `刷新 ${label}`,
+            'aria-label': `刷新 ${label}`,
+            disabled: saving || refreshingChannels.has(refresh.channel),
+            onClick: () => void refreshCredential(refresh.channel, refresh.value, refresh.clearValue),
           },
-          '移除',
+          React.createElement(RefreshIcon),
         ) : null,
       ),
     )
@@ -993,14 +1050,36 @@ function createSettingsCard(scope) {
       const presentation = credentialPresentation(balanceSnapshot, channel)
       const editable = presentation.kind === 'user' || presentation.kind === 'none'
       const control = editable
-        ? React.createElement('input', {
-          type: 'password',
-          value,
-          autoComplete: 'new-password',
-          placeholder: presentation.configured ? '输入新 Key 以替换' : placeholder,
-          disabled: saving,
-          onChange: event => setValue(event.target.value),
-        })
+        ? React.createElement(
+          'div',
+          { className: 'bm-credential-control' },
+          React.createElement('input', {
+            type: 'text',
+            className: 'bm-secret-input',
+            name: `dsh-balance-monitor-${channel}-credential`,
+            value,
+            autoComplete: 'off',
+            spellCheck: false,
+            'data-form-type': 'other',
+            'data-1p-ignore': true,
+            'data-lpignore': 'true',
+            placeholder: presentation.configured ? '已配置——输入新值可替换' : placeholder,
+            disabled: saving,
+            onChange: event => setValue(event.target.value),
+          }),
+          presentation.kind === 'user' ? React.createElement(
+            'button',
+            {
+              className: 'bm-credential-clear',
+              type: 'button',
+              title: `移除 ${label}`,
+              'aria-label': `移除 ${label}`,
+              disabled: saving,
+              onClick: () => void removeCredential(channel, () => setValue('')),
+            },
+            React.createElement('span', { 'aria-hidden': true }, '×'),
+          ) : null,
+        )
         : React.createElement(
           'div',
           { className: 'bm-credential-readonly', 'aria-disabled': true },
@@ -1009,9 +1088,9 @@ function createSettingsCard(scope) {
       return field(
         label,
         control,
-        presentation.label,
-        presentation.kind === 'user' ? channel : undefined,
+        presentation.indicator,
         channel === 'teamo' ? teamoSettings : undefined,
+        { channel, value, clearValue: () => setValue('') },
       )
     }
 
