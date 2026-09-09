@@ -1,4 +1,5 @@
-import React, { useEffect, useSyncExternalStore, useState } from 'react'
+import React, { useEffect, useRef, useSyncExternalStore, useState } from 'react'
+import Sortable from 'sortablejs'
 
 export const inject = ['slots', 'settingsScope']
 
@@ -22,6 +23,9 @@ function normalizeChannelOrder(value) {
 }
 
 const STYLE = `
+[data-dsh-balance-monitor-entry][hidden]{display:none}
+.bm-checkbox-field{display:flex;align-items:center;gap:8px;padding-top:8px;font-size:12px;font-weight:550}.bm-checkbox-field input{width:14px!important;height:14px!important;flex:none!important;margin:0;cursor:pointer}
+.bm-sortable-ghost{opacity:.28;background:var(--dsw-alias-interactive-bg-active,rgba(127,127,127,.16))}.bm-sortable-chosen{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-sortable-drag{opacity:.96;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.16))}
 body{--bm-feedback-success:#15803d;--bm-feedback-error:var(--dsw-alias-state-error-primary,#dc2626)}
 body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-primary,#22c55e);--bm-feedback-error:var(--dsw-alias-state-error-primary,#f25a5a)}
 [data-dsh-balance-monitor-entry]{box-sizing:border-box;width:100%;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,#d6d9df);display:flex;align-items:center;gap:8px;min-height:36px;padding:5px 10px;cursor:pointer;font:inherit;text-align:left}
@@ -50,7 +54,7 @@ body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-pri
 .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
 .bm-source-settings{position:relative;margin-left:auto}.bm-source-settings-trigger{box-sizing:border-box;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-source-settings-trigger:hover,.bm-source-settings-trigger[data-open=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-source-settings-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.bm-source-popover{position:absolute;z-index:20;top:calc(100% + 5px);right:0;width:min(340px,calc(100vw - 64px));padding:14px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 10px 30px rgba(0,0,0,.16));display:grid;gap:12px;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}.bm-source-popover-title{font-size:13px;font-weight:600}.bm-source-popover-field{display:grid;gap:6px}.bm-source-popover-field label{font-size:11px;color:var(--dsw-alias-label-secondary,#6b7280)}.bm-source-popover-field input{width:100%}.bm-source-popover-actions{display:flex;justify-content:flex-end;gap:8px}
-.bm-multi{position:relative;width:min(504px,100%);max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover,.bm-multi-option[data-drag-over=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.bm-multi{position:relative;width:min(504px,100%);max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;user-select:none}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
 .bm-credential-dot{width:7px;height:7px;border-radius:50%;flex:none}.bm-credential-dot[data-status=success]{background:var(--dsw-alias-state-success-primary,#16a34a)}.bm-credential-dot[data-status=error]{background:var(--dsw-alias-state-error-primary,#dc2626)}
 .bm-buttons{display:flex;justify-content:flex-end;gap:8px}.bm-button{height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.25));border-radius:6px;padding:0 12px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.bm-button-primary{background:var(--dsw-alias-button-info-fill,#2563eb);border-color:transparent;color:var(--dsw-alias-label-primary-foreground,#fff)}.bm-button:disabled{opacity:.5;cursor:default}.bm-message{font-size:11px}.bm-message[data-error=true]{color:var(--dsw-alias-state-error-primary,#ef4444)}
 @keyframes bm-spin{to{transform:rotate(360deg)}}@keyframes bm-popover-in{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}@keyframes bm-popover-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px) scale(.985)}}@keyframes bm-success-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-success)}}@keyframes bm-error-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-error)}}@keyframes bm-stroke-feedback{0%,100%{stroke-width:1.8}35%,65%{stroke-width:3}}@media(prefers-reduced-motion:reduce){.bm-popover{animation:none}}`
@@ -409,6 +413,11 @@ function mountMonitor(scope) {
     return order.filter(id => selectedSet.has(id))
   }
 
+  const sidebarVisible = () => {
+    const settings = scope.getSnapshot()
+    return settings.status !== 'ready' || settings.value?.showSidebar !== false
+  }
+
   const orderedChannels = () => {
     const settings = scope.getSnapshot()
     const order = normalizeChannelOrder(
@@ -431,9 +440,17 @@ function mountMonitor(scope) {
 
   const renderSummary = () => {
     summary.replaceChildren()
+    const visible = sidebarVisible()
+    entry.hidden = !visible
+    if (!visible) {
+      popup.hidden = true
+      delete popup.dataset.closing
+      delete entry.dataset.active
+      return
+    }
     const byId = new Map(snapshot.channels.map(channel => [channel.id, channel]))
-    const visible = selectedChannels().map(id => byId.get(id)).filter(Boolean)
-    for (const channel of visible) {
+    const channels = selectedChannels().map(id => byId.get(id)).filter(Boolean)
+    for (const channel of channels) {
       const row = document.createElement('span')
       row.className = 'bm-line'
       const label = document.createElement('span')
@@ -446,7 +463,7 @@ function mountMonitor(scope) {
       row.append(label, value)
       summary.append(row)
     }
-    if (!visible.length) summary.textContent = '余额监控'
+    if (!channels.length) summary.textContent = '余额监控'
   }
 
   const positionPopup = () => {
@@ -706,12 +723,12 @@ function createSettingsCard(scope) {
     const [open, setOpen] = useState(false)
     const [pickerOpen, setPickerOpen] = useState(false)
     const [sourceSettingsOpen, setSourceSettingsOpen] = useState(false)
+    const [showSidebar, setShowSidebar] = useState(values.showSidebar ?? true)
     const [sidebarChannels, setSidebarChannels] = useState(
       values.sidebarChannels ?? CHANNEL_IDS,
     )
     const [channelOrder, setChannelOrder] = useState(() => normalizeChannelOrder(values.channelOrder))
-    const [draggedChannel, setDraggedChannel] = useState()
-    const [dragOverChannel, setDragOverChannel] = useState()
+    const pickerMenu = useRef()
     const [teamoRangeDays, setTeamoRangeDays] = useState(values.teamoRangeDays ?? 7)
     const [deepseekKey, setDeepseekKey] = useState('')
     const [teamoKey, setTeamoKey] = useState('')
@@ -721,9 +738,11 @@ function createSettingsCard(scope) {
     const [refreshingChannels, setRefreshingChannels] = useState(() => new Set())
     const [message, setMessage] = useState('')
     const [failed, setFailed] = useState(false)
+    const settingsWrites = useRef(Promise.resolve())
 
     useEffect(() => {
       if (snapshot.status !== 'ready') return
+      setShowSidebar(values.showSidebar ?? true)
       setSidebarChannels(values.sidebarChannels ?? CHANNEL_IDS)
       setChannelOrder(normalizeChannelOrder(values.channelOrder))
       setTeamoRangeDays(values.teamoRangeDays ?? 7)
@@ -733,10 +752,26 @@ function createSettingsCard(scope) {
       if (!open) {
         setPickerOpen(false)
         setSourceSettingsOpen(false)
-        setDraggedChannel(undefined)
-        setDragOverChannel(undefined)
       }
     }, [open])
+
+    useEffect(() => {
+      if (!pickerOpen) return undefined
+      const closeOutside = event => {
+        if (!(event.target instanceof Element) || !event.target.closest('.bm-multi')) {
+          setPickerOpen(false)
+        }
+      }
+      const closeOnEscape = event => {
+        if (event.key === 'Escape') setPickerOpen(false)
+      }
+      document.addEventListener('pointerdown', closeOutside)
+      document.addEventListener('keydown', closeOnEscape)
+      return () => {
+        document.removeEventListener('pointerdown', closeOutside)
+        document.removeEventListener('keydown', closeOnEscape)
+      }
+    }, [pickerOpen])
 
     useEffect(() => {
       if (!sourceSettingsOpen) return undefined
@@ -759,55 +794,54 @@ function createSettingsCard(scope) {
       setBalanceSnapshot(next)
     }), [])
 
-    const save = async () => {
-      setSaving(true)
+    const persistSetting = (path, value) => {
       setFailed(false)
       setMessage('')
-      try {
-        const writes = []
-        const deepseekEditable = ['user', 'none'].includes(
-          credentialPresentation(balanceSnapshot, 'deepseek').kind,
-        )
-        const teamoEditable = ['user', 'none'].includes(
-          credentialPresentation(balanceSnapshot, 'teamo').kind,
-        )
-        const kimiEditable = ['user', 'none'].includes(
-          credentialPresentation(balanceSnapshot, 'kimi').kind,
-        )
-        if (deepseekEditable && deepseekKey.trim()) {
-          writes.push(api('/api/dsh-balance-monitor/credential', {
-            method: 'POST',
-            body: JSON.stringify({ action: 'set', channel: 'deepseek', value: deepseekKey.trim() }),
-          }))
-        }
-        if (teamoEditable && teamoKey.trim()) {
-          writes.push(api('/api/dsh-balance-monitor/credential', {
-            method: 'POST',
-            body: JSON.stringify({ action: 'set', channel: 'teamo', value: teamoKey.trim() }),
-          }))
-        }
-        if (kimiEditable && kimiKey.trim()) {
-          writes.push(api('/api/dsh-balance-monitor/credential', {
-            method: 'POST',
-            body: JSON.stringify({ action: 'set', channel: 'kimi', value: kimiKey.trim() }),
-          }))
-        }
-        await Promise.all(writes)
-        await scope.mutate([
-          { op: 'set', path: ['sidebarChannels'], value: sidebarChannels },
-          { op: 'set', path: ['channelOrder'], value: channelOrder },
-        ], snapshot.revision)
-        setDeepseekKey('')
-        setTeamoKey('')
-        setKimiKey('')
-        setMessage('已保存')
-      } catch (error) {
-        setFailed(true)
-        setMessage(error.message)
-      } finally {
-        setSaving(false)
-      }
+      settingsWrites.current = settingsWrites.current
+        .then(async () => {
+          const current = scope.getSnapshot()
+          if (current.status !== 'ready' || !current.writable) {
+            throw new Error('设置暂不可保存')
+          }
+          await scope.mutate([
+            { op: 'set', path: [path], value },
+          ], current.revision)
+        })
+        .catch(error => {
+          setFailed(true)
+          setMessage(error.message)
+        })
+      return settingsWrites.current
     }
+
+    useEffect(() => {
+      if (!pickerOpen || !pickerMenu.current) return undefined
+      const sortable = Sortable.create(pickerMenu.current, {
+        animation: 180,
+        easing: 'cubic-bezier(0.2, 0, 0, 1)',
+        handle: '.bm-drag-handle',
+        draggable: '.bm-multi-option',
+        dataIdAttr: 'data-channel-id',
+        direction: 'vertical',
+        forceFallback: true,
+        fallbackOnBody: true,
+        fallbackTolerance: 3,
+        swapThreshold: 0.65,
+        ghostClass: 'bm-sortable-ghost',
+        chosenClass: 'bm-sortable-chosen',
+        dragClass: 'bm-sortable-drag',
+        onEnd: event => {
+          const from = event.oldDraggableIndex
+          const to = event.newDraggableIndex
+          if (!Number.isInteger(from) || !Number.isInteger(to) || from === to) return
+          const next = normalizeChannelOrder(channelOrder)
+          next.splice(to, 0, next.splice(from, 1)[0])
+          setChannelOrder(next)
+          void persistSetting('channelOrder', next)
+        },
+      })
+      return () => sortable.destroy()
+    }, [pickerOpen, channelOrder])
 
     const saveTeamoSettings = async () => {
       setSaving(true)
@@ -930,26 +964,16 @@ function createSettingsCard(scope) {
     )
 
     const toggleSidebarChannel = id => {
-      setSidebarChannels(current => {
-        if (current.includes(id)) {
-          return current.length > 1 ? current.filter(value => value !== id) : current
-        }
-        if (current.length >= MAX_SIDEBAR_CHANNELS) return current
-        return [...current, id]
-      })
-    }
-
-    const moveChannel = target => {
-      if (!draggedChannel || draggedChannel === target) return
-      setChannelOrder(current => {
-        const next = normalizeChannelOrder(current)
-        const sourceIndex = next.indexOf(draggedChannel)
-        const targetIndex = next.indexOf(target)
-        if (sourceIndex < 0 || targetIndex < 0) return next
-        next.splice(targetIndex, 0, next.splice(sourceIndex, 1)[0])
-        return next
-      })
-      setDragOverChannel(undefined)
+      const next = sidebarChannels.includes(id)
+        ? sidebarChannels.length > 1
+          ? sidebarChannels.filter(value => value !== id)
+          : sidebarChannels
+        : sidebarChannels.length >= MAX_SIDEBAR_CHANNELS
+          ? sidebarChannels
+          : [...sidebarChannels, id]
+      if (next === sidebarChannels) return
+      setSidebarChannels(next)
+      void persistSetting('sidebarChannels', next)
     }
 
     const optionsById = new Map(CHANNEL_OPTIONS.map(channel => [channel.id, channel]))
@@ -985,7 +1009,12 @@ function createSettingsCard(scope) {
       ),
       pickerOpen ? React.createElement(
         'div',
-        { className: 'bm-multi-menu', role: 'listbox', 'aria-multiselectable': true },
+        {
+          className: 'bm-multi-menu',
+          ref: pickerMenu,
+          role: 'listbox',
+          'aria-multiselectable': true,
+        },
         ...orderedOptions.map(channel => {
           const checked = sidebarChannels.includes(channel.id)
           const disabled = !checked && sidebarChannels.length >= MAX_SIDEBAR_CHANNELS
@@ -994,20 +1023,8 @@ function createSettingsCard(scope) {
             {
               key: channel.id,
               className: 'bm-multi-option',
+              'data-channel-id': channel.id,
               'data-disabled': String(disabled),
-              'data-drag-over': String(dragOverChannel === channel.id),
-              onDragOver: event => {
-                event.preventDefault()
-                event.dataTransfer.dropEffect = 'move'
-                setDragOverChannel(channel.id)
-              },
-              onDragLeave: () => {
-                if (dragOverChannel === channel.id) setDragOverChannel(undefined)
-              },
-              onDrop: event => {
-                event.preventDefault()
-                moveChannel(channel.id)
-              },
             },
             React.createElement(
               'label',
@@ -1025,18 +1042,8 @@ function createSettingsCard(scope) {
               {
                 className: 'bm-drag-handle',
                 type: 'button',
-                draggable: true,
                 title: `拖动调整 ${channel.label} 顺序`,
                 'aria-label': `拖动调整 ${channel.label} 顺序`,
-                onDragStart: event => {
-                  setDraggedChannel(channel.id)
-                  event.dataTransfer.effectAllowed = 'move'
-                  event.dataTransfer.setData('text/plain', channel.id)
-                },
-                onDragEnd: () => {
-                  setDraggedChannel(undefined)
-                  setDragOverChannel(undefined)
-                },
               },
               React.createElement(DragHandleIcon),
             ),
@@ -1164,7 +1171,22 @@ function createSettingsCard(scope) {
     const form = React.createElement(
       'div',
       { className: 'bm-form' },
-      field('侧边栏展示', channelPicker),
+      React.createElement(
+        'div',
+        { className: 'bm-checkbox-field' },
+        React.createElement('input', {
+          type: 'checkbox',
+          checked: showSidebar,
+          'aria-label': '展示侧边栏',
+          onChange: event => {
+            const next = event.target.checked
+            setShowSidebar(next)
+            void persistSetting('showSidebar', next)
+          },
+        }),
+        React.createElement('span', null, '展示侧边栏'),
+      ),
+      field('侧边栏渠道', channelPicker),
       credentialField({
         channel: 'deepseek',
         label: 'DeepSeek API Key',
@@ -1191,20 +1213,6 @@ function createSettingsCard(scope) {
         { className: 'bm-message', 'data-error': String(failed) },
         message,
       ) : null,
-      React.createElement(
-        'div',
-        { className: 'bm-buttons' },
-        React.createElement(
-          'button',
-          {
-            className: 'bm-button bm-button-primary',
-            type: 'button',
-            disabled: saving || snapshot.status !== 'ready' || !snapshot.writable,
-            onClick: () => void save(),
-          },
-          saving ? '保存中' : '保存',
-        ),
-      ),
     )
     const updateStatus = updatePresentation(update)
     const updateNotice = updateStatus ? React.createElement(
