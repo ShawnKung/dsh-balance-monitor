@@ -18,3 +18,16 @@ test('client bundle registers the published package name', async () => {
   assert.equal(loaderId, manifest.name)
   assert.equal(clientBundle.includes(`v${manifest.version}`), true)
 })
+
+test('client bundle uses credential status dots and inline channel actions', async () => {
+  const clientBundle = await readFile(resolve(root, 'client.js'), 'utf8')
+
+  assert.match(clientBundle, /bm-credential-dot/)
+  assert.match(clientBundle, /bm-credential-clear/)
+  assert.match(clientBundle, /bm-field-refresh/)
+  assert.match(clientBundle, /bm-secret-input/)
+  assert.match(clientBundle, /data-form-type/)
+  assert.match(clientBundle, /\\u5DF2\\u914D\\u7F6E\\u2014\\u2014\\u8F93\\u5165\\u65B0\\u503C\\u53EF\\u66FF\\u6362/)
+  assert.doesNotMatch(clientBundle, /className: "bm-badge"/)
+  assert.doesNotMatch(clientBundle, /type: "password"/)
+})
