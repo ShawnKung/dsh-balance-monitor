@@ -50,8 +50,13 @@ window.__ModuleLoader__.load({
       { id: "teamo", label: "TeamoRouter" },
       { id: "kimi", label: "Kimi \u5B98\u65B9" }
     ]);
+    var CHANNEL_IDS = CHANNEL_OPTIONS.map((channel) => channel.id);
     var WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>';
     var REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>';
+    function normalizeChannelOrder(value) {
+      const requested = Array.isArray(value) ? value : [];
+      return [.../* @__PURE__ */ new Set([...requested.filter((id) => CHANNEL_IDS.includes(id)), ...CHANNEL_IDS])];
+    }
     var STYLE = `
     body{--bm-feedback-success:#15803d;--bm-feedback-error:var(--dsw-alias-state-error-primary,#dc2626)}
     body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-primary,#22c55e);--bm-feedback-error:var(--dsw-alias-state-error-primary,#f25a5a)}
@@ -81,7 +86,7 @@ window.__ModuleLoader__.load({
     .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
     .bm-source-settings{position:relative;margin-left:auto}.bm-source-settings-trigger{box-sizing:border-box;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-source-settings-trigger:hover,.bm-source-settings-trigger[data-open=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-source-settings-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.bm-source-popover{position:absolute;z-index:20;top:calc(100% + 5px);right:0;width:min(340px,calc(100vw - 64px));padding:14px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 10px 30px rgba(0,0,0,.16));display:grid;gap:12px;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}.bm-source-popover-title{font-size:13px;font-weight:600}.bm-source-popover-field{display:grid;gap:6px}.bm-source-popover-field label{font-size:11px;color:var(--dsw-alias-label-secondary,#6b7280)}.bm-source-popover-field input{width:100%}.bm-source-popover-actions{display:flex;justify-content:flex-end;gap:8px}
-    .bm-multi{position:relative}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex!important;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;font-weight:400!important;cursor:pointer}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45;cursor:default}
+    .bm-multi{position:relative;width:min(504px,100%);max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover,.bm-multi-option[data-drag-over=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{opacity:.45}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
     .bm-credential-dot{width:7px;height:7px;border-radius:50%;flex:none}.bm-credential-dot[data-status=success]{background:var(--dsw-alias-state-success-primary,#16a34a)}.bm-credential-dot[data-status=error]{background:var(--dsw-alias-state-error-primary,#dc2626)}
     .bm-buttons{display:flex;justify-content:flex-end;gap:8px}.bm-button{height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.25));border-radius:6px;padding:0 12px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.bm-button-primary{background:var(--dsw-alias-button-info-fill,#2563eb);border-color:transparent;color:var(--dsw-alias-label-primary-foreground,#fff)}.bm-button:disabled{opacity:.5;cursor:default}.bm-message{font-size:11px}.bm-message[data-error=true]{color:var(--dsw-alias-state-error-primary,#ef4444)}
     @keyframes bm-spin{to{transform:rotate(360deg)}}@keyframes bm-popover-in{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}@keyframes bm-popover-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px) scale(.985)}}@keyframes bm-success-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-success)}}@keyframes bm-error-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-error)}}@keyframes bm-stroke-feedback{0%,100%{stroke-width:1.8}35%,65%{stroke-width:3}}@media(prefers-reduced-motion:reduce){.bm-popover{animation:none}}`;
@@ -392,7 +397,21 @@ window.__ModuleLoader__.load({
       const selectedChannels = () => {
         const settings = scope.getSnapshot();
         const selected = settings.status === "ready" ? settings.value?.sidebarChannels : void 0;
-        return Array.isArray(selected) && selected.length ? selected.slice(0, MAX_SIDEBAR_CHANNELS) : CHANNEL_OPTIONS.map((channel) => channel.id);
+        const selectedSet = new Set(
+          Array.isArray(selected) && selected.length ? selected.slice(0, MAX_SIDEBAR_CHANNELS) : CHANNEL_IDS
+        );
+        const order = normalizeChannelOrder(
+          settings.status === "ready" ? settings.value?.channelOrder : void 0
+        );
+        return order.filter((id) => selectedSet.has(id));
+      };
+      const orderedChannels = () => {
+        const settings = scope.getSnapshot();
+        const order = normalizeChannelOrder(
+          settings.status === "ready" ? settings.value?.channelOrder : void 0
+        );
+        const byId = new Map(snapshot.channels.map((channel) => [channel.id, channel]));
+        return order.map((id) => byId.get(id)).filter(Boolean);
       };
       const acceptSnapshot = (next) => {
         if (!next || !Array.isArray(next.channels)) return false;
@@ -404,8 +423,8 @@ window.__ModuleLoader__.load({
       };
       const renderSummary = () => {
         summary.replaceChildren();
-        const selected = new Set(selectedChannels());
-        const visible = snapshot.channels.filter((channel) => selected.has(channel.id));
+        const byId = new Map(snapshot.channels.map((channel) => [channel.id, channel]));
+        const visible = selectedChannels().map((id) => byId.get(id)).filter(Boolean);
         for (const channel of visible) {
           const row = document.createElement("span");
           row.className = "bm-line";
@@ -512,7 +531,7 @@ window.__ModuleLoader__.load({
           empty.textContent = "\u6B63\u5728\u52A0\u8F7D\u4F59\u989D";
           popup.append(empty);
         }
-        for (const channel of snapshot.channels) {
+        for (const channel of orderedChannels()) {
           popup.append(channelView(
             channel,
             () => void refresh(channel.id),
@@ -640,6 +659,13 @@ window.__ModuleLoader__.load({
         import_react.default.createElement("path", { d: "M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" })
       );
     }
+    function DragHandleIcon() {
+      return import_react.default.createElement(
+        "svg",
+        { viewBox: "0 0 18 18", "aria-hidden": true },
+        import_react.default.createElement("path", { d: "M4 5h10M4 9h10M4 13h10" })
+      );
+    }
     function createSettingsCard(scope) {
       return function DshBalanceMonitorSettings() {
         const snapshot = (0, import_react.useSyncExternalStore)(
@@ -652,9 +678,11 @@ window.__ModuleLoader__.load({
         const [pickerOpen, setPickerOpen] = (0, import_react.useState)(false);
         const [sourceSettingsOpen, setSourceSettingsOpen] = (0, import_react.useState)(false);
         const [sidebarChannels, setSidebarChannels] = (0, import_react.useState)(
-          values.sidebarChannels ?? CHANNEL_OPTIONS.map((channel) => channel.id)
+          values.sidebarChannels ?? CHANNEL_IDS
         );
-        const [teamoBaseUrl, setTeamoBaseUrl] = (0, import_react.useState)(values.teamoBaseUrl ?? "https://teamorouter.cn");
+        const [channelOrder, setChannelOrder] = (0, import_react.useState)(() => normalizeChannelOrder(values.channelOrder));
+        const [draggedChannel, setDraggedChannel] = (0, import_react.useState)();
+        const [dragOverChannel, setDragOverChannel] = (0, import_react.useState)();
         const [teamoRangeDays, setTeamoRangeDays] = (0, import_react.useState)(values.teamoRangeDays ?? 7);
         const [deepseekKey, setDeepseekKey] = (0, import_react.useState)("");
         const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
@@ -666,14 +694,16 @@ window.__ModuleLoader__.load({
         const [failed, setFailed] = (0, import_react.useState)(false);
         (0, import_react.useEffect)(() => {
           if (snapshot.status !== "ready") return;
-          setSidebarChannels(values.sidebarChannels ?? CHANNEL_OPTIONS.map((channel) => channel.id));
-          setTeamoBaseUrl(values.teamoBaseUrl ?? "https://teamorouter.cn");
+          setSidebarChannels(values.sidebarChannels ?? CHANNEL_IDS);
+          setChannelOrder(normalizeChannelOrder(values.channelOrder));
           setTeamoRangeDays(values.teamoRangeDays ?? 7);
         }, [snapshot.revision]);
         (0, import_react.useEffect)(() => {
           if (!open) {
             setPickerOpen(false);
             setSourceSettingsOpen(false);
+            setDraggedChannel(void 0);
+            setDragOverChannel(void 0);
           }
         }, [open]);
         (0, import_react.useEffect)(() => {
@@ -730,7 +760,8 @@ window.__ModuleLoader__.load({
             }
             await Promise.all(writes);
             await scope.mutate([
-              { op: "set", path: ["sidebarChannels"], value: sidebarChannels }
+              { op: "set", path: ["sidebarChannels"], value: sidebarChannels },
+              { op: "set", path: ["channelOrder"], value: channelOrder }
             ], snapshot.revision);
             setDeepseekKey("");
             setTeamoKey("");
@@ -748,17 +779,11 @@ window.__ModuleLoader__.load({
           setFailed(false);
           setMessage("");
           try {
-            const baseUrl = teamoBaseUrl.trim();
-            const parsed = new URL(baseUrl);
-            if (!["http:", "https:"].includes(parsed.protocol)) {
-              throw new Error("TeamoRouter \u5730\u5740\u5FC5\u987B\u4F7F\u7528 HTTP \u6216 HTTPS");
-            }
             const rangeDays = Number(teamoRangeDays);
             if (!Number.isInteger(rangeDays) || rangeDays < 2 || rangeDays > 90) {
               throw new Error("\u7EDF\u8BA1\u5929\u6570\u5FC5\u987B\u662F 2 \u5230 90 \u7684\u6574\u6570");
             }
             await scope.mutate([
-              { op: "set", path: ["teamoBaseUrl"], value: baseUrl },
               { op: "set", path: ["teamoRangeDays"], value: rangeDays }
             ], snapshot.revision);
             await api("/api/dsh-balance-monitor/refresh", {
@@ -872,7 +897,21 @@ window.__ModuleLoader__.load({
             return [...current, id];
           });
         };
-        const selectedLabels = CHANNEL_OPTIONS.filter((channel) => sidebarChannels.includes(channel.id)).map((channel) => channel.label).join("\u3001");
+        const moveChannel = (target) => {
+          if (!draggedChannel || draggedChannel === target) return;
+          setChannelOrder((current) => {
+            const next = normalizeChannelOrder(current);
+            const sourceIndex = next.indexOf(draggedChannel);
+            const targetIndex = next.indexOf(target);
+            if (sourceIndex < 0 || targetIndex < 0) return next;
+            next.splice(targetIndex, 0, next.splice(sourceIndex, 1)[0]);
+            return next;
+          });
+          setDragOverChannel(void 0);
+        };
+        const optionsById = new Map(CHANNEL_OPTIONS.map((channel) => [channel.id, channel]));
+        const orderedOptions = channelOrder.map((id) => optionsById.get(id)).filter(Boolean);
+        const selectedLabels = orderedOptions.filter((channel) => sidebarChannels.includes(channel.id)).map((channel) => channel.label).join("\u3001");
         const channelPicker = import_react.default.createElement(
           "div",
           { className: "bm-multi", "data-open": String(pickerOpen) },
@@ -900,23 +939,60 @@ window.__ModuleLoader__.load({
           pickerOpen ? import_react.default.createElement(
             "div",
             { className: "bm-multi-menu", role: "listbox", "aria-multiselectable": true },
-            ...CHANNEL_OPTIONS.map((channel) => {
+            ...orderedOptions.map((channel) => {
               const checked = sidebarChannels.includes(channel.id);
               const disabled = !checked && sidebarChannels.length >= MAX_SIDEBAR_CHANNELS;
               return import_react.default.createElement(
-                "label",
+                "div",
                 {
                   key: channel.id,
                   className: "bm-multi-option",
-                  "data-disabled": String(disabled)
+                  "data-disabled": String(disabled),
+                  "data-drag-over": String(dragOverChannel === channel.id),
+                  onDragOver: (event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = "move";
+                    setDragOverChannel(channel.id);
+                  },
+                  onDragLeave: () => {
+                    if (dragOverChannel === channel.id) setDragOverChannel(void 0);
+                  },
+                  onDrop: (event) => {
+                    event.preventDefault();
+                    moveChannel(channel.id);
+                  }
                 },
-                import_react.default.createElement("input", {
-                  type: "checkbox",
-                  checked,
-                  disabled,
-                  onChange: () => toggleSidebarChannel(channel.id)
-                }),
-                import_react.default.createElement("span", null, channel.label)
+                import_react.default.createElement(
+                  "label",
+                  { className: "bm-multi-option-select" },
+                  import_react.default.createElement("input", {
+                    type: "checkbox",
+                    checked,
+                    disabled,
+                    onChange: () => toggleSidebarChannel(channel.id)
+                  }),
+                  import_react.default.createElement("span", null, channel.label)
+                ),
+                import_react.default.createElement(
+                  "button",
+                  {
+                    className: "bm-drag-handle",
+                    type: "button",
+                    draggable: true,
+                    title: `\u62D6\u52A8\u8C03\u6574 ${channel.label} \u987A\u5E8F`,
+                    "aria-label": `\u62D6\u52A8\u8C03\u6574 ${channel.label} \u987A\u5E8F`,
+                    onDragStart: (event) => {
+                      setDraggedChannel(channel.id);
+                      event.dataTransfer.effectAllowed = "move";
+                      event.dataTransfer.setData("text/plain", channel.id);
+                    },
+                    onDragEnd: () => {
+                      setDraggedChannel(void 0);
+                      setDragOverChannel(void 0);
+                    }
+                  },
+                  import_react.default.createElement(DragHandleIcon)
+                )
               );
             })
           ) : null
@@ -942,17 +1018,6 @@ window.__ModuleLoader__.load({
             "div",
             { className: "bm-source-popover", role: "dialog", "aria-label": "TeamoRouter \u8BBE\u7F6E" },
             import_react.default.createElement("div", { className: "bm-source-popover-title" }, "TeamoRouter \u8BBE\u7F6E"),
-            import_react.default.createElement(
-              "div",
-              { className: "bm-source-popover-field" },
-              import_react.default.createElement("label", null, "\u670D\u52A1\u5730\u5740"),
-              import_react.default.createElement("input", {
-                type: "url",
-                value: teamoBaseUrl,
-                disabled: saving,
-                onChange: (event) => setTeamoBaseUrl(event.target.value)
-              })
-            ),
             import_react.default.createElement(
               "div",
               { className: "bm-source-popover-field" },
