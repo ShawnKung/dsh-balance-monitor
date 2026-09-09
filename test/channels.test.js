@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { deepseekChannel } from '../channels/deepseek.js'
+import { kimiChannel } from '../channels/kimi.js'
 import { teamoChannel } from '../channels/teamo.js'
 
 function json(value, status = 200) {
@@ -70,4 +71,28 @@ test('Teamo adapter combines balance, costs, and token usage', async () => {
   assert.equal(result.periods[0].cost, '$1.25')
   assert.equal(result.detail[0].value, '$23.50')
   assert.equal(result.detail.length, 4)
+})
+
+test('Kimi adapter maps Moonshot CN balance fields', async () => {
+  const result = await kimiChannel.fetch({
+    apiKey: 'secret',
+    fetchImpl: async (url, options) => {
+      assert.equal(String(url), 'https://api.moonshot.cn/v1/users/me/balance')
+      assert.equal(options.headers.Authorization, 'Bearer secret')
+      return json({
+        code: 0,
+        status: true,
+        data: {
+          available_balance: 41.71543,
+          cash_balance: 40,
+          voucher_balance: 1.71543,
+        },
+      })
+    },
+  })
+
+  assert.equal(result.currency, 'CNY')
+  assert.equal(result.balance, 41.71543)
+  assert.equal(result.detail.length, 3)
+  assert.equal(result.detail[0].value, '¥41.71543')
 })

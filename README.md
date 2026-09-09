@@ -18,7 +18,7 @@
 ## 功能
 
 - 在“新会话”和工作区之间展示所选渠道的余额，不干扰任务看板等其他侧边栏插件。
-- 点击侧边栏入口查看所有渠道的余额、消费、请求数和 Token 用量。
+- 点击侧边栏入口查看所有渠道的余额，及支持渠道的消费、请求数和 Token 用量。
 - 支持单渠道刷新与全量刷新，并通过颜色渐变反馈刷新结果。
 - 会话结束后，根据当前模型 provider 的实际 API 域名定向刷新对应渠道。
 - 支持浅色、深色和跟随系统主题。
@@ -31,6 +31,7 @@
 | --- | --- | --- | --- | --- |
 | DeepSeek 官方 API | 是 | 否 | 否 | `deepseek.com` |
 | TeamoRouter | 是 | 是 | 是 | `teamorouter.cn` |
+| Kimi 官方 API | 是 | 否 | 否 | `moonshot.cn` |
 
 未知域名、缺失 provider 或无效 URL 不会触发兜底全量刷新。
 
@@ -78,6 +79,7 @@ dsh plugin --profile web list
 - **侧边栏展示渠道**：可多选，最多展示 3 个渠道。
 - **DeepSeek API Key**：默认凭据引用为 `DEEPSEEK_API_KEY`。
 - **TeamoRouter API Key**：默认凭据引用为 `TEAMO_API_KEY`。
+- **Kimi API Key**：默认凭据引用为 `KIMI_API_KEY`，调用 CN Host `https://api.moonshot.cn/v1/users/me/balance`。
 - **TeamoRouter API 地址**：余额与用量接口地址。
 - **统计天数**：TeamoRouter 区间统计范围，支持 2 至 90 天。
 

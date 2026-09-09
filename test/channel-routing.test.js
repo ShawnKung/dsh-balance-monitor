@@ -32,8 +32,10 @@ function session(provider) {
 
 test('channel routing matches exact domains and their subdomains', () => {
   assert.equal(channelForBaseURL('https://api.teamorouter.cn/v1'), 'teamo')
+  assert.equal(channelForBaseURL('https://api.moonshot.cn/v1'), 'kimi')
   assert.equal(channelForBaseURL('https://api.deepseek.com'), 'deepseek')
   assert.equal(channelForBaseURL('https://DEEPSEEK.COM./v1'), 'deepseek')
+  assert.equal(channelForBaseURL('https://moonshot.cn.example.org'), undefined)
   assert.equal(channelForBaseURL('https://deepseek.com.example.org'), undefined)
   assert.equal(channelForBaseURL('not a URL'), undefined)
 })
