@@ -16,7 +16,7 @@ export const inject = ['webServer', 'credentials']
 
 export const Config = z.object({
   showSidebar: z.boolean().default(true),
-  balancePrecision: z.union(['0', '1', '2', '3', '4', '5', '6', 'exact']).default('exact'),
+  balancePrecision: z.union(['0', '1', '2', '3', '4', '5', '6', 'exact']).default('2'),
   sidebarChannels: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(3).default(['deepseek', 'teamo']),
   channelOrder: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(4).default(['deepseek', 'kimi', 'zhipu', 'teamo']),
   deepseekApiKeyRef: z.string().role('credential-ref').default('DEEPSEEK_API_KEY'),
@@ -29,7 +29,7 @@ export const Config = z.object({
 
 const DEFAULT_CONFIG = Object.freeze({
   showSidebar: true,
-  balancePrecision: 'exact',
+  balancePrecision: '2',
   sidebarChannels: ['deepseek', 'teamo'],
   channelOrder: ['deepseek', 'kimi', 'zhipu', 'teamo'],
   deepseekApiKeyRef: 'DEEPSEEK_API_KEY',
