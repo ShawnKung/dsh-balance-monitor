@@ -8,18 +8,22 @@ import {
   refreshTargetForSession,
 } from '../lib/channel-routing.js'
 
-function runtime(profiles, entries = Object.keys(profiles).map(provider => ({
-  provider,
-  settingsNs: 'llm-pi-ai',
-  settingsPath: ['providers', provider],
-  declared: true,
-}))) {
+function runtime(
+  profiles,
+  entries = Object.keys(profiles).map(provider => ({
+    provider,
+    settingsNs: 'llm-pi-ai',
+    settingsPath: ['providers', provider],
+    declared: true,
+  })),
+  namespaces = { 'llm-pi-ai': { providers: profiles } },
+) {
   return {
     llm: {
       listConfigurableProviders: () => entries,
     },
     settings: {
-      get: namespace => namespace === 'llm-pi-ai' ? { providers: profiles } : undefined,
+      get: namespace => namespaces[namespace],
     },
   }
 }
@@ -179,31 +183,102 @@ test('provider identity cannot override an unrelated configured URL', () => {
 
 test('built-in DeepSeek uses its catalog identity when URL is omitted', () => {
   const services = runtime(
-    { deepseek: { apiKeyEnv: 'DEEPSEEK_API_KEY' } },
+    {},
     [{
-      provider: 'deepseek',
-      settingsNs: 'llm-pi-ai',
-      settingsPath: ['providers', 'deepseek'],
-      declared: false,
+      provider: 'deepseek-official',
+      settingsNs: 'llm-deepseek',
+      settingsPath: [],
     }],
+    {
+      'llm-deepseek': {
+        models: [{ id: 'deepseek-v4.1-flash-expires-on-0910' }],
+      },
+    },
   )
   assert.deepEqual(
-    refreshTargetForSession(session('deepseek'), services),
+    refreshTargetForSession(session('deepseek-official'), services),
     { kind: 'channel', channel: 'deepseek' },
   )
 })
 
+test('pi-ai catalog routes use supported account identities when URL is omitted', () => {
+  const services = runtime(
+    {},
+    [
+      {
+        provider: 'deepseek',
+        settingsNs: 'llm-pi-ai',
+        settingsPath: ['providers', 'deepseek'],
+        declared: false,
+      },
+      {
+        provider: 'moonshotai-cn',
+        settingsNs: 'llm-pi-ai',
+        settingsPath: ['providers', 'moonshotai-cn'],
+        declared: false,
+      },
+    ],
+    {
+      'llm-pi-ai': {
+        providers: {
+          deepseek: { apiKeyEnv: 'DEEPSEEK_API_KEY' },
+          'moonshotai-cn': { apiKeyEnv: 'MOONSHOT_API_KEY' },
+        },
+      },
+    },
+  )
+
+  assert.deepEqual(
+    refreshTargetForSession(session('deepseek'), services),
+    { kind: 'channel', channel: 'deepseek' },
+  )
+  assert.deepEqual(
+    refreshTargetForSession(session('moonshotai-cn'), services),
+    { kind: 'channel', channel: 'kimi' },
+  )
+})
+
+test('catalog routes for other account systems do not trigger balance refreshes', () => {
+  const providers = ['moonshotai', 'kimi-coding', 'zai', 'zai-coding-cn']
+  const services = runtime(
+    {},
+    providers.map(provider => ({
+      provider,
+      settingsNs: 'llm-pi-ai',
+      settingsPath: ['providers', provider],
+      declared: false,
+    })),
+    {
+      'llm-pi-ai': {
+        providers: Object.fromEntries(
+          providers.map(provider => [provider, {}]),
+        ),
+      },
+    },
+  )
+
+  for (const provider of providers) {
+    assert.deepEqual(
+      refreshTargetForSession(session(provider), services),
+      { kind: 'skip' },
+    )
+  }
+})
+
 test('explicit URL overrides built-in provider identity', () => {
   const services = runtime(
-    { deepseek: { baseURL: 'https://gateway.example.org/v1' } },
+    {},
     [{
-      provider: 'deepseek',
-      settingsNs: 'llm-pi-ai',
-      settingsPath: ['providers', 'deepseek'],
-      declared: false,
+      provider: 'deepseek-official',
+      settingsNs: 'llm-deepseek',
+      settingsPath: [],
     }],
+    { 'llm-deepseek': { baseURL: 'https://gateway.example.org/v1' } },
   )
-  assert.deepEqual(refreshTargetForSession(session('deepseek'), services), { kind: 'skip' })
+  assert.deepEqual(
+    refreshTargetForSession(session('deepseek-official'), services),
+    { kind: 'skip' },
+  )
 })
 
 test('unmatched, unknown, and missing providers do not refresh', () => {
