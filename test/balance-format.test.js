@@ -20,7 +20,7 @@ test('balance formatting preserves currency and handles missing values', () => {
   assert.equal(formatMoney(null, 'CNY', 'exact'), '--')
 })
 
-test('unknown balance precision preserves the source value', () => {
-  assert.equal(normalizeBalancePrecision('unexpected'), 'exact')
-  assert.equal(formatMoney(12.345, 'USD', 'unexpected'), '$12.345')
+test('unknown balance precision falls back to two fraction digits', () => {
+  assert.equal(normalizeBalancePrecision('unexpected'), '2')
+  assert.equal(formatMoney(12.345, 'USD', 'unexpected'), '$12.35')
 })
