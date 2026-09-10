@@ -2297,14 +2297,32 @@ window.__ModuleLoader__.load({
     var POPOVER_EXIT_MS = 160;
     var MAX_SIDEBAR_CHANNELS = 3;
     var CHANNEL_OPTIONS = Object.freeze([
-      { id: "deepseek", label: "DeepSeek \u5B98\u65B9" },
-      { id: "kimi", label: "Kimi \u5B98\u65B9" },
-      { id: "zhipu", label: "\u667A\u8C31 GLM" },
-      { id: "teamo", label: "TeamoRouter" }
+      {
+        id: "deepseek",
+        label: "DeepSeek \u5B98\u65B9",
+        website: "https://platform.deepseek.com/usage"
+      },
+      {
+        id: "kimi",
+        label: "Kimi \u5B98\u65B9",
+        website: "https://platform.kimi.com/console/account"
+      },
+      {
+        id: "zhipu",
+        label: "\u667A\u8C31 GLM",
+        website: "https://bigmodel.cn/finance-center/finance/overview"
+      },
+      {
+        id: "teamo",
+        label: "TeamoRouter",
+        website: "https://teamorouter.com/dashboard"
+      }
     ]);
     var CHANNEL_IDS = CHANNEL_OPTIONS.map((channel) => channel.id);
+    var CHANNEL_BY_ID = new Map(CHANNEL_OPTIONS.map((channel) => [channel.id, channel]));
     var WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>';
     var REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>';
+    var EXTERNAL_LINK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="m10 14 11-11"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
     function normalizeChannelOrder(value) {
       const requested = Array.isArray(value) ? value : [];
       return [.../* @__PURE__ */ new Set([...requested.filter((id) => CHANNEL_IDS.includes(id)), ...CHANNEL_IDS])];
@@ -2335,8 +2353,8 @@ window.__ModuleLoader__.load({
     .bm-popover[data-closing=true]{pointer-events:none;animation:bm-popover-out .16s var(--ds-ease-in,cubic-bezier(.4,0,1,1)) forwards}
     .bm-popover-heading{display:flex;align-items:center;gap:6px;min-width:0;flex:1}.bm-popover-title{font-size:14px;font-weight:600}.bm-version{font-size:10px;font-weight:400;line-height:1;color:var(--dsw-alias-label-tertiary,#9ca3af);white-space:nowrap}.bm-update-pill{-webkit-appearance:none;appearance:none;box-sizing:border-box;height:20px;border:0;border-radius:5px;outline:0;background:#d09a00;box-shadow:none;color:#fff;padding:3px 8px;font:inherit;font-size:10px;font-weight:600;line-height:14px;white-space:nowrap}.bm-update-pill:not(span){cursor:pointer}.bm-update-pill:not(span):hover{background:#b98200}.bm-update-pill:focus-visible{outline:2px solid var(--dsw-alias-focus-ring,#4d6bfe);outline-offset:2px}.bm-update-pill:disabled{cursor:wait;opacity:.72}.bm-update-pill[data-state=restart-required]{background:#16803d}.bm-update-pill[data-state=error]{background:#b42318}.bm-actions{display:flex;gap:4px}.bm-icon-button{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);width:30px;height:30px;border:0;border-radius:6px;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
     .bm-icon-button{transition:color .35s ease,background .12s ease}.bm-icon-button:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}.bm-icon-button:disabled{opacity:.45;cursor:default}.bm-spinning svg{animation:bm-spin 1.1s linear infinite}.bm-refresh-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-refresh-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-refresh-success svg,.bm-refresh-error svg{animation:bm-stroke-feedback 2.4s cubic-bezier(.4,0,.2,1)}
-    .bm-channel{padding:14px}.bm-channel+.bm-channel{border-top:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16))}.bm-channel-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-    .bm-channel-name{font-size:13px;font-weight:600;flex:1}.bm-status{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-balance{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);font-size:24px;line-height:1.2;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:12px}.bm-value-success,.bm-balance-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-value-error,.bm-balance-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}
+    .bm-channel{padding:14px}.bm-channel+.bm-channel{border-top:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16))}.bm-channel-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}.bm-channel-title{display:flex;align-items:center;gap:4px;min-width:0;flex:1}
+    .bm-channel-name{font-size:13px;font-weight:600}.bm-channel-website{box-sizing:border-box;width:20px;height:20px;flex:none;border-radius:4px;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;text-decoration:none}.bm-channel-website:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-channel-website:focus-visible{outline:2px solid var(--dsw-alias-focus-ring,#4d6bfe);outline-offset:1px}.bm-channel-website svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.bm-status{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-balance{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);font-size:24px;line-height:1.2;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:12px}.bm-value-success,.bm-balance-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-value-error,.bm-balance-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}
     .bm-periods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}.bm-period{padding:9px;background:var(--dsw-alias-bg-multi-select,rgba(127,127,127,.08));border-radius:6px}
     .bm-period-label,.bm-detail-label{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-period-value{font-size:14px;font-weight:600;margin-top:3px}.bm-period-meta{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:2px}
     .bm-details{display:grid;gap:7px}.bm-detail{display:flex;justify-content:space-between;gap:14px;font-size:12px}.bm-detail-value{text-align:right;font-variant-numeric:tabular-nums}.bm-error{color:var(--dsw-alias-state-error-primary,#ef4444)}
@@ -2539,6 +2557,20 @@ window.__ModuleLoader__.load({
       });
       return button;
     }
+    function channelWebsiteLink(channelId) {
+      const channel = CHANNEL_BY_ID.get(channelId);
+      if (!channel?.website) return void 0;
+      const link = document.createElement("a");
+      link.className = "bm-channel-website";
+      link.href = channel.website;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.title = `\u6253\u5F00 ${channel.label} \u63A7\u5236\u53F0`;
+      link.setAttribute("aria-label", `\u6253\u5F00 ${channel.label} \u63A7\u5236\u53F0`);
+      link.innerHTML = EXTERNAL_LINK_ICON;
+      link.addEventListener("click", (event) => event.stopPropagation());
+      return link;
+    }
     function detailRow(item, precision) {
       const row = document.createElement("div");
       row.className = "bm-detail";
@@ -2559,6 +2591,11 @@ window.__ModuleLoader__.load({
       const name = document.createElement("span");
       name.className = "bm-channel-name";
       name.textContent = channel.label;
+      const title = document.createElement("span");
+      title.className = "bm-channel-title";
+      title.append(name);
+      const website = channelWebsiteLink(channel.id);
+      if (website) title.append(website);
       const status = document.createElement("span");
       status.className = `bm-status${channel.status === "error" ? " bm-error" : ""}`;
       status.textContent = channel.status === "error" ? "\u5237\u65B0\u5931\u8D25" : channel.updatedAt ? new Date(channel.updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }) : "";
@@ -2566,7 +2603,7 @@ window.__ModuleLoader__.load({
       refreshButton.disabled = loading || channel.status === "loading";
       if (loading || channel.status === "loading") refreshButton.classList.add("bm-spinning");
       if (feedback) refreshButton.classList.add(`bm-refresh-${feedback}`);
-      header.append(name, status, refreshButton);
+      header.append(title, status, refreshButton);
       section.append(header);
       if (channel.status === "unconfigured") {
         const empty = document.createElement("div");
@@ -2625,6 +2662,7 @@ window.__ModuleLoader__.load({
       entry.dataset.dshBalanceMonitorEntry = "";
       entry.dataset.dshPlugin = "dsh-balance-monitor";
       entry.dataset.dshPart = "sidebar-entry";
+      entry.setAttribute("aria-haspopup", "dialog");
       entry.setAttribute("aria-label", "\u4F59\u989D\u76D1\u63A7");
       const icon = document.createElement("span");
       icon.className = "bm-icon";
@@ -2938,6 +2976,33 @@ window.__ModuleLoader__.load({
         import_react.default.createElement("path", { d: "M4 5h10M4 9h10M4 13h10" })
       );
     }
+    function ExternalLinkIcon() {
+      return import_react.default.createElement(
+        "svg",
+        { viewBox: "0 0 24 24", "aria-hidden": true },
+        import_react.default.createElement("path", { d: "M15 3h6v6" }),
+        import_react.default.createElement("path", { d: "m10 14 11-11" }),
+        import_react.default.createElement("path", {
+          d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+        })
+      );
+    }
+    function channelWebsiteReactLink(channelId) {
+      const channel = CHANNEL_BY_ID.get(channelId);
+      if (!channel?.website) return null;
+      return import_react.default.createElement(
+        "a",
+        {
+          className: "bm-channel-website",
+          href: channel.website,
+          target: "_blank",
+          rel: "noopener noreferrer",
+          title: `\u6253\u5F00 ${channel.label} \u63A7\u5236\u53F0`,
+          "aria-label": `\u6253\u5F00 ${channel.label} \u63A7\u5236\u53F0`
+        },
+        import_react.default.createElement(ExternalLinkIcon)
+      );
+    }
     function createSettingsCard(scope) {
       return function DshBalanceMonitorSettings() {
         const snapshot = (0, import_react.useSyncExternalStore)(
@@ -3140,26 +3205,23 @@ window.__ModuleLoader__.load({
             });
           }
         };
-        const field = (label, control, indicator, action, refresh) => import_react.default.createElement(
+        const field = (label, control, indicator, action, refresh, websiteChannel) => import_react.default.createElement(
           "div",
           { className: "bm-field" },
           import_react.default.createElement(
             "div",
             { className: "bm-field-label" },
-            import_react.default.createElement(
-              "label",
-              null,
-              label,
-              indicator === void 0 ? null : import_react.default.createElement(
-                "span",
-                {
-                  className: "bm-credential-dot",
-                  "data-status": indicator,
-                  role: "img",
-                  "aria-label": indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25",
-                  title: indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25"
-                }
-              )
+            import_react.default.createElement("label", null, label),
+            websiteChannel ? channelWebsiteReactLink(websiteChannel) : null,
+            indicator === void 0 ? null : import_react.default.createElement(
+              "span",
+              {
+                className: "bm-credential-dot",
+                "data-status": indicator,
+                role: "img",
+                "aria-label": indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25",
+                title: indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25"
+              }
             ),
             action
           ),
@@ -3414,7 +3476,8 @@ window.__ModuleLoader__.load({
             control,
             presentation.indicator,
             channel === "teamo" ? teamoSettings : void 0,
-            { channel, value, clearValue: () => setValue("") }
+            { channel, value, clearValue: () => setValue("") },
+            channel
           );
         };
         const form = import_react.default.createElement(

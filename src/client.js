@@ -14,14 +14,32 @@ const FEEDBACK_DURATION_MS = 2_400
 const POPOVER_EXIT_MS = 160
 const MAX_SIDEBAR_CHANNELS = 3
 const CHANNEL_OPTIONS = Object.freeze([
-  { id: 'deepseek', label: 'DeepSeek 官方' },
-  { id: 'kimi', label: 'Kimi 官方' },
-  { id: 'zhipu', label: '智谱 GLM' },
-  { id: 'teamo', label: 'TeamoRouter' },
+  {
+    id: 'deepseek',
+    label: 'DeepSeek 官方',
+    website: 'https://platform.deepseek.com/usage',
+  },
+  {
+    id: 'kimi',
+    label: 'Kimi 官方',
+    website: 'https://platform.kimi.com/console/account',
+  },
+  {
+    id: 'zhipu',
+    label: '智谱 GLM',
+    website: 'https://bigmodel.cn/finance-center/finance/overview',
+  },
+  {
+    id: 'teamo',
+    label: 'TeamoRouter',
+    website: 'https://teamorouter.com/dashboard',
+  },
 ])
 const CHANNEL_IDS = CHANNEL_OPTIONS.map(channel => channel.id)
+const CHANNEL_BY_ID = new Map(CHANNEL_OPTIONS.map(channel => [channel.id, channel]))
 const WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>'
 const REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>'
+const EXTERNAL_LINK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="m10 14 11-11"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>'
 
 function normalizeChannelOrder(value) {
   const requested = Array.isArray(value) ? value : []
@@ -55,8 +73,8 @@ body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-pri
 .bm-popover[data-closing=true]{pointer-events:none;animation:bm-popover-out .16s var(--ds-ease-in,cubic-bezier(.4,0,1,1)) forwards}
 .bm-popover-heading{display:flex;align-items:center;gap:6px;min-width:0;flex:1}.bm-popover-title{font-size:14px;font-weight:600}.bm-version{font-size:10px;font-weight:400;line-height:1;color:var(--dsw-alias-label-tertiary,#9ca3af);white-space:nowrap}.bm-update-pill{-webkit-appearance:none;appearance:none;box-sizing:border-box;height:20px;border:0;border-radius:5px;outline:0;background:#d09a00;box-shadow:none;color:#fff;padding:3px 8px;font:inherit;font-size:10px;font-weight:600;line-height:14px;white-space:nowrap}.bm-update-pill:not(span){cursor:pointer}.bm-update-pill:not(span):hover{background:#b98200}.bm-update-pill:focus-visible{outline:2px solid var(--dsw-alias-focus-ring,#4d6bfe);outline-offset:2px}.bm-update-pill:disabled{cursor:wait;opacity:.72}.bm-update-pill[data-state=restart-required]{background:#16803d}.bm-update-pill[data-state=error]{background:#b42318}.bm-actions{display:flex;gap:4px}.bm-icon-button{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);width:30px;height:30px;border:0;border-radius:6px;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
 .bm-icon-button{transition:color .35s ease,background .12s ease}.bm-icon-button:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}.bm-icon-button:disabled{opacity:.45;cursor:default}.bm-spinning svg{animation:bm-spin 1.1s linear infinite}.bm-refresh-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-refresh-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-refresh-success svg,.bm-refresh-error svg{animation:bm-stroke-feedback 2.4s cubic-bezier(.4,0,.2,1)}
-.bm-channel{padding:14px}.bm-channel+.bm-channel{border-top:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16))}.bm-channel-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.bm-channel-name{font-size:13px;font-weight:600;flex:1}.bm-status{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-balance{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);font-size:24px;line-height:1.2;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:12px}.bm-value-success,.bm-balance-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-value-error,.bm-balance-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}
+.bm-channel{padding:14px}.bm-channel+.bm-channel{border-top:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16))}.bm-channel-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}.bm-channel-title{display:flex;align-items:center;gap:4px;min-width:0;flex:1}
+.bm-channel-name{font-size:13px;font-weight:600}.bm-channel-website{box-sizing:border-box;width:20px;height:20px;flex:none;border-radius:4px;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;text-decoration:none}.bm-channel-website:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-channel-website:focus-visible{outline:2px solid var(--dsw-alias-focus-ring,#4d6bfe);outline-offset:1px}.bm-channel-website svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.bm-status{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-balance{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);font-size:24px;line-height:1.2;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:12px}.bm-value-success,.bm-balance-success{animation:bm-success-feedback 2.4s cubic-bezier(.4,0,.2,1)}.bm-value-error,.bm-balance-error{animation:bm-error-feedback 2.4s cubic-bezier(.4,0,.2,1)}
 .bm-periods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}.bm-period{padding:9px;background:var(--dsw-alias-bg-multi-select,rgba(127,127,127,.08));border-radius:6px}
 .bm-period-label,.bm-detail-label{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-period-value{font-size:14px;font-weight:600;margin-top:3px}.bm-period-meta{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:2px}
 .bm-details{display:grid;gap:7px}.bm-detail{display:flex;justify-content:space-between;gap:14px;font-size:12px}.bm-detail-value{text-align:right;font-variant-numeric:tabular-nums}.bm-error{color:var(--dsw-alias-state-error-primary,#ef4444)}
@@ -284,6 +302,22 @@ function iconButton(icon, label, action) {
   return button
 }
 
+function channelWebsiteLink(channelId) {
+  const channel = CHANNEL_BY_ID.get(channelId)
+  if (!channel?.website) return undefined
+
+  const link = document.createElement('a')
+  link.className = 'bm-channel-website'
+  link.href = channel.website
+  link.target = '_blank'
+  link.rel = 'noopener noreferrer'
+  link.title = `打开 ${channel.label} 控制台`
+  link.setAttribute('aria-label', `打开 ${channel.label} 控制台`)
+  link.innerHTML = EXTERNAL_LINK_ICON
+  link.addEventListener('click', event => event.stopPropagation())
+  return link
+}
+
 function detailRow(item, precision) {
   const row = document.createElement('div')
   row.className = 'bm-detail'
@@ -307,6 +341,11 @@ function channelView(channel, refresh, feedback, loading, precision) {
   const name = document.createElement('span')
   name.className = 'bm-channel-name'
   name.textContent = channel.label
+  const title = document.createElement('span')
+  title.className = 'bm-channel-title'
+  title.append(name)
+  const website = channelWebsiteLink(channel.id)
+  if (website) title.append(website)
   const status = document.createElement('span')
   status.className = `bm-status${channel.status === 'error' ? ' bm-error' : ''}`
   status.textContent = channel.status === 'error'
@@ -318,7 +357,7 @@ function channelView(channel, refresh, feedback, loading, precision) {
   refreshButton.disabled = loading || channel.status === 'loading'
   if (loading || channel.status === 'loading') refreshButton.classList.add('bm-spinning')
   if (feedback) refreshButton.classList.add(`bm-refresh-${feedback}`)
-  header.append(name, status, refreshButton)
+  header.append(title, status, refreshButton)
   section.append(header)
 
   if (channel.status === 'unconfigured') {
@@ -385,6 +424,7 @@ function mountMonitor(scope) {
   entry.dataset.dshBalanceMonitorEntry = ''
   entry.dataset.dshPlugin = 'dsh-balance-monitor'
   entry.dataset.dshPart = 'sidebar-entry'
+  entry.setAttribute('aria-haspopup', 'dialog')
   entry.setAttribute('aria-label', '余额监控')
   const icon = document.createElement('span')
   icon.className = 'bm-icon'
@@ -729,6 +769,36 @@ function DragHandleIcon() {
   )
 }
 
+function ExternalLinkIcon() {
+  return React.createElement(
+    'svg',
+    { viewBox: '0 0 24 24', 'aria-hidden': true },
+    React.createElement('path', { d: 'M15 3h6v6' }),
+    React.createElement('path', { d: 'm10 14 11-11' }),
+    React.createElement('path', {
+      d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
+    }),
+  )
+}
+
+function channelWebsiteReactLink(channelId) {
+  const channel = CHANNEL_BY_ID.get(channelId)
+  if (!channel?.website) return null
+
+  return React.createElement(
+    'a',
+    {
+      className: 'bm-channel-website',
+      href: channel.website,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      title: `打开 ${channel.label} 控制台`,
+      'aria-label': `打开 ${channel.label} 控制台`,
+    },
+    React.createElement(ExternalLinkIcon),
+  )
+}
+
 function createSettingsCard(scope) {
   return function DshBalanceMonitorSettings() {
     const snapshot = useSyncExternalStore(
@@ -946,26 +1016,23 @@ function createSettingsCard(scope) {
       }
     }
 
-    const field = (label, control, indicator, action, refresh) => React.createElement(
+    const field = (label, control, indicator, action, refresh, websiteChannel) => React.createElement(
       'div',
       { className: 'bm-field' },
       React.createElement(
         'div',
         { className: 'bm-field-label' },
-        React.createElement(
-          'label',
-          null,
-          label,
-          indicator === undefined ? null : React.createElement(
-            'span',
-            {
-              className: 'bm-credential-dot',
-              'data-status': indicator,
-              role: 'img',
-              'aria-label': indicator === 'success' ? '数据获取正常' : '数据获取失败',
-              title: indicator === 'success' ? '数据获取正常' : '数据获取失败',
-            },
-          ),
+        React.createElement('label', null, label),
+        websiteChannel ? channelWebsiteReactLink(websiteChannel) : null,
+        indicator === undefined ? null : React.createElement(
+          'span',
+          {
+            className: 'bm-credential-dot',
+            'data-status': indicator,
+            role: 'img',
+            'aria-label': indicator === 'success' ? '数据获取正常' : '数据获取失败',
+            title: indicator === 'success' ? '数据获取正常' : '数据获取失败',
+          },
         ),
         action,
       ),
@@ -1248,6 +1315,7 @@ function createSettingsCard(scope) {
         presentation.indicator,
         channel === 'teamo' ? teamoSettings : undefined,
         { channel, value, clearValue: () => setValue('') },
+        channel,
       )
     }
 
