@@ -17,7 +17,9 @@ test('client bundle registers the published package name', async () => {
 
   assert.equal(loaderId, manifest.name)
   assert.equal(clientBundle.includes(`v${manifest.version}`), true)
-  assert.equal(manifest.dependencies.sortablejs, '^1.15.7')
+  assert.equal(manifest.dependencies.sortablejs, undefined)
+  assert.equal(manifest.devDependencies.sortablejs, '^1.15.7')
+  assert.match(clientBundle, /Sortable/)
 })
 
 test('client bundle uses credential status dots and inline channel actions', async () => {

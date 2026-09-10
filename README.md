@@ -72,11 +72,13 @@ dsh plugin --profile web list
 git clone https://github.com/ShawnKung/dsh-balance-monitor.git
 cd dsh-balance-monitor
 npm ci
-npm run ci
+npm run build
+npm run check
+npm test
 dsh plugin --profile web add link:"$(pwd)"
 ```
 
-`link:` 会让 DSH profile 直接引用当前目录。修改前端源码后执行 `npm run build` 并刷新页面；修改 Host 代码后还需要重启 DSH Web。
+仓库提交并发布预构建的 `client.js`，安装过程不会运行构建脚本。`link:` 会让 DSH Profile 直接引用当前目录；首次安装以及每次修改 `src/client.js` 后都应显式执行 `npm run build`。修改 Host 代码后还需要重启 DSH Web。
 
 ### 更新
 
@@ -115,6 +117,37 @@ Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，
 插件启动时及之后每 10 分钟会由 Host 异步检查 npm `latest` 版本，不阻塞 DSH 运行。更新状态由 Host 中的全局单例维护，余额弹窗和设置页只通过 HTTP/SSE 读取同一状态；任一入口点击后，两处会同步展示更新进度。Host 使用固定包名和 Registry 返回的精确 SemVer 调用当前 DSH CLI，安装结果会再次从 profile 校验，成功后显示“重启后生效”，但不会自动重启 DSH。
 
 本地 `link:`、`file:`、Git 和 workspace 安装不会被自动替换，也不会显示 Registry 更新入口。
+
+## 兼容性
+
+- Node.js：`>=20`。
+- DSH：`>=0.1.2-rc.1 <0.2.0`。
+- Profile：仅支持 `web`。
+- 已验证版本：`0.1.2-rc.1`、`0.1.5-rc.1`。其他版本只有完成一次性 Profile 的安装、配置加载、Web 冷启动和卸载验证后，才会在 manifest 中标记为兼容。
+
+## 运行边界
+
+### 生命周期与依赖
+
+包不包含 `preinstall`、`install`、`postinstall` 或 `prepare` 脚本。构建只在开发者显式运行 `npm run build`、CI 执行 `npm run ci`，以及 npm 发布前执行 `prepublishOnly` 时发生。
+
+运行时依赖及用途：
+
+- `@deepseek-ai/schemastery`：声明 DSH 插件配置 Schema。
+- `semver`：比较已安装版本与 npm Registry 返回的版本。
+- SortableJS 已打包进 `client.js`，仅作为开发依赖参与前端构建，不会作为独立运行时依赖安装。
+
+### 权限与外部服务
+
+| 能力 | 使用范围 |
+| --- | --- |
+| 网络 | 请求 DeepSeek、Kimi、智谱和 TeamoRouter 的余额或用量接口；请求 `registry.npmjs.org` 检查插件更新。 |
+| 凭据 | 仅通过 DSH `credentials` 服务解析、写入或移除插件声明的 API Key 引用；Key 不发送到浏览器。 |
+| 文件 | 仅读取 `~/.dsh/profiles/web/package.json` 和当前插件的 `package.json`，用于确认安装来源与版本。 |
+| 命令 | 仅在用户点击插件更新后，通过当前 Node.js 进程调用当前 DSH CLI，执行固定包名和精确版本的 `plugin --profile web add`。 |
+| 浏览器接口 | 仅接受 loopback 且同源的 HTTP/SSE 请求，用于 Host 与插件前端同步状态。 |
+
+外部渠道请求彼此隔离；单个渠道失败不会阻塞其他渠道，并会保留上次成功结果。更新检查或安装失败不会修改当前运行版本；更新成功后也不会自动重启 DSH。未识别的 provider 不会触发兜底刷新。
 
 ## 安全设计
 
