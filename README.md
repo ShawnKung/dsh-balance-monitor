@@ -42,7 +42,7 @@
 - 在“新会话”和工作区之间展示所选渠道的余额，不干扰任务看板等其他侧边栏插件。
 - 点击侧边栏入口查看所有渠道的余额，及支持渠道的消费、请求数和 Token 用量。
 - 支持单渠道刷新与全量刷新，并通过颜色渐变反馈刷新结果。
-- 会话结束后，根据当前模型 provider 的实际 API 域名定向刷新对应渠道。
+- 会话结束后，根据当前模型 Provider 的实际 API 域名或受支持的内置 Provider ID，定向刷新对应渠道。
 - 支持浅色、深色和跟随系统主题。
 - 在插件设置中选择侧边栏展示渠道、配置凭据引用和 TeamoRouter 查询范围。
 - 启动时检查 npm 新版本，并可在插件内完成精确版本更新。
@@ -51,12 +51,12 @@
 
 | 渠道 | 余额 | 每日/区间消费 | Token 用量 | 自动刷新识别 |
 | --- | --- | --- | --- | --- |
-| DeepSeek 官方 API | 是 | 否 | 否 | `deepseek.com` |
-| Kimi 官方 API | 是 | 否 | 否 | `moonshot.cn` |
+| DeepSeek 官方 API | 是 | 否 | 否 | `deepseek.com`、`deepseek-official`、`deepseek` |
+| Kimi 官方 API | 是 | 否 | 否 | `moonshot.cn`、`moonshotai-cn` |
 | 智谱 GLM | 是 | 否 | 否 | `bigmodel.cn` |
 | TeamoRouter | 是 | 是 | 是 | `teamorouter.cn` |
 
-未知域名、缺失 provider 或无效 URL 不会触发兜底全量刷新。
+Provider 配置了 `baseURL` 时，以实际 hostname 为准；未配置 URL 时，仅识别与余额账户体系一致的内置 Provider。未知域名、缺失 Provider 或无效 URL 不会触发兜底全量刷新。
 
 ## 安装
 
@@ -115,8 +115,10 @@ API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏�
 
 - 点击顶部刷新按钮：刷新全部渠道。
 - 点击渠道刷新按钮：只刷新该渠道。
-- 会话回合结束：读取 Session 中的 provider，通过 DSH provider 目录找到对应 `baseURL`，再按 hostname 匹配渠道。
-- provider 未命中已支持域名：不刷新。
+- 会话回合结束：读取 Session 中的 Provider，通过 DSH Provider 目录定位当前路由；存在 `baseURL` 时按 hostname 匹配渠道。
+- DSH 内置 Provider 未暴露 URL 时，支持 `deepseek-official`、`deepseek` 和 `moonshotai-cn`，分别刷新 DeepSeek 或 Kimi。
+- Moonshot 国际站、Kimi Coding 和 Z.AI Coding Plan 与当前余额接口不属于同一账户体系，不会错误触发按量余额刷新。
+- Provider 未命中受支持的域名或内置身份时，不刷新。
 
 Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，避免启动阶段的 `loading` 覆盖已完成结果。
 

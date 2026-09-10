@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 修复
+
+- 修复官方 DeepSeek 和 Moonshot AI CN 模型在会话结束后未触发对应余额刷新的问题。
+
 ## [0.1.13] - 2026-09-10
 
 ### 变更
