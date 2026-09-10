@@ -6,6 +6,7 @@ test('presentation settings do not change the balance source signature', () => {
   const base = balanceSourceSignature()
   const presentationOnly = balanceSourceSignature({
     showSidebar: false,
+    balancePrecision: '0',
     sidebarChannels: ['kimi'],
     channelOrder: ['zhipu', 'kimi', 'teamo', 'deepseek'],
   })

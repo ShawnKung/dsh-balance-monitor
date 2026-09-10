@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useSyncExternalStore, useState } from 'react'
 import Sortable from 'sortablejs'
+import {
+  BALANCE_PRECISIONS,
+  formatMoney,
+  normalizeBalancePrecision,
+} from '../lib/balance-format.js'
 
 export const inject = ['slots', 'settingsScope']
 
@@ -21,6 +26,12 @@ const REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 1
 function normalizeChannelOrder(value) {
   const requested = Array.isArray(value) ? value : []
   return [...new Set([...requested.filter(id => CHANNEL_IDS.includes(id)), ...CHANNEL_IDS])]
+}
+
+function balancePrecisionLabel(value) {
+  if (value === 'exact') return '精确'
+  if (value === '0') return '无小数位'
+  return `${value} 位`
 }
 
 const STYLE = `
@@ -53,9 +64,10 @@ body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-pri
 .bm-settings{list-style:none;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:12px;background:var(--dsw-alias-bg-layer-3,transparent);color:inherit;transition:border-color .16s,background .16s}.bm-settings:hover{border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}.bm-settings[data-open=true]{background:var(--dsw-alias-bg-layer-2,transparent);border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}
 .bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 2px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
 .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bm-precision-setting{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,290px);align-items:center;gap:18px;min-height:34px;padding-top:8px}.bm-precision-title{display:flex;align-items:baseline;gap:7px;min-width:0;font-size:12px;font-weight:550;white-space:nowrap}.bm-precision-current{font-size:10px;font-weight:600;color:var(--dsw-alias-label-primary,#111827);font-variant-numeric:tabular-nums}.bm-precision-control{display:flex;align-items:center;justify-self:end;gap:7px;width:100%;min-width:0}.bm-precision-end{box-sizing:border-box;width:38px;flex:none;font-size:9px;line-height:13px;color:var(--dsw-alias-label-secondary,#6b7280);white-space:nowrap}.bm-precision-end:last-child{text-align:right}.bm-precision-track{position:relative;flex:1;min-width:90px;height:20px}.bm-precision-slider{-webkit-appearance:none;appearance:none;position:absolute;z-index:2;inset:0;box-sizing:border-box;width:100%;height:20px;margin:0;border:0;background:transparent;padding:0;cursor:pointer}.bm-precision-slider::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--dsw-alias-state-info-primary,#2563eb) 0 var(--bm-precision-progress),var(--dsw-alias-border-l3,rgba(127,127,127,.32)) var(--bm-precision-progress) 100%)}.bm-precision-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;margin-top:-5px;border:2px solid var(--dsw-alias-bg-layer-2,#fff);border-radius:50%;background:var(--dsw-alias-state-info-primary,#2563eb);box-shadow:0 1px 3px rgba(0,0,0,.2)}.bm-precision-slider::-moz-range-track{height:4px;border:0;border-radius:2px;background:var(--dsw-alias-border-l3,rgba(127,127,127,.32))}.bm-precision-slider::-moz-range-progress{height:4px;border-radius:2px;background:var(--dsw-alias-state-info-primary,#2563eb)}.bm-precision-slider::-moz-range-thumb{width:12px;height:12px;border:2px solid var(--dsw-alias-bg-layer-2,#fff);border-radius:50%;background:var(--dsw-alias-state-info-primary,#2563eb);box-shadow:0 1px 3px rgba(0,0,0,.2)}.bm-precision-ticks{position:absolute;z-index:1;left:7px;right:7px;top:9px;display:flex;justify-content:space-between;pointer-events:none}.bm-precision-ticks span{width:2px;height:2px;border-radius:50%;background:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-precision-tooltip{position:fixed;z-index:10002;transform:translateX(-50%);padding:4px 7px;border-radius:5px;background:var(--dsw-alias-bg-tooltip,#1f2937);color:var(--dsw-alias-label-primary-foreground,#fff);box-shadow:0 4px 12px rgba(0,0,0,.18);font-size:11px;font-weight:550;line-height:16px;white-space:nowrap;pointer-events:none}
 .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
 .bm-source-settings{position:relative;margin-left:auto}.bm-source-settings-trigger{box-sizing:border-box;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-source-settings-trigger:hover,.bm-source-settings-trigger[data-open=true]{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-source-settings-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.bm-source-popover{position:absolute;z-index:20;top:calc(100% + 5px);right:0;width:min(340px,calc(100vw - 64px));padding:14px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 10px 30px rgba(0,0,0,.16));display:grid;gap:12px;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}.bm-source-popover-title{font-size:13px;font-weight:600}.bm-source-popover-field{display:grid;gap:6px}.bm-source-popover-field label{font-size:11px;color:var(--dsw-alias-label-secondary,#6b7280)}.bm-source-popover-field input{width:100%}.bm-source-popover-actions{display:flex;justify-content:flex-end;gap:8px}
-.bm-multi{position:relative;width:min(504px,100%);max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{position:relative}.bm-multi-option[data-disabled=true]>.bm-multi-option-select,.bm-multi-option[data-disabled=true]>.bm-drag-handle{opacity:.45}.bm-limit-tooltip{position:fixed;z-index:10001;padding:5px 7px;border-radius:5px;background:var(--dsw-alias-bg-tooltip,#1f2937);color:var(--dsw-alias-label-primary-foreground,#fff);box-shadow:0 4px 12px rgba(0,0,0,.18);font-size:11px;font-weight:400;line-height:16px;white-space:nowrap;pointer-events:none}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;user-select:none}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.bm-multi{position:relative;width:100%;max-width:100%;flex:none}.bm-multi-trigger{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;display:flex;align-items:center;gap:8px;font:inherit;font-size:12px;cursor:pointer}.bm-multi-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.bm-multi-count{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-multi-menu{position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:0;padding:5px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:6px;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.14))}.bm-multi-option{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px}.bm-multi-option:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-multi-option-select{display:flex;align-items:center;gap:8px;min-width:0;flex:1;font-weight:400;cursor:pointer}.bm-multi-option input{width:14px!important;height:14px!important;flex:none!important;margin:0}.bm-multi-option[data-disabled=true]{position:relative}.bm-multi-option[data-disabled=true]>.bm-multi-option-select,.bm-multi-option[data-disabled=true]>.bm-drag-handle{opacity:.45}.bm-limit-tooltip{position:fixed;z-index:10001;padding:5px 7px;border-radius:5px;background:var(--dsw-alias-bg-tooltip,#1f2937);color:var(--dsw-alias-label-primary-foreground,#fff);box-shadow:0 4px 12px rgba(0,0,0,.18);font-size:11px;font-weight:400;line-height:16px;white-space:nowrap;pointer-events:none}.bm-drag-handle{width:24px;height:24px;flex:none;border:0;border-radius:4px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;user-select:none}.bm-drag-handle:active{cursor:grabbing}.bm-drag-handle:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-drag-handle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
 .bm-credential-dot{width:7px;height:7px;border-radius:50%;flex:none}.bm-credential-dot[data-status=success]{background:var(--dsw-alias-state-success-primary,#16a34a)}.bm-credential-dot[data-status=error]{background:var(--dsw-alias-state-error-primary,#dc2626)}
 .bm-buttons{display:flex;justify-content:flex-end;gap:8px}.bm-button{height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.25));border-radius:6px;padding:0 12px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.bm-button-primary{background:var(--dsw-alias-button-info-fill,#2563eb);border-color:transparent;color:var(--dsw-alias-label-primary-foreground,#fff)}.bm-button:disabled{opacity:.5;cursor:default}.bm-message{font-size:11px}.bm-message[data-error=true]{color:var(--dsw-alias-state-error-primary,#ef4444)}
 @keyframes bm-spin{to{transform:rotate(360deg)}}@keyframes bm-popover-in{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}@keyframes bm-popover-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px) scale(.985)}}@keyframes bm-success-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-success)}}@keyframes bm-error-feedback{0%,100%{color:var(--bm-feedback-rest,var(--dsw-alias-label-primary,#eef0f3))}35%,65%{color:var(--bm-feedback-error)}}@keyframes bm-stroke-feedback{0%,100%{stroke-width:1.8}35%,65%{stroke-width:3}}@media(prefers-reduced-motion:reduce){.bm-popover{animation:none}}`
@@ -68,26 +80,16 @@ function installStyle() {
   document.head.append(style)
 }
 
-function formatBalance(channel) {
+function formatBalance(channel, precision) {
   if (channel.status === 'unconfigured') return '未配置'
   if (channel.status === 'loading' && channel.balance === undefined) return '加载中'
   if (channel.balance === undefined) return '--'
-  try {
-    if (channel.currency === 'USD') {
-      return `$${new Intl.NumberFormat('zh-CN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 4,
-      }).format(channel.balance)}`
-    }
-    return new Intl.NumberFormat('zh-CN', {
-      style: 'currency',
-      currency: channel.currency || 'CNY',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4,
-    }).format(channel.balance)
-  } catch {
-    return `${channel.balance} ${channel.currency || ''}`.trim()
-  }
+  return formatMoney(
+    channel.balance,
+    channel.currency,
+    precision,
+    channel.balanceRaw,
+  )
 }
 
 async function api(path, options) {
@@ -282,7 +284,7 @@ function iconButton(icon, label, action) {
   return button
 }
 
-function detailRow(item) {
+function detailRow(item, precision) {
   const row = document.createElement('div')
   row.className = 'bm-detail'
   const label = document.createElement('span')
@@ -290,12 +292,14 @@ function detailRow(item) {
   label.textContent = item.label
   const value = document.createElement('span')
   value.className = `bm-detail-value${item.tone === 'error' ? ' bm-error' : ''}`
-  value.textContent = item.value
+  value.textContent = item.amount === undefined
+    ? item.value
+    : formatMoney(item.amount, item.currency, precision, item.rawAmount)
   row.append(label, value)
   return row
 }
 
-function channelView(channel, refresh, feedback, loading) {
+function channelView(channel, refresh, feedback, loading, precision) {
   const section = document.createElement('section')
   section.className = 'bm-channel'
   const header = document.createElement('div')
@@ -328,7 +332,7 @@ function channelView(channel, refresh, feedback, loading) {
   if (channel.balance !== undefined) {
     const balance = document.createElement('div')
     balance.className = `bm-balance${feedback ? ` bm-balance-${feedback}` : ''}`
-    balance.textContent = formatBalance(channel)
+    balance.textContent = formatBalance(channel, precision)
     section.append(balance)
   }
 
@@ -343,7 +347,9 @@ function channelView(channel, refresh, feedback, loading) {
       label.textContent = item.label
       const value = document.createElement('div')
       value.className = 'bm-period-value'
-      value.textContent = item.cost
+      value.textContent = item.amount === undefined
+        ? item.cost
+        : formatMoney(item.amount, item.currency, precision, item.rawAmount)
       const meta = document.createElement('div')
       meta.className = 'bm-period-meta'
       meta.textContent = `${item.requests} 次请求`
@@ -356,11 +362,13 @@ function channelView(channel, refresh, feedback, loading) {
   if (channel.detail?.length) {
     const details = document.createElement('div')
     details.className = 'bm-details'
-    for (const item of channel.detail) details.append(detailRow(item))
+    for (const item of channel.detail) details.append(detailRow(item, precision))
     section.append(details)
   }
 
-  if (channel.error) section.append(detailRow({ label: '错误', value: channel.error, tone: 'error' }))
+  if (channel.error) {
+    section.append(detailRow({ label: '错误', value: channel.error, tone: 'error' }, precision))
+  }
   if (channel.note) {
     const note = document.createElement('div')
     note.className = 'bm-note'
@@ -419,6 +427,13 @@ function mountMonitor(scope) {
     return settings.status !== 'ready' || settings.value?.showSidebar !== false
   }
 
+  const balancePrecision = () => {
+    const settings = scope.getSnapshot()
+    return normalizeBalancePrecision(
+      settings.status === 'ready' ? settings.value?.balancePrecision : undefined,
+    )
+  }
+
   const orderedChannels = () => {
     const settings = scope.getSnapshot()
     const order = normalizeChannelOrder(
@@ -460,7 +475,7 @@ function mountMonitor(scope) {
       const value = document.createElement('span')
       const result = feedback.get(channel.id)
       value.className = `bm-value${result ? ` bm-value-${result}` : ''}`
-      value.textContent = formatBalance(channel)
+      value.textContent = formatBalance(channel, balancePrecision())
       row.append(label, value)
       summary.append(row)
     }
@@ -570,6 +585,7 @@ function mountMonitor(scope) {
         () => void refresh(channel.id),
         feedback.get(channel.id),
         refreshing.has(channel.id) || refreshing.has('all'),
+        balancePrecision(),
       ))
     }
     requestAnimationFrame(positionPopup)
@@ -613,7 +629,7 @@ function mountMonitor(scope) {
   }
   const observer = new MutationObserver(place)
   observer.observe(document.body, { childList: true, subtree: true })
-  const unsubscribe = scope.subscribe(renderSummary)
+  const unsubscribe = scope.subscribe(render)
   const unsubscribeUpdates = subscribeUpdateState(next => {
     updateSnapshot = next
     if (next.status === 'updating' || next.status === 'restart-required') {
@@ -725,12 +741,17 @@ function createSettingsCard(scope) {
     const [pickerOpen, setPickerOpen] = useState(false)
     const [sourceSettingsOpen, setSourceSettingsOpen] = useState(false)
     const [showSidebar, setShowSidebar] = useState(values.showSidebar ?? true)
+    const [balancePrecision, setBalancePrecision] = useState(
+      normalizeBalancePrecision(values.balancePrecision),
+    )
     const [sidebarChannels, setSidebarChannels] = useState(
       values.sidebarChannels ?? CHANNEL_IDS,
     )
     const [channelOrder, setChannelOrder] = useState(() => normalizeChannelOrder(values.channelOrder))
     const pickerMenu = useRef()
     const limitTooltip = useRef()
+    const precisionTooltip = useRef()
+    const precisionDragging = useRef(false)
     const [teamoRangeDays, setTeamoRangeDays] = useState(values.teamoRangeDays ?? 7)
     const [deepseekKey, setDeepseekKey] = useState('')
     const [kimiKey, setKimiKey] = useState('')
@@ -746,6 +767,7 @@ function createSettingsCard(scope) {
     useEffect(() => {
       if (snapshot.status !== 'ready') return
       setShowSidebar(values.showSidebar ?? true)
+      setBalancePrecision(normalizeBalancePrecision(values.balancePrecision))
       setSidebarChannels(values.sidebarChannels ?? CHANNEL_IDS)
       setChannelOrder(normalizeChannelOrder(values.channelOrder))
       setTeamoRangeDays(values.teamoRangeDays ?? 7)
@@ -1014,6 +1036,24 @@ function createSettingsCard(scope) {
       if (limitTooltip.current) limitTooltip.current.hidden = true
     }
 
+    const movePrecisionTooltip = event => {
+      if (!precisionDragging.current || !precisionTooltip.current) return
+      const tooltip = precisionTooltip.current
+      const value = BALANCE_PRECISIONS[Number(event.currentTarget.value)]
+      tooltip.textContent = balancePrecisionLabel(value)
+      tooltip.hidden = false
+      tooltip.style.left = `${event.clientX}px`
+
+      const height = tooltip.getBoundingClientRect().height
+      const above = event.clientY - height - 12
+      tooltip.style.top = `${above >= 8 ? above : event.clientY + 14}px`
+    }
+
+    const hidePrecisionTooltip = () => {
+      precisionDragging.current = false
+      if (precisionTooltip.current) precisionTooltip.current.hidden = true
+    }
+
     const channelPicker = React.createElement(
       'div',
       { className: 'bm-multi', 'data-open': String(pickerOpen) },
@@ -1228,6 +1268,74 @@ function createSettingsCard(scope) {
           },
         }),
         React.createElement('span', null, '展示侧边栏'),
+      ),
+      React.createElement(
+        'div',
+        { className: 'bm-precision-setting' },
+        React.createElement(
+          'label',
+          { className: 'bm-precision-title', htmlFor: 'bm-balance-precision' },
+          '余额保留位数',
+          React.createElement(
+            'span',
+            { className: 'bm-precision-current' },
+            balancePrecisionLabel(balancePrecision),
+          ),
+        ),
+        React.createElement(
+          'div',
+          { className: 'bm-precision-control' },
+          React.createElement('span', { className: 'bm-precision-end' }, '无小数位'),
+          React.createElement(
+            'div',
+            { className: 'bm-precision-track' },
+            React.createElement('input', {
+              id: 'bm-balance-precision',
+              type: 'range',
+              className: 'bm-precision-slider',
+              min: 0,
+              max: BALANCE_PRECISIONS.length - 1,
+              step: 1,
+              value: BALANCE_PRECISIONS.indexOf(balancePrecision),
+              style: {
+                '--bm-precision-progress':
+                  `${BALANCE_PRECISIONS.indexOf(balancePrecision) / 7 * 100}%`,
+              },
+              'aria-valuetext': balancePrecision === 'exact'
+                ? '精确'
+                : balancePrecision === '0'
+                  ? '无小数位'
+                  : `保留 ${balancePrecision} 位`,
+              onPointerDown: event => {
+                precisionDragging.current = true
+                movePrecisionTooltip(event)
+              },
+              onPointerMove: movePrecisionTooltip,
+              onPointerUp: hidePrecisionTooltip,
+              onPointerCancel: hidePrecisionTooltip,
+              onBlur: hidePrecisionTooltip,
+              onChange: event => {
+                const next = BALANCE_PRECISIONS[Number(event.target.value)]
+                setBalancePrecision(next)
+                void persistSetting('balancePrecision', next)
+              },
+            }),
+            React.createElement(
+              'span',
+              { className: 'bm-precision-ticks', 'aria-hidden': true },
+              ...BALANCE_PRECISIONS.map(value =>
+                React.createElement('span', { key: value }),
+              ),
+            ),
+          ),
+          React.createElement('span', { className: 'bm-precision-end' }, '精确'),
+        ),
+        React.createElement('span', {
+          className: 'bm-precision-tooltip',
+          ref: precisionTooltip,
+          role: 'tooltip',
+          hidden: true,
+        }),
       ),
       field('侧边栏渠道', channelPicker),
       credentialField({

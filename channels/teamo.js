@@ -60,7 +60,8 @@ export const teamoChannel = {
     if (balanceBody?.balance?.value === undefined) throw new Error('余额接口返回结构异常')
 
     const currency = String(balanceBody.balance.currency || 'USD').toUpperCase()
-    const balance = Number(balanceBody.balance.value)
+    const balanceRaw = balanceBody.balance.value
+    const balance = Number(balanceRaw)
     if (!Number.isFinite(balance)) throw new Error('余额不是有效数字')
 
     const paths = [
@@ -71,14 +72,24 @@ export const teamoChannel = {
     const [today, range, usage] = await Promise.allSettled(
       paths.map(path => getJson(baseUrl, path, apiKey, fetchImpl)),
     )
-    const detail = [{ label: '账户余额', value: money(currency, balance) }]
+    const detail = [{
+      label: '账户余额',
+      value: money(currency, balance),
+      amount: balance,
+      rawAmount: balanceRaw,
+      currency,
+    }]
     const periods = []
 
     for (const [label, result] of [['今日', today], [`近 ${days} 天`, range]]) {
       if (result.status === 'fulfilled' && result.value?.total_amount?.value !== undefined) {
+        const amount = Number(result.value.total_amount.value)
         periods.push({
           label,
-          cost: money(currency, result.value.total_amount.value),
+          cost: money(currency, amount),
+          amount,
+          rawAmount: result.value.total_amount.value,
+          currency,
           requests: Number(result.value.requests) || 0,
         })
       } else {
@@ -110,6 +121,6 @@ export const teamoChannel = {
       })
     }
 
-    return { currency, balance, detail, periods }
+    return { currency, balance, balanceRaw, detail, periods }
   },
 }

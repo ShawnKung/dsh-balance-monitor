@@ -45,10 +45,29 @@ export const kimiChannel = {
     return {
       currency: 'CNY',
       balance,
+      balanceRaw: data.available_balance,
       detail: [
-        { label: '可用余额', value: money(data.available_balance) },
-        { label: '现金余额', value: money(data.cash_balance) },
-        { label: '赠金余额', value: money(data.voucher_balance) },
+        {
+          label: '可用余额',
+          value: money(data.available_balance),
+          amount: Number(data.available_balance),
+          rawAmount: data.available_balance,
+          currency: 'CNY',
+        },
+        {
+          label: '现金余额',
+          value: money(data.cash_balance),
+          amount: Number(data.cash_balance),
+          rawAmount: data.cash_balance,
+          currency: 'CNY',
+        },
+        {
+          label: '赠金余额',
+          value: money(data.voucher_balance),
+          amount: Number(data.voucher_balance),
+          rawAmount: data.voucher_balance,
+          currency: 'CNY',
+        },
       ],
       periods: [],
       note: '官方 CN 接口仅提供账户余额。',
