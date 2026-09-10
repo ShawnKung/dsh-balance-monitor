@@ -17,10 +17,18 @@
 
 ## 界面预览
 
+侧边栏展示选定渠道的余额；点击入口可查看各渠道详情，并在设置中调整展示、精度与凭据来源。
+
 ### 侧边栏余额
 
 <p align="center">
   <img src="./docs/images/sidebar-overview.png" alt="DSH Balance Monitor 侧边栏余额展示" width="960" />
+</p>
+
+### 余额详情
+
+<p align="center">
+  <img src="./docs/images/popup-window.png" alt="DSH Balance Monitor 多渠道余额详情弹窗" width="960" />
 </p>
 
 ### 插件设置
@@ -133,7 +141,7 @@ Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，
 
 运行时依赖及用途：
 
-- `@deepseek-ai/schemastery`：声明 DSH 插件配置 Schema。
+- `@deepseek-ai/schemastery`：由 DSH Profile 提供的 peer dependency，用于声明插件配置 Schema；开发环境同时将其列为 dev dependency。
 - `semver`：比较已安装版本与 npm Registry 返回的版本。
 - SortableJS 已打包进 `client.js`，仅作为开发依赖参与前端构建，不会作为独立运行时依赖安装。
 
