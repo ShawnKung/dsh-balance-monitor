@@ -15,6 +15,20 @@
   <img alt="安全凭据" src="https://img.shields.io/badge/-安全凭据-4d6bfe" />
 </div>
 
+## 界面预览
+
+### 侧边栏余额
+
+<p align="center">
+  <img src="./docs/images/sidebar-overview.png" alt="DSH Balance Monitor 侧边栏余额展示" width="960" />
+</p>
+
+### 插件设置
+
+<p align="center">
+  <img src="./docs/images/settings.png" alt="DSH Balance Monitor 插件设置界面" width="960" />
+</p>
+
 ## 功能
 
 - 在“新会话”和工作区之间展示所选渠道的余额，不干扰任务看板等其他侧边栏插件。
