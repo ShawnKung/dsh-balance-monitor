@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 新增
+
+- 在余额弹窗和设置页提供各渠道控制台的快捷入口。
+
 ## [0.1.11] - 2026-09-10
 
 ### 新增
