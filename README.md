@@ -76,6 +76,7 @@ dsh plugin --profile web list
 进入 DSH 的“设置 → 插件 → DSH Balance Monitor”：
 
 - **侧边栏展示渠道**：可多选，最多展示 3 个渠道。
+- **余额保留位数**：通过滑块统一控制侧边栏、弹窗余额明细和消费金额的显示精度，可选无小数位、1 至 6 位或精确。
 - **DeepSeek API Key**：默认凭据引用为 `DEEPSEEK_API_KEY`。
 - **Kimi API Key**：默认凭据引用为 `KIMI_API_KEY`，调用 CN Host `https://api.moonshot.cn/v1/users/me/balance`。
 - **智谱 GLM API Key**：默认凭据引用为 `ZAI_API_KEY`，通过智谱官方域名的账户接口查询按量余额。

@@ -40,18 +40,50 @@ export const zhipuChannel = {
     }
 
     const data = body?.data
-    const balance = Number(data?.availableBalance ?? data?.balance)
+    const balanceRaw = data?.availableBalance ?? data?.balance
+    const balance = Number(balanceRaw)
     if (!Number.isFinite(balance)) throw new Error('余额不是有效数字')
 
     return {
       currency: 'CNY',
       balance,
+      balanceRaw,
       detail: [
-        { label: '可用余额', value: money(balance) },
-        { label: '充值余额', value: money(data?.rechargeAmount) },
-        { label: '赠金余额', value: money(data?.giveAmount) },
-        { label: '今日消费', value: money(data?.todaySpendAmount) },
-        { label: '累计消费', value: money(data?.totalSpendAmount) },
+        {
+          label: '可用余额',
+          value: money(balance),
+          amount: balance,
+          rawAmount: balanceRaw,
+          currency: 'CNY',
+        },
+        {
+          label: '充值余额',
+          value: money(data?.rechargeAmount),
+          amount: Number(data?.rechargeAmount),
+          rawAmount: data?.rechargeAmount,
+          currency: 'CNY',
+        },
+        {
+          label: '赠金余额',
+          value: money(data?.giveAmount),
+          amount: Number(data?.giveAmount),
+          rawAmount: data?.giveAmount,
+          currency: 'CNY',
+        },
+        {
+          label: '今日消费',
+          value: money(data?.todaySpendAmount),
+          amount: Number(data?.todaySpendAmount),
+          rawAmount: data?.todaySpendAmount,
+          currency: 'CNY',
+        },
+        {
+          label: '累计消费',
+          value: money(data?.totalSpendAmount),
+          amount: Number(data?.totalSpendAmount),
+          rawAmount: data?.totalSpendAmount,
+          currency: 'CNY',
+        },
       ],
       periods: [],
       note: '智谱按量账户余额。',

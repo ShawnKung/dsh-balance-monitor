@@ -96,6 +96,7 @@ test('Kimi adapter maps Moonshot CN balance fields', async () => {
   assert.equal(result.balance, 41.71543)
   assert.equal(result.detail.length, 3)
   assert.equal(result.detail[0].value, '¥41.71543')
+  assert.equal(result.detail[0].amount, 41.71543)
 })
 
 
@@ -127,4 +128,5 @@ test('Zhipu adapter maps BigModel account fields', async () => {
   assert.equal(result.balance, 92.246524285)
   assert.equal(result.detail.length, 5)
   assert.equal(result.detail[0].value, '¥92.24652')
+  assert.equal(result.detail[0].amount, 92.246524285)
 })

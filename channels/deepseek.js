@@ -57,10 +57,29 @@ export const deepseekChannel = {
     return {
       currency,
       balance,
+      balanceRaw: info.total_balance,
       detail: [
-        { label: '账户总余额', value: amount(currency, info.total_balance) },
-        { label: '充值余额', value: amount(currency, info.topped_up_balance) },
-        { label: '赠送余额', value: amount(currency, info.granted_balance) },
+        {
+          label: '账户总余额',
+          value: amount(currency, info.total_balance),
+          amount: Number(info.total_balance),
+          rawAmount: info.total_balance,
+          currency,
+        },
+        {
+          label: '充值余额',
+          value: amount(currency, info.topped_up_balance),
+          amount: Number(info.topped_up_balance),
+          rawAmount: info.topped_up_balance,
+          currency,
+        },
+        {
+          label: '赠送余额',
+          value: amount(currency, info.granted_balance),
+          amount: Number(info.granted_balance),
+          rawAmount: info.granted_balance,
+          currency,
+        },
         { label: '账户状态', value: body?.is_available ? '可用' : '不可用' },
       ],
       periods: [],
