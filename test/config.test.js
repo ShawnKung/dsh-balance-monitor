@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { balanceSourceSignature } from '../index.js'
+import { balanceSourceSignature, Config } from '../index.js'
+
+test('sidebar defaults to DeepSeek only', () => {
+  assert.deepEqual(Config({}).sidebarChannels, ['deepseek'])
+})
 
 test('presentation settings do not change the balance source signature', () => {
   const base = balanceSourceSignature()
