@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 变更
+
+- 新安装默认仅在侧边栏展示 DeepSeek 渠道。
+
 ## [0.1.12] - 2026-09-10
 
 ### 新增
