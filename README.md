@@ -115,7 +115,8 @@ API Key 通过 DSH credentials 服务解析和写入，明文不会发送到浏�
 
 - 点击顶部刷新按钮：刷新全部渠道。
 - 点击渠道刷新按钮：只刷新该渠道。
-- 会话回合结束：读取 Session 中的 Provider，通过 DSH Provider 目录定位当前路由；存在 `baseURL` 时按 hostname 匹配渠道。
+- 会话回合执行期间：全局后台任务每分钟枚举实时 Session，通过事件快照检查最新的回合边界，再按 Provider 路由将活跃会话归并到渠道；每个活跃渠道每轮只刷新一次，没有活跃会话时不请求余额。这不依赖 `turn/start` 成功创建渠道任务。
+- 会话回合结束：立即刷新一次对应渠道；存在 `baseURL` 时按 hostname 匹配渠道。
 - DSH 内置 Provider 未暴露 URL 时，支持 `deepseek-official`、`deepseek` 和 `moonshotai-cn`，分别刷新 DeepSeek 或 Kimi。
 - Moonshot 国际站、Kimi Coding 和 Z.AI Coding Plan 与当前余额接口不属于同一账户体系，不会错误触发按量余额刷新。
 - Provider 未命中受支持的域名或内置身份时，不刷新。

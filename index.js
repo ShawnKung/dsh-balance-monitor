@@ -1,5 +1,6 @@
 import z from '@deepseek-ai/schemastery'
 import { channels } from './channels/index.js'
+import { ActiveSessionRefresher } from './lib/active-session-refresher.js'
 import {
   providerCredentialRefsForChannel,
   refreshTargetForSession,
@@ -84,7 +85,7 @@ export function apply(ctx, entry = {}) {
     }
   }, 'dsh-balance-monitor: routes')
 
-  ctx.inject(['llm', 'settings'], routingCtx => {
+  ctx.inject(['llm', 'settings', 'sessions'], routingCtx => {
     routingCtx.effect(() => {
       const resolver = (channel, targetBaseURL) => providerCredentialRefsForChannel(
         channel,
@@ -94,15 +95,25 @@ export function apply(ctx, entry = {}) {
       )
       providerCredentialRefs = resolver
       void service.refreshAllAfterCurrent()
-
-      const offEvent = routingCtx.on('session/event', (session, event) => {
-        if (event?.type !== 'turn/end') return
+      const channelForSession = session => {
         const target = refreshTargetForSession(session, {
           llm: routingCtx.llm,
           settings: routingCtx.settings,
         })
-        if (target.kind === 'skip') return
-        void service.refresh(target.channel).catch(error => {
+        return target.kind === 'channel' ? target.channel : undefined
+      }
+      const activeRefresher = new ActiveSessionRefresher({
+        sessions: () => routingCtx.sessions.list(),
+        channelForSession,
+        refresh: channel => service.refresh(channel),
+      })
+      activeRefresher.start()
+
+      const offEvent = routingCtx.on('session/event', (session, event) => {
+        if (event?.type !== 'turn/end') return
+        const channel = channelForSession(session)
+        if (!channel) return
+        void service.refresh(channel).catch(error => {
           console.error('[dsh-balance-monitor] turn-end refresh failed:', error)
         })
       }, { global: true })
@@ -111,8 +122,9 @@ export function apply(ctx, entry = {}) {
           providerCredentialRefs = noProviderCredentials
         }
         offEvent()
+        activeRefresher.dispose()
       }
-    }, 'dsh-balance-monitor: turn-end refresh')
+    }, 'dsh-balance-monitor: active session refresh')
   })
 
   ctx.inject(['settings'], settingsCtx => {
