@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.1.15] - 2026-09-12
+
+### 新增
+
+- 活跃会话执行期间每分钟刷新对应渠道余额；全局任务按渠道去重，并保留会话回合结束后的即时刷新。
+
 ## [0.1.14] - 2026-09-10
 
 ### 修复
