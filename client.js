@@ -2289,6 +2289,14 @@ window.__ModuleLoader__.load({
       }
     }
 
+    // lib/channel-display.js
+    function popupChannels(channels, order) {
+      const byId = new Map(
+        (Array.isArray(channels) ? channels : []).map((channel) => [channel.id, channel])
+      );
+      return (Array.isArray(order) ? order : []).map((id) => byId.get(id)).filter((channel) => channel?.credential?.configured === true);
+    }
+
     // src/client.js
     var inject = ["slots", "settingsScope"];
     var NS = "dsh-balance-monitor";
@@ -2706,13 +2714,12 @@ window.__ModuleLoader__.load({
           settings.status === "ready" ? settings.value?.balancePrecision : void 0
         );
       };
-      const orderedChannels = () => {
+      const configuredPopupChannels = () => {
         const settings = scope.getSnapshot();
         const order = normalizeChannelOrder(
           settings.status === "ready" ? settings.value?.channelOrder : void 0
         );
-        const byId = new Map(snapshot.channels.map((channel) => [channel.id, channel]));
-        return order.map((id) => byId.get(id)).filter(Boolean);
+        return popupChannels(snapshot.channels, order);
       };
       const acceptSnapshot = (next) => {
         if (!next || !Array.isArray(next.channels)) return false;
@@ -2834,13 +2841,19 @@ window.__ModuleLoader__.load({
         actions.append(refreshAll);
         header.append(heading, actions);
         popup.append(header);
+        const channels = configuredPopupChannels();
         if (!snapshot.channels.length) {
           const empty = document.createElement("div");
           empty.className = "bm-empty";
           empty.textContent = "\u6B63\u5728\u52A0\u8F7D\u4F59\u989D";
           popup.append(empty);
+        } else if (!channels.length) {
+          const empty = document.createElement("div");
+          empty.className = "bm-empty";
+          empty.textContent = "\u6682\u65E0\u5DF2\u914D\u7F6E API Key \u7684\u6E20\u9053";
+          popup.append(empty);
         }
-        for (const channel of orderedChannels()) {
+        for (const channel of channels) {
           popup.append(channelView(
             channel,
             () => void refresh(channel.id),

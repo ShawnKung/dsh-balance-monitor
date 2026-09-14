@@ -5,6 +5,7 @@ import {
   formatMoney,
   normalizeBalancePrecision,
 } from '../lib/balance-format.js'
+import { popupChannels } from '../lib/channel-display.js'
 
 export const inject = ['slots', 'settingsScope']
 
@@ -474,13 +475,12 @@ function mountMonitor(scope) {
     )
   }
 
-  const orderedChannels = () => {
+  const configuredPopupChannels = () => {
     const settings = scope.getSnapshot()
     const order = normalizeChannelOrder(
       settings.status === 'ready' ? settings.value?.channelOrder : undefined,
     )
-    const byId = new Map(snapshot.channels.map(channel => [channel.id, channel]))
-    return order.map(id => byId.get(id)).filter(Boolean)
+    return popupChannels(snapshot.channels, order)
   }
 
   const acceptSnapshot = next => {
@@ -613,13 +613,19 @@ function mountMonitor(scope) {
     actions.append(refreshAll)
     header.append(heading, actions)
     popup.append(header)
+    const channels = configuredPopupChannels()
     if (!snapshot.channels.length) {
       const empty = document.createElement('div')
       empty.className = 'bm-empty'
       empty.textContent = '正在加载余额'
       popup.append(empty)
+    } else if (!channels.length) {
+      const empty = document.createElement('div')
+      empty.className = 'bm-empty'
+      empty.textContent = '暂无已配置 API Key 的渠道'
+      popup.append(empty)
     }
-    for (const channel of orderedChannels()) {
+    for (const channel of channels) {
       popup.append(channelView(
         channel,
         () => void refresh(channel.id),
