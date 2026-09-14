@@ -62,7 +62,7 @@ body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-pri
 [data-dsh-balance-monitor-entry]{box-sizing:border-box;width:100%;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,#d6d9df);display:flex;align-items:center;gap:8px;min-height:36px;padding:5px 10px;cursor:pointer;font:inherit;text-align:left}
 [data-dsh-balance-monitor-entry]:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#eef0f3)}[data-dsh-balance-monitor-entry][data-active]{background:var(--dsw-alias-interactive-bg-active,rgba(127,127,127,.16));color:var(--dsw-alias-label-primary,#eef0f3);font-weight:600}
 [data-dsh-balance-monitor-entry] .bm-icon{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none}
-[data-dsh-balance-monitor-entry] .bm-icon svg{display:block;width:18px;height:18px}.bm-icon-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+[data-dsh-balance-monitor-entry] .bm-icon svg{display:block;width:18px;height:18px}.bm-icon.bm-loading svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.bm-icon-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 [data-dsh-balance-monitor-entry] .bm-summary{display:grid;gap:1px;min-width:0;flex:1}
 [data-dsh-balance-monitor-entry] .bm-line{display:flex;justify-content:space-between;gap:8px;min-width:0;font-size:12px;line-height:17px}
 [data-dsh-balance-monitor-entry] .bm-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:inherit}
@@ -451,6 +451,23 @@ function mountMonitor(scope) {
   const feedbackStarted = new Map()
   const pendingFeedback = new Map()
 
+  const setSidebarLoading = loading => {
+    if (loading === (icon.dataset.loading === 'true')) return
+    if (loading) {
+      icon.dataset.loading = 'true'
+      icon.classList.add('bm-loading', 'bm-spinning')
+      icon.innerHTML = REFRESH_ICON
+      entry.disabled = true
+      entry.setAttribute('aria-label', '余额监控正在加载')
+      return
+    }
+    delete icon.dataset.loading
+    icon.classList.remove('bm-loading', 'bm-spinning')
+    icon.innerHTML = WALLET_ICON
+    entry.disabled = false
+    entry.setAttribute('aria-label', '余额监控')
+  }
+
   const selectedChannels = () => {
     const settings = scope.getSnapshot()
     const selected = settings.status === 'ready' ? settings.value?.sidebarChannels : undefined
@@ -496,6 +513,17 @@ function mountMonitor(scope) {
 
   const renderSummary = () => {
     summary.replaceChildren()
+    const settings = scope.getSnapshot()
+    if (settings.status !== 'ready') {
+      setSidebarLoading(true)
+      entry.hidden = false
+      summary.textContent = '正在加载'
+      popup.hidden = true
+      delete popup.dataset.closing
+      delete entry.dataset.active
+      return
+    }
+    setSidebarLoading(false)
     const visible = sidebarVisible()
     entry.hidden = !visible
     if (!visible) {
