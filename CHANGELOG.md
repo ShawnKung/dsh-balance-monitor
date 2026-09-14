@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 变更
+
+- 余额弹窗仅按用户设置顺序展示已配置 API Key 的渠道。
+
 ## [0.1.15] - 2026-09-12
 
 ### 新增
