@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.2.1] - 2026-09-28
+
+### 修复
+
+- 修复服务端 `settings.get` 调用因 DSH 0.1.7 `SettingsForms` 服务不再提供该方法而抛出 `settings.get is not a function`，导致余额面板持续"正在加载"、所有渠道均为 error 的问题；改为通过 `settings.describe()` 检索命名空间快照。
+
 ## [0.2.0] - 2026-09-28
 
 ### 变更
