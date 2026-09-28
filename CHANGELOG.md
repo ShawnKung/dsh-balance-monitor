@@ -2,6 +2,12 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.2.0] - 2026-09-28
+
+### 变更
+
+- 迁移至 DSH 0.1.7 的 `configForms` 服务，取代已下线的 `settingsScope`。声明兼容 dsh `>=0.1.7-rc.1 <0.2.0`；不再兼容 0.1.6 及更早版本。
+
 ## [0.1.16] - 2026-09-14
 
 ### 变更

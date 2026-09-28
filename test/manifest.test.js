@@ -15,14 +15,14 @@ test('manifest avoids install-time lifecycle scripts', () => {
 
 test('manifest declares the supported DSH runtime', () => {
   assert.equal(manifest.dsh?.compatibility?.node, manifest.engines?.node)
-  assert.equal(manifest.dsh?.compatibility?.dsh, '>=0.1.2-rc.1 <0.2.0')
+  assert.equal(manifest.dsh?.compatibility?.dsh, '>=0.1.7-rc.1 <0.2.0')
   assert.deepEqual(manifest.dsh?.compatibility?.profiles, ['web'])
   assert.equal(
-    manifest.dsh?.compatibility?.dshReleases?.['0.1.2-rc.1'],
+    manifest.dsh?.compatibility?.dshReleases?.['0.1.7-rc.1'],
     'compatible',
   )
   assert.equal(
-    manifest.dsh?.compatibility?.dshReleases?.['0.1.5-rc.1'],
+    manifest.dsh?.compatibility?.dshReleases?.['0.1.7-rc.2'],
     'compatible',
   )
 })
