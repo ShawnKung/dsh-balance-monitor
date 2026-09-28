@@ -7,7 +7,7 @@ import {
 } from '../lib/balance-format.js'
 import { popupChannels } from '../lib/channel-display.js'
 
-export const inject = ['slots', 'settingsScope']
+export const inject = ['slots', 'configForms']
 
 const NS = 'dsh-balance-monitor'
 const VERSION = __DSH_BALANCE_MONITOR_VERSION_LABEL__
@@ -1552,7 +1552,7 @@ function createSettingsCard(scope) {
 
 export function apply(ctx) {
   installStyle()
-  const scope = ctx.settingsScope.bind({ namespace: NS })
+  const scope = ctx.configForms.get(NS)
   const SettingsCard = createSettingsCard(scope)
   ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
     name: 'settings.plugin.item',

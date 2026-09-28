@@ -2298,9 +2298,9 @@ window.__ModuleLoader__.load({
     }
 
     // src/client.js
-    var inject = ["slots", "settingsScope"];
+    var inject = ["slots", "configForms"];
     var NS = "dsh-balance-monitor";
-    var VERSION = "v0.1.16";
+    var VERSION = "v0.2.0";
     var FEEDBACK_DURATION_MS = 2400;
     var POPOVER_EXIT_MS = 160;
     var MAX_SIDEBAR_CHANNELS = 3;
@@ -3710,7 +3710,7 @@ window.__ModuleLoader__.load({
     }
     function apply(ctx) {
       installStyle();
-      const scope = ctx.settingsScope.bind({ namespace: NS });
+      const scope = ctx.configForms.get(NS);
       const SettingsCard = createSettingsCard(scope);
       ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
         name: "settings.plugin.item",
