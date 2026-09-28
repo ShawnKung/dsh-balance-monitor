@@ -2296,11 +2296,20 @@ window.__ModuleLoader__.load({
       );
       return (Array.isArray(order) ? order : []).map((id) => byId.get(id)).filter((channel) => channel?.credential?.configured === true);
     }
+    function selectedSidebarChannels(channels, selected, order) {
+      const byId = new Map(
+        (Array.isArray(channels) ? channels : []).map((channel) => [channel.id, channel])
+      );
+      const selectedIds = new Set(Array.isArray(selected) ? selected : []);
+      return (Array.isArray(order) ? order : []).filter((id) => selectedIds.has(id)).map((id) => byId.get(id) ?? { id, status: "unconfigured" });
+    }
 
     // src/client.js
     var inject = ["slots", "configForms"];
     var NS = "dsh-balance-monitor";
-    var VERSION = "v0.2.2";
+    var PACKAGE_NAME = "@shawnkung/dsh-balance-monitor";
+    var ROW_CONFIG_KEY = `${PACKAGE_NAME}#${NS}`;
+    var VERSION = "v0.2.3";
     var FEEDBACK_DURATION_MS = 2400;
     var POPOVER_EXIT_MS = 160;
     var MAX_SIDEBAR_CHANNELS = 3;
@@ -2345,8 +2354,8 @@ window.__ModuleLoader__.load({
     body{--bm-feedback-success:#15803d;--bm-feedback-error:var(--dsw-alias-state-error-primary,#dc2626)}
     body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-primary,#22c55e);--bm-feedback-error:var(--dsw-alias-state-error-primary,#f25a5a)}
     .bm-icon-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .bm-panel-glyph{display:inline-flex;align-items:center;justify-content:center}
-    .bm-panel-glyph svg{display:block}
+    .bm-panel-glyph{display:inline-flex;align-items:center;justify-content:center}.bm-panel-glyph svg{display:block}
+    .bm-panel-button[data-bm-balance-wide=true]{position:relative;height:auto!important;min-height:calc(var(--bm-panel-row-count,1)*17px + 14px)!important;align-items:center!important;padding-top:7px!important;padding-bottom:7px!important}.bm-panel-button[data-bm-balance-wide=true]>span:has(>.bm-panel-glyph)~span{display:none!important}.bm-panel-button[data-bm-balance-wide=true] .bm-panel-glyph{width:16px;align-items:center;justify-content:center}.bm-panel-wallet{width:16px;height:17px;flex:none;display:inline-flex;align-items:center;justify-content:center}.bm-panel-balances{position:absolute;top:7px;right:8px;left:32px;min-width:0;display:grid;gap:1px}.bm-panel-balance-row{width:100%;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:baseline;column-gap:8px;font-size:12px;line-height:17px}.bm-panel-channel{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bm-panel-value{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
     .bm-popover{position:fixed;z-index:10000;width:min(390px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 24px));overflow:auto;border:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#0f1115);box-shadow:var(--dsw-elevation-prominent,0 12px 32px rgba(0,0,0,.14));font-family:inherit;transform-origin:left top;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}
     .bm-popover[hidden]{display:none}.bm-popover-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;padding:12px 14px;border-bottom:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16));background:inherit}
     .bm-popover[data-closing=true]{pointer-events:none;animation:bm-popover-out .16s var(--ds-ease-in,cubic-bezier(.4,0,1,1)) forwards}
@@ -2358,8 +2367,7 @@ window.__ModuleLoader__.load({
     .bm-period-label,.bm-detail-label{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-period-value{font-size:14px;font-weight:600;margin-top:3px}.bm-period-meta{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:2px}
     .bm-details{display:grid;gap:7px}.bm-detail{display:flex;justify-content:space-between;gap:14px;font-size:12px}.bm-detail-value{text-align:right;font-variant-numeric:tabular-nums}.bm-error{color:var(--dsw-alias-state-error-primary,#ef4444)}
     .bm-note{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:10px}.bm-empty{padding:16px;font-size:12px;color:var(--dsw-alias-label-tertiary,#9ca3af)}
-    .bm-settings{list-style:none;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:12px;background:var(--dsw-alias-bg-layer-3,transparent);color:inherit;transition:border-color .16s,background .16s}.bm-settings:hover{border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}.bm-settings[data-open=true]{background:var(--dsw-alias-bg-layer-2,transparent);border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}
-    .bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 2px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
+    .bm-settings-page{display:grid;gap:14px;color:inherit}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
     .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .bm-precision-setting{display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,300px);align-items:center;gap:16px;min-height:34px;padding-top:8px}.bm-precision-title{display:flex;align-items:baseline;gap:10px;min-width:0;font-size:12px;font-weight:550;white-space:nowrap}.bm-precision-current{font-size:11px;font-weight:400;color:var(--dsw-alias-label-secondary,#6b7280);font-variant-numeric:tabular-nums}.bm-precision-control{display:flex;align-items:center;justify-self:end;gap:10px;width:100%;min-width:0}.bm-precision-end{box-sizing:border-box;flex:none;font-size:10px;line-height:14px;color:var(--dsw-alias-label-secondary,#6b7280);white-space:nowrap}.bm-precision-end:last-child{text-align:right}.bm-precision-track{position:relative;flex:1;min-width:90px;height:20px}.bm-precision-slider{-webkit-appearance:none;appearance:none;position:absolute;z-index:2;inset:0;box-sizing:border-box;width:100%;height:20px;margin:0;border:0;background:transparent;padding:0;cursor:pointer}.bm-precision-slider::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(to right,var(--dsw-alias-state-info-primary,#2563eb) 0 var(--bm-precision-progress),var(--dsw-alias-border-l2,rgba(127,127,127,.22)) var(--bm-precision-progress) 100%)}.bm-precision-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:12px;height:12px;margin-top:-4.5px;border:1.5px solid var(--dsw-alias-bg-layer-2,#fff);border-radius:50%;background:var(--dsw-alias-state-info-primary,#2563eb);box-shadow:0 1px 2px rgba(0,0,0,.12)}.bm-precision-slider::-moz-range-track{height:3px;border:0;border-radius:2px;background:var(--dsw-alias-border-l2,rgba(127,127,127,.22))}.bm-precision-slider::-moz-range-progress{height:3px;border-radius:2px;background:var(--dsw-alias-state-info-primary,#2563eb)}.bm-precision-slider::-moz-range-thumb{box-sizing:border-box;width:12px;height:12px;border:1.5px solid var(--dsw-alias-bg-layer-2,#fff);border-radius:50%;background:var(--dsw-alias-state-info-primary,#2563eb);box-shadow:0 1px 2px rgba(0,0,0,.12)}.bm-precision-ticks{position:absolute;z-index:1;left:6px;right:6px;top:9px;display:flex;justify-content:space-between;pointer-events:none}.bm-precision-ticks span{opacity:.5;width:2px;height:2px;border-radius:50%;background:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-precision-tooltip{position:fixed;z-index:10002;transform:translateX(-50%);padding:4px 7px;border-radius:5px;background:var(--dsw-alias-bg-tooltip,#1f2937);color:var(--dsw-alias-label-primary-foreground,#fff);box-shadow:0 4px 12px rgba(0,0,0,.18);font-size:11px;font-weight:550;line-height:16px;white-space:nowrap;pointer-events:none}
     .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
@@ -2632,13 +2640,22 @@ window.__ModuleLoader__.load({
       }
       return section;
     }
-    function WalletGlyph({ size = 18 }) {
+    function WalletGlyph({ size = 18, rows = [], ariaLabel = "\u4F59\u989D\u76D1\u63A7" }) {
       const ref = import_react.default.useRef(null);
       import_react.default.useEffect(() => {
         const el = ref.current;
         if (!el) return void 0;
+        const host = el.parentElement;
         const button = el.closest("button");
         if (!button) return void 0;
+        const frameworkTitle = host?.nextElementSibling;
+        host?.classList.add("bm-panel-host");
+        frameworkTitle?.setAttribute("hidden", "");
+        button.classList.add("bm-panel-button");
+        button.dataset.bmBalanceWide = String(size === 16);
+        button.style.setProperty("--bm-panel-row-count", String(Math.max(1, rows.length)));
+        button.setAttribute("aria-label", ariaLabel);
+        button.title = ariaLabel;
         const handler = (event) => {
           event.stopPropagation();
           event.preventDefault();
@@ -2646,16 +2663,40 @@ window.__ModuleLoader__.load({
           if (typeof toggle === "function") toggle(button);
         };
         button.addEventListener("click", handler, { capture: true });
-        return () => button.removeEventListener("click", handler, { capture: true });
-      }, []);
-      return import_react.default.createElement("span", {
-        ref,
-        className: "bm-panel-glyph",
-        "data-dsh-plugin": NS,
+        return () => {
+          button.removeEventListener("click", handler, { capture: true });
+          host?.classList.remove("bm-panel-host");
+          frameworkTitle?.removeAttribute("hidden");
+          button.classList.remove("bm-panel-button");
+          delete button.dataset.bmBalanceWide;
+          button.style.removeProperty("--bm-panel-row-count");
+          button.removeAttribute("title");
+        };
+      }, [ariaLabel, rows.length, size]);
+      const wallet = import_react.default.createElement("span", {
+        className: "bm-panel-wallet",
         dangerouslySetInnerHTML: {
           __html: `<svg viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>`
         }
       });
+      const balances = size === 16 && rows.length > 0 ? import_react.default.createElement(
+        "span",
+        { className: "bm-panel-balances" },
+        ...rows.map((row) => import_react.default.createElement(
+          "span",
+          { className: "bm-panel-balance-row", key: row.id },
+          import_react.default.createElement("span", { className: "bm-panel-channel" }, row.label),
+          import_react.default.createElement("span", {
+            className: `bm-panel-value${row.feedback ? ` bm-value-${row.feedback}` : ""}`
+          }, row.value)
+        ))
+      ) : null;
+      return import_react.default.createElement(
+        "span",
+        { ref, className: "bm-panel-glyph", "data-dsh-plugin": NS },
+        wallet,
+        balances
+      );
     }
     function setupSidebarPanel(ctx, scope) {
       installStyle();
@@ -2683,6 +2724,25 @@ window.__ModuleLoader__.load({
         return normalizeBalancePrecision(
           settings.status === "ready" ? settings.value?.balancePrecision : void 0
         );
+      };
+      const sidebarRows = () => {
+        const settings = scope.getSnapshot();
+        const values = settings.status === "ready" ? settings.value ?? {} : {};
+        const order = normalizeChannelOrder(values.channelOrder);
+        const selected = selectedSidebarChannels(
+          snapshot.channels,
+          values.sidebarChannels ?? ["deepseek"],
+          order
+        );
+        return selected.map((channel) => {
+          const label = CHANNEL_BY_ID.get(channel.id)?.label ?? channel.id;
+          return {
+            id: channel.id,
+            label,
+            value: formatBalance(channel, balancePrecision()),
+            feedback: feedback.get(channel.id)
+          };
+        });
       };
       const configuredPopupChannels = () => {
         const settings = scope.getSnapshot();
@@ -2807,7 +2867,34 @@ window.__ModuleLoader__.load({
         }
         requestAnimationFrame(positionPopup);
       };
+      let disposeSlot = () => {
+      };
+      let registeredSignature;
+      const syncSidebarSlot = () => {
+        if (!sidebarVisible()) {
+          if (registeredSignature !== void 0) {
+            disposeSlot();
+            disposeSlot = () => {
+            };
+            registeredSignature = void 0;
+          }
+          return;
+        }
+        const rows = sidebarRows();
+        const label = rows.length === 0 ? "\u4F59\u989D\u76D1\u63A7" : `\u4F59\u989D\u76D1\u63A7\uFF1A${rows.map((row) => `${row.label} ${row.value}`).join("\uFF1B")}`;
+        const signature = `${label}\0${rows.map((row) => `${row.id}:${row.feedback ?? ""}`).join("|")}`;
+        if (registeredSignature === signature) return;
+        disposeSlot();
+        disposeSlot = ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({
+          name: "sidebar.panellist",
+          id: NS,
+          order: 200,
+          label: ""
+        }, (props) => import_react.default.createElement(WalletGlyph, { ...props, rows, ariaLabel: label })));
+        registeredSignature = signature;
+      };
       const render = () => {
+        syncSidebarSlot();
         if (!sidebarVisible()) {
           closePopup(true);
           return;
@@ -2889,12 +2976,7 @@ window.__ModuleLoader__.load({
       document.addEventListener("pointerdown", outside);
       document.addEventListener("keydown", escape);
       window.addEventListener("resize", positionPopup);
-      const disposeSlot = ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({
-        name: "sidebar.panellist",
-        id: NS,
-        order: 200,
-        label: () => "\u4F59\u989D\u76D1\u63A7"
-      }, WalletGlyph));
+      syncSidebarSlot();
       return () => {
         if (window.__dshBalanceMonitorTogglePopup === togglePopup) {
           delete window.__dshBalanceMonitorTogglePopup;
@@ -2981,680 +3063,705 @@ window.__ModuleLoader__.load({
         import_react.default.createElement(ExternalLinkIcon)
       );
     }
-    function createSettingsCard(scope) {
-      return function DshBalanceMonitorSettings() {
-        const snapshot = (0, import_react.useSyncExternalStore)(
-          (listener) => scope.subscribe(listener),
-          () => scope.getSnapshot()
-        );
-        const [update, setUpdate] = (0, import_react.useState)();
-        const values = snapshot.status === "ready" ? snapshot.value ?? {} : {};
-        const [open, setOpen] = (0, import_react.useState)(false);
-        const [pickerOpen, setPickerOpen] = (0, import_react.useState)(false);
-        const [sourceSettingsOpen, setSourceSettingsOpen] = (0, import_react.useState)(false);
-        const [showSidebar, setShowSidebar] = (0, import_react.useState)(values.showSidebar ?? true);
-        const [balancePrecision, setBalancePrecision] = (0, import_react.useState)(
-          normalizeBalancePrecision(values.balancePrecision)
-        );
-        const [sidebarChannels, setSidebarChannels] = (0, import_react.useState)(
-          values.sidebarChannels ?? CHANNEL_IDS
-        );
-        const [channelOrder, setChannelOrder] = (0, import_react.useState)(() => normalizeChannelOrder(values.channelOrder));
-        const pickerMenu = (0, import_react.useRef)();
-        const limitTooltip = (0, import_react.useRef)();
-        const precisionTooltip = (0, import_react.useRef)();
-        const precisionDragging = (0, import_react.useRef)(false);
-        const [teamoRangeDays, setTeamoRangeDays] = (0, import_react.useState)(values.teamoRangeDays ?? 7);
-        const [deepseekKey, setDeepseekKey] = (0, import_react.useState)("");
-        const [kimiKey, setKimiKey] = (0, import_react.useState)("");
-        const [zhipuKey, setZhipuKey] = (0, import_react.useState)("");
-        const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
-        const [balanceSnapshot, setBalanceSnapshot] = (0, import_react.useState)();
-        const [saving, setSaving] = (0, import_react.useState)(false);
-        const [refreshingChannels, setRefreshingChannels] = (0, import_react.useState)(() => /* @__PURE__ */ new Set());
-        const [message, setMessage] = (0, import_react.useState)("");
-        const [failed, setFailed] = (0, import_react.useState)(false);
-        const settingsWrites = (0, import_react.useRef)(Promise.resolve());
-        (0, import_react.useEffect)(() => {
-          if (snapshot.status !== "ready") return;
-          setShowSidebar(values.showSidebar ?? true);
+    function DshBalanceMonitorSettings({ form: configForm }) {
+      const snapshot = configForm?.state ?? {
+        status: "unavailable",
+        value: void 0,
+        revision: void 0,
+        writable: false
+      };
+      const [update, setUpdate] = (0, import_react.useState)();
+      const values = snapshot.status === "ready" ? snapshot.value ?? {} : {};
+      const [pickerOpen, setPickerOpen] = (0, import_react.useState)(false);
+      const [sourceSettingsOpen, setSourceSettingsOpen] = (0, import_react.useState)(false);
+      const [showSidebar, setShowSidebar] = (0, import_react.useState)(values.showSidebar ?? true);
+      const [balancePrecision, setBalancePrecision] = (0, import_react.useState)(
+        normalizeBalancePrecision(values.balancePrecision)
+      );
+      const [sidebarChannels, setSidebarChannels] = (0, import_react.useState)(
+        values.sidebarChannels ?? CHANNEL_IDS
+      );
+      const [channelOrder, setChannelOrder] = (0, import_react.useState)(() => normalizeChannelOrder(values.channelOrder));
+      const pickerMenu = (0, import_react.useRef)();
+      const limitTooltip = (0, import_react.useRef)();
+      const precisionTooltip = (0, import_react.useRef)();
+      const precisionDragging = (0, import_react.useRef)(false);
+      const [teamoRangeDays, setTeamoRangeDays] = (0, import_react.useState)(values.teamoRangeDays ?? 7);
+      const [deepseekKey, setDeepseekKey] = (0, import_react.useState)("");
+      const [kimiKey, setKimiKey] = (0, import_react.useState)("");
+      const [zhipuKey, setZhipuKey] = (0, import_react.useState)("");
+      const [teamoKey, setTeamoKey] = (0, import_react.useState)("");
+      const [balanceSnapshot, setBalanceSnapshot] = (0, import_react.useState)();
+      const [saving, setSaving] = (0, import_react.useState)(false);
+      const [refreshingChannels, setRefreshingChannels] = (0, import_react.useState)(() => /* @__PURE__ */ new Set());
+      const [message, setMessage] = (0, import_react.useState)("");
+      const [failed, setFailed] = (0, import_react.useState)(false);
+      const [dirtyFields, setDirtyFields] = (0, import_react.useState)(() => /* @__PURE__ */ new Set());
+      (0, import_react.useEffect)(() => {
+        if (snapshot.status !== "ready") return;
+        if (!dirtyFields.has("showSidebar")) setShowSidebar(values.showSidebar ?? true);
+        if (!dirtyFields.has("balancePrecision")) {
           setBalancePrecision(normalizeBalancePrecision(values.balancePrecision));
+        }
+        if (!dirtyFields.has("sidebarChannels")) {
           setSidebarChannels(values.sidebarChannels ?? CHANNEL_IDS);
+        }
+        if (!dirtyFields.has("channelOrder")) {
           setChannelOrder(normalizeChannelOrder(values.channelOrder));
-          setTeamoRangeDays(values.teamoRangeDays ?? 7);
-        }, [snapshot.revision]);
-        (0, import_react.useEffect)(() => {
-          if (!open) {
+        }
+        setTeamoRangeDays(values.teamoRangeDays ?? 7);
+      }, [snapshot.revision]);
+      (0, import_react.useEffect)(() => {
+        if (!pickerOpen) return void 0;
+        const closeOutside = (event) => {
+          if (!(event.target instanceof Element) || !event.target.closest(".bm-multi")) {
             setPickerOpen(false);
-            setSourceSettingsOpen(false);
-          }
-        }, [open]);
-        (0, import_react.useEffect)(() => {
-          if (!pickerOpen) return void 0;
-          const closeOutside = (event) => {
-            if (!(event.target instanceof Element) || !event.target.closest(".bm-multi")) {
-              setPickerOpen(false);
-            }
-          };
-          const closeOnEscape = (event) => {
-            if (event.key === "Escape") setPickerOpen(false);
-          };
-          document.addEventListener("pointerdown", closeOutside);
-          document.addEventListener("keydown", closeOnEscape);
-          return () => {
-            document.removeEventListener("pointerdown", closeOutside);
-            document.removeEventListener("keydown", closeOnEscape);
-          };
-        }, [pickerOpen]);
-        (0, import_react.useEffect)(() => {
-          if (!sourceSettingsOpen) return void 0;
-          const closeOutside = (event) => {
-            if (!event.target.closest("[data-bm-source-settings]")) setSourceSettingsOpen(false);
-          };
-          const closeOnEscape = (event) => {
-            if (event.key === "Escape") setSourceSettingsOpen(false);
-          };
-          document.addEventListener("pointerdown", closeOutside);
-          document.addEventListener("keydown", closeOnEscape);
-          return () => {
-            document.removeEventListener("pointerdown", closeOutside);
-            document.removeEventListener("keydown", closeOnEscape);
-          };
-        }, [sourceSettingsOpen]);
-        (0, import_react.useEffect)(() => subscribeUpdateState(setUpdate), []);
-        (0, import_react.useEffect)(() => subscribeBalanceState(({ snapshot: next }) => {
-          setBalanceSnapshot(next);
-        }), []);
-        const persistSetting = (path, value) => {
-          setFailed(false);
-          setMessage("");
-          settingsWrites.current = settingsWrites.current.then(async () => {
-            const current = scope.getSnapshot();
-            if (current.status !== "ready" || !current.writable) {
-              throw new Error("\u8BBE\u7F6E\u6682\u4E0D\u53EF\u4FDD\u5B58");
-            }
-            await scope.mutate([
-              { op: "set", path: [path], value }
-            ], current.revision);
-          }).catch((error) => {
-            setFailed(true);
-            setMessage(error.message);
-          });
-          return settingsWrites.current;
-        };
-        (0, import_react.useEffect)(() => {
-          if (!pickerOpen || !pickerMenu.current) return void 0;
-          const sortable = sortable_esm_default.create(pickerMenu.current, {
-            animation: 180,
-            easing: "cubic-bezier(0.2, 0, 0, 1)",
-            handle: ".bm-drag-handle",
-            draggable: ".bm-multi-option",
-            dataIdAttr: "data-channel-id",
-            direction: "vertical",
-            forceFallback: true,
-            fallbackOnBody: true,
-            fallbackTolerance: 3,
-            swapThreshold: 0.65,
-            ghostClass: "bm-sortable-ghost",
-            chosenClass: "bm-sortable-chosen",
-            dragClass: "bm-sortable-drag",
-            onEnd: (event) => {
-              const from = event.oldDraggableIndex;
-              const to = event.newDraggableIndex;
-              if (!Number.isInteger(from) || !Number.isInteger(to) || from === to) return;
-              const next = normalizeChannelOrder(channelOrder);
-              next.splice(to, 0, next.splice(from, 1)[0]);
-              setChannelOrder(next);
-              void persistSetting("channelOrder", next);
-            }
-          });
-          return () => sortable.destroy();
-        }, [pickerOpen, channelOrder]);
-        const saveTeamoSettings = async () => {
-          setSaving(true);
-          setFailed(false);
-          setMessage("");
-          try {
-            const rangeDays = Number(teamoRangeDays);
-            if (!Number.isInteger(rangeDays) || rangeDays < 2 || rangeDays > 90) {
-              throw new Error("\u7EDF\u8BA1\u5929\u6570\u5FC5\u987B\u662F 2 \u5230 90 \u7684\u6574\u6570");
-            }
-            await scope.mutate([
-              { op: "set", path: ["teamoRangeDays"], value: rangeDays }
-            ], snapshot.revision);
-            await api("/api/dsh-balance-monitor/refresh", {
-              method: "POST",
-              body: JSON.stringify({ channel: "teamo" })
-            });
-            setSourceSettingsOpen(false);
-            setMessage("TeamoRouter \u8BBE\u7F6E\u5DF2\u4FDD\u5B58");
-          } catch (error) {
-            setFailed(true);
-            setMessage(error.message);
-          } finally {
-            setSaving(false);
           }
         };
-        const removeCredential = async (channel, clearValue) => {
-          setSaving(true);
-          setFailed(false);
-          setMessage("");
-          try {
-            await api("/api/dsh-balance-monitor/credential", {
-              method: "POST",
-              body: JSON.stringify({ action: "unset", channel })
-            });
+        const closeOnEscape = (event) => {
+          if (event.key === "Escape") setPickerOpen(false);
+        };
+        document.addEventListener("pointerdown", closeOutside);
+        document.addEventListener("keydown", closeOnEscape);
+        return () => {
+          document.removeEventListener("pointerdown", closeOutside);
+          document.removeEventListener("keydown", closeOnEscape);
+        };
+      }, [pickerOpen]);
+      (0, import_react.useEffect)(() => {
+        if (!sourceSettingsOpen) return void 0;
+        const closeOutside = (event) => {
+          if (!event.target.closest("[data-bm-source-settings]")) setSourceSettingsOpen(false);
+        };
+        const closeOnEscape = (event) => {
+          if (event.key === "Escape") setSourceSettingsOpen(false);
+        };
+        document.addEventListener("pointerdown", closeOutside);
+        document.addEventListener("keydown", closeOnEscape);
+        return () => {
+          document.removeEventListener("pointerdown", closeOutside);
+          document.removeEventListener("keydown", closeOnEscape);
+        };
+      }, [sourceSettingsOpen]);
+      (0, import_react.useEffect)(() => subscribeUpdateState(setUpdate), []);
+      (0, import_react.useEffect)(() => subscribeBalanceState(({ snapshot: next }) => {
+        setBalanceSnapshot(next);
+      }), []);
+      const stageSetting = (path) => {
+        setFailed(false);
+        setMessage("");
+        setDirtyFields((current) => new Set(current).add(path));
+      };
+      const resetDisplaySettings = () => {
+        const current = snapshot.status === "ready" ? snapshot.value ?? {} : {};
+        setShowSidebar(current.showSidebar ?? true);
+        setBalancePrecision(normalizeBalancePrecision(current.balancePrecision));
+        setSidebarChannels(current.sidebarChannels ?? CHANNEL_IDS);
+        setChannelOrder(normalizeChannelOrder(current.channelOrder));
+        setDirtyFields(/* @__PURE__ */ new Set());
+        setPickerOpen(false);
+        setFailed(false);
+        setMessage("");
+      };
+      const saveDisplaySettings = async () => {
+        if (dirtyFields.size === 0) return;
+        const current = configForm?.state;
+        if (configForm === void 0 || current?.status !== "ready" || !current.writable) {
+          setFailed(true);
+          setMessage("\u8BBE\u7F6E\u6682\u4E0D\u53EF\u4FDD\u5B58");
+          return;
+        }
+        const valuesByField = {
+          showSidebar,
+          balancePrecision,
+          sidebarChannels,
+          channelOrder
+        };
+        setSaving(true);
+        setFailed(false);
+        setMessage("");
+        try {
+          const accepted = await configForm.mutate(
+            [...dirtyFields].map((path) => ({ op: "set", path: [path], value: valuesByField[path] })),
+            current.revision
+          );
+          if (!accepted) throw new Error("\u8BBE\u7F6E\u5DF2\u53D1\u751F\u53D8\u5316\uFF0C\u8BF7\u68C0\u67E5\u540E\u91CD\u8BD5");
+          setDirtyFields(/* @__PURE__ */ new Set());
+          setMessage("\u663E\u793A\u8BBE\u7F6E\u5DF2\u4FDD\u5B58");
+        } catch (error) {
+          setFailed(true);
+          setMessage(error.message);
+        } finally {
+          setSaving(false);
+        }
+      };
+      (0, import_react.useEffect)(() => {
+        if (!pickerOpen || !pickerMenu.current) return void 0;
+        const sortable = sortable_esm_default.create(pickerMenu.current, {
+          animation: 180,
+          easing: "cubic-bezier(0.2, 0, 0, 1)",
+          handle: ".bm-drag-handle",
+          draggable: ".bm-multi-option",
+          dataIdAttr: "data-channel-id",
+          direction: "vertical",
+          forceFallback: true,
+          fallbackOnBody: true,
+          fallbackTolerance: 3,
+          swapThreshold: 0.65,
+          ghostClass: "bm-sortable-ghost",
+          chosenClass: "bm-sortable-chosen",
+          dragClass: "bm-sortable-drag",
+          onEnd: (event) => {
+            const from = event.oldDraggableIndex;
+            const to = event.newDraggableIndex;
+            if (!Number.isInteger(from) || !Number.isInteger(to) || from === to) return;
+            const next = normalizeChannelOrder(channelOrder);
+            next.splice(to, 0, next.splice(from, 1)[0]);
+            setChannelOrder(next);
+            stageSetting("channelOrder");
+          }
+        });
+        return () => sortable.destroy();
+      }, [pickerOpen, channelOrder]);
+      const saveTeamoSettings = async () => {
+        setSaving(true);
+        setFailed(false);
+        setMessage("");
+        try {
+          const rangeDays = Number(teamoRangeDays);
+          if (!Number.isInteger(rangeDays) || rangeDays < 2 || rangeDays > 90) {
+            throw new Error("\u7EDF\u8BA1\u5929\u6570\u5FC5\u987B\u662F 2 \u5230 90 \u7684\u6574\u6570");
+          }
+          if (snapshot.status !== "ready" || !snapshot.writable || configForm === void 0) {
+            throw new Error("\u8BBE\u7F6E\u6682\u4E0D\u53EF\u4FDD\u5B58");
+          }
+          await configForm.mutate([
+            { op: "set", path: ["teamoRangeDays"], value: rangeDays }
+          ], snapshot.revision);
+          await api("/api/dsh-balance-monitor/refresh", {
+            method: "POST",
+            body: JSON.stringify({ channel: "teamo" })
+          });
+          setSourceSettingsOpen(false);
+          setMessage("TeamoRouter \u8BBE\u7F6E\u5DF2\u4FDD\u5B58");
+        } catch (error) {
+          setFailed(true);
+          setMessage(error.message);
+        } finally {
+          setSaving(false);
+        }
+      };
+      const removeCredential = async (channel, clearValue) => {
+        setSaving(true);
+        setFailed(false);
+        setMessage("");
+        try {
+          await api("/api/dsh-balance-monitor/credential", {
+            method: "POST",
+            body: JSON.stringify({ action: "unset", channel })
+          });
+          clearValue();
+          setMessage("\u5DF2\u79FB\u9664");
+        } catch (error) {
+          setFailed(true);
+          setMessage(error.message);
+        } finally {
+          setSaving(false);
+        }
+      };
+      const refreshCredential = async (channel, value, clearValue) => {
+        if (refreshingChannels.has(channel)) return;
+        setRefreshingChannels((current) => new Set(current).add(channel));
+        setFailed(false);
+        setMessage("");
+        try {
+          const credential = value.trim();
+          const next = credential ? await api("/api/dsh-balance-monitor/credential", {
+            method: "POST",
+            body: JSON.stringify({ action: "set", channel, value: credential })
+          }) : await api("/api/dsh-balance-monitor/refresh", {
+            method: "POST",
+            body: JSON.stringify({ channel })
+          });
+          if (credential) {
             clearValue();
-            setMessage("\u5DF2\u79FB\u9664");
-          } catch (error) {
-            setFailed(true);
-            setMessage(error.message);
-          } finally {
-            setSaving(false);
+            setMessage("\u5DF2\u4FDD\u5B58\u5E76\u5237\u65B0");
           }
-        };
-        const refreshCredential = async (channel, value, clearValue) => {
-          if (refreshingChannels.has(channel)) return;
-          setRefreshingChannels((current) => new Set(current).add(channel));
-          setFailed(false);
-          setMessage("");
-          try {
-            const credential = value.trim();
-            const next = credential ? await api("/api/dsh-balance-monitor/credential", {
-              method: "POST",
-              body: JSON.stringify({ action: "set", channel, value: credential })
-            }) : await api("/api/dsh-balance-monitor/refresh", {
-              method: "POST",
-              body: JSON.stringify({ channel })
-            });
-            if (credential) {
-              clearValue();
-              setMessage("\u5DF2\u4FDD\u5B58\u5E76\u5237\u65B0");
-            }
-            setBalanceSnapshot(next);
-          } catch (error) {
-            setFailed(true);
-            setMessage(error.message);
-          } finally {
-            setRefreshingChannels((current) => {
-              const next = new Set(current);
-              next.delete(channel);
-              return next;
-            });
-          }
-        };
-        const field = (label, control, indicator, action, refresh, websiteChannel) => import_react.default.createElement(
+          setBalanceSnapshot(next);
+        } catch (error) {
+          setFailed(true);
+          setMessage(error.message);
+        } finally {
+          setRefreshingChannels((current) => {
+            const next = new Set(current);
+            next.delete(channel);
+            return next;
+          });
+        }
+      };
+      const field = (label, control, indicator, action, refresh, websiteChannel) => import_react.default.createElement(
+        "div",
+        { className: "bm-field" },
+        import_react.default.createElement(
           "div",
-          { className: "bm-field" },
-          import_react.default.createElement(
-            "div",
-            { className: "bm-field-label" },
-            import_react.default.createElement("label", null, label),
-            websiteChannel ? channelWebsiteReactLink(websiteChannel) : null,
-            indicator === void 0 ? null : import_react.default.createElement(
-              "span",
-              {
-                className: "bm-credential-dot",
-                "data-status": indicator,
-                role: "img",
-                "aria-label": indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25",
-                title: indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25"
-              }
-            ),
-            action
-          ),
-          import_react.default.createElement(
-            "div",
-            { className: "bm-field-row" },
-            control,
-            refresh ? import_react.default.createElement(
-              "button",
-              {
-                className: `bm-field-refresh${refreshingChannels.has(refresh.channel) ? " bm-spinning" : ""}`,
-                type: "button",
-                title: `\u5237\u65B0 ${label}`,
-                "aria-label": `\u5237\u65B0 ${label}`,
-                disabled: saving || refreshingChannels.has(refresh.channel),
-                onClick: () => void refreshCredential(refresh.channel, refresh.value, refresh.clearValue)
-              },
-              import_react.default.createElement(RefreshIcon)
-            ) : null
-          )
-        );
-        const toggleSidebarChannel = (id) => {
-          const next = sidebarChannels.includes(id) ? sidebarChannels.length > 1 ? sidebarChannels.filter((value) => value !== id) : sidebarChannels : sidebarChannels.length >= MAX_SIDEBAR_CHANNELS ? sidebarChannels : [...sidebarChannels, id];
-          if (next === sidebarChannels) return;
-          setSidebarChannels(next);
-          void persistSetting("sidebarChannels", next);
-        };
-        const optionsById = new Map(CHANNEL_OPTIONS.map((channel) => [channel.id, channel]));
-        const orderedOptions = channelOrder.map((id) => optionsById.get(id)).filter(Boolean);
-        const selectedLabels = orderedOptions.filter((channel) => sidebarChannels.includes(channel.id)).map((channel) => channel.label).join("\u3001");
-        const moveLimitTooltip = (event) => {
-          const tooltip = limitTooltip.current;
-          if (!tooltip) return;
-          tooltip.textContent = event.currentTarget.dataset.limitMessage ?? "";
-          tooltip.hidden = false;
-          const gap = 12;
-          const edge = 8;
-          const rect = tooltip.getBoundingClientRect();
-          let left = event.clientX + gap;
-          let top = event.clientY + gap;
-          if (left + rect.width > window.innerWidth - edge) {
-            left = event.clientX - rect.width - gap;
-          }
-          if (top + rect.height > window.innerHeight - edge) {
-            top = event.clientY - rect.height - gap;
-          }
-          tooltip.style.left = `${Math.max(edge, left)}px`;
-          tooltip.style.top = `${Math.max(edge, top)}px`;
-        };
-        const hideLimitTooltip = () => {
-          if (limitTooltip.current) limitTooltip.current.hidden = true;
-        };
-        const movePrecisionTooltip = (event) => {
-          if (!precisionDragging.current || !precisionTooltip.current) return;
-          const tooltip = precisionTooltip.current;
-          const value = BALANCE_PRECISIONS[Number(event.currentTarget.value)];
-          tooltip.textContent = balancePrecisionLabel(value);
-          tooltip.hidden = false;
-          tooltip.style.left = `${event.clientX}px`;
-          const height = tooltip.getBoundingClientRect().height;
-          const above = event.clientY - height - 12;
-          tooltip.style.top = `${above >= 8 ? above : event.clientY + 14}px`;
-        };
-        const hidePrecisionTooltip = () => {
-          precisionDragging.current = false;
-          if (precisionTooltip.current) precisionTooltip.current.hidden = true;
-        };
-        const channelPicker = import_react.default.createElement(
-          "div",
-          { className: "bm-multi", "data-open": String(pickerOpen) },
-          import_react.default.createElement(
-            "button",
-            {
-              type: "button",
-              className: "bm-multi-trigger",
-              "aria-expanded": pickerOpen,
-              "aria-haspopup": "listbox",
-              onClick: () => setPickerOpen((value) => !value)
-            },
-            import_react.default.createElement("span", { className: "bm-multi-value" }, selectedLabels),
-            import_react.default.createElement(
-              "span",
-              { className: "bm-multi-count" },
-              `${sidebarChannels.length}/${MAX_SIDEBAR_CHANNELS}`
-            ),
-            import_react.default.createElement(
-              "svg",
-              { className: "bm-chevron", viewBox: "0 0 14 14", "aria-hidden": true },
-              import_react.default.createElement("path", { d: "m3 5.25 4 4 4-4" })
-            )
-          ),
-          pickerOpen ? import_react.default.createElement(
-            "div",
-            {
-              className: "bm-multi-menu",
-              ref: pickerMenu,
-              role: "listbox",
-              "aria-multiselectable": true
-            },
-            ...orderedOptions.map((channel) => {
-              const checked = sidebarChannels.includes(channel.id);
-              const disabled = !checked && sidebarChannels.length >= MAX_SIDEBAR_CHANNELS;
-              return import_react.default.createElement(
-                "div",
-                {
-                  key: channel.id,
-                  className: "bm-multi-option",
-                  "data-channel-id": channel.id,
-                  "data-disabled": String(disabled),
-                  "aria-disabled": disabled,
-                  "data-limit-message": disabled ? "\u4FA7\u8FB9\u680F\u6700\u591A\u4EC5\u5C55\u793A 3 \u4E2A" : void 0,
-                  onPointerMove: disabled ? moveLimitTooltip : void 0,
-                  onPointerLeave: disabled ? hideLimitTooltip : void 0
-                },
-                import_react.default.createElement(
-                  "label",
-                  { className: "bm-multi-option-select" },
-                  import_react.default.createElement("input", {
-                    type: "checkbox",
-                    checked,
-                    disabled,
-                    onChange: () => toggleSidebarChannel(channel.id)
-                  }),
-                  import_react.default.createElement("span", null, channel.label)
-                ),
-                import_react.default.createElement(
-                  "button",
-                  {
-                    className: "bm-drag-handle",
-                    type: "button",
-                    title: `\u62D6\u52A8\u8C03\u6574 ${channel.label} \u987A\u5E8F`,
-                    "aria-label": `\u62D6\u52A8\u8C03\u6574 ${channel.label} \u987A\u5E8F`
-                  },
-                  import_react.default.createElement(DragHandleIcon)
-                )
-              );
-            })
-          ) : null,
-          pickerOpen ? import_react.default.createElement("div", {
-            className: "bm-limit-tooltip",
-            ref: limitTooltip,
-            role: "tooltip",
-            hidden: true
-          }) : null
-        );
-        const teamoSettings = import_react.default.createElement(
-          "div",
-          { className: "bm-source-settings", "data-bm-source-settings": "" },
-          import_react.default.createElement(
-            "button",
-            {
-              type: "button",
-              className: "bm-source-settings-trigger",
-              title: "TeamoRouter \u8BBE\u7F6E",
-              "aria-label": "TeamoRouter \u8BBE\u7F6E",
-              "aria-expanded": sourceSettingsOpen,
-              "data-open": String(sourceSettingsOpen),
-              disabled: saving,
-              onClick: () => setSourceSettingsOpen((value) => !value)
-            },
-            import_react.default.createElement(SettingsIcon)
-          ),
-          sourceSettingsOpen ? import_react.default.createElement(
-            "div",
-            { className: "bm-source-popover", role: "dialog", "aria-label": "TeamoRouter \u8BBE\u7F6E" },
-            import_react.default.createElement("div", { className: "bm-source-popover-title" }, "TeamoRouter \u8BBE\u7F6E"),
-            import_react.default.createElement(
-              "div",
-              { className: "bm-source-popover-field" },
-              import_react.default.createElement("label", null, "\u7EDF\u8BA1\u5929\u6570"),
-              import_react.default.createElement("input", {
-                type: "number",
-                min: 2,
-                max: 90,
-                step: 1,
-                value: teamoRangeDays,
-                disabled: saving,
-                onChange: (event) => setTeamoRangeDays(event.target.value)
-              })
-            ),
-            import_react.default.createElement(
-              "div",
-              { className: "bm-source-popover-actions" },
-              import_react.default.createElement(
-                "button",
-                {
-                  className: "bm-button",
-                  type: "button",
-                  disabled: saving,
-                  onClick: () => setSourceSettingsOpen(false)
-                },
-                "\u53D6\u6D88"
-              ),
-              import_react.default.createElement(
-                "button",
-                {
-                  className: "bm-button bm-button-primary",
-                  type: "button",
-                  disabled: saving || snapshot.status !== "ready" || !snapshot.writable,
-                  onClick: () => void saveTeamoSettings()
-                },
-                saving ? "\u4FDD\u5B58\u4E2D" : "\u4FDD\u5B58"
-              )
-            )
-          ) : null
-        );
-        const credentialField = ({
-          channel,
-          label,
-          placeholder,
-          value,
-          setValue
-        }) => {
-          const presentation = credentialPresentation(balanceSnapshot, channel);
-          const editable = presentation.kind === "user" || presentation.kind === "none";
-          const control = editable ? import_react.default.createElement(
-            "div",
-            { className: "bm-credential-control" },
-            import_react.default.createElement("input", {
-              type: "text",
-              className: "bm-secret-input",
-              name: `dsh-balance-monitor-${channel}-credential`,
-              value,
-              autoComplete: "off",
-              spellCheck: false,
-              "data-form-type": "other",
-              "data-1p-ignore": true,
-              "data-lpignore": "true",
-              placeholder: presentation.configured ? "\u5DF2\u914D\u7F6E\u2014\u2014\u8F93\u5165\u65B0\u503C\u53EF\u66FF\u6362" : placeholder,
-              disabled: saving,
-              onChange: (event) => setValue(event.target.value)
-            }),
-            presentation.kind === "user" ? import_react.default.createElement(
-              "button",
-              {
-                className: "bm-credential-clear",
-                type: "button",
-                title: `\u79FB\u9664 ${label}`,
-                "aria-label": `\u79FB\u9664 ${label}`,
-                disabled: saving,
-                onClick: () => void removeCredential(channel, () => setValue(""))
-              },
-              import_react.default.createElement("span", { "aria-hidden": true }, "\xD7")
-            ) : null
-          ) : import_react.default.createElement(
-            "div",
-            { className: "bm-credential-readonly", "aria-disabled": true },
-            presentation.readonly
-          );
-          return field(
-            label,
-            control,
-            presentation.indicator,
-            channel === "teamo" ? teamoSettings : void 0,
-            { channel, value, clearValue: () => setValue("") },
-            channel
-          );
-        };
-        const form = import_react.default.createElement(
-          "div",
-          { className: "bm-form" },
-          import_react.default.createElement(
-            "div",
-            { className: "bm-checkbox-field" },
-            import_react.default.createElement("input", {
-              type: "checkbox",
-              checked: showSidebar,
-              "aria-label": "\u5C55\u793A\u4FA7\u8FB9\u680F",
-              onChange: (event) => {
-                const next = event.target.checked;
-                setShowSidebar(next);
-                void persistSetting("showSidebar", next);
-              }
-            }),
-            import_react.default.createElement("span", null, "\u5C55\u793A\u4FA7\u8FB9\u680F")
-          ),
-          import_react.default.createElement(
-            "div",
-            { className: "bm-precision-setting" },
-            import_react.default.createElement(
-              "label",
-              { className: "bm-precision-title", htmlFor: "bm-balance-precision" },
-              "\u4F59\u989D\u4FDD\u7559\u4F4D\u6570",
-              import_react.default.createElement(
-                "span",
-                { className: "bm-precision-current" },
-                balancePrecisionLabel(balancePrecision)
-              )
-            ),
-            import_react.default.createElement(
-              "div",
-              { className: "bm-precision-control" },
-              import_react.default.createElement("span", { className: "bm-precision-end" }, "\u65E0\u5C0F\u6570\u4F4D"),
-              import_react.default.createElement(
-                "div",
-                { className: "bm-precision-track" },
-                import_react.default.createElement("input", {
-                  id: "bm-balance-precision",
-                  type: "range",
-                  className: "bm-precision-slider",
-                  min: 0,
-                  max: BALANCE_PRECISIONS.length - 1,
-                  step: 1,
-                  value: BALANCE_PRECISIONS.indexOf(balancePrecision),
-                  style: {
-                    "--bm-precision-progress": `${BALANCE_PRECISIONS.indexOf(balancePrecision) / 7 * 100}%`
-                  },
-                  "aria-valuetext": balancePrecision === "exact" ? "\u7CBE\u786E" : balancePrecision === "0" ? "\u65E0\u5C0F\u6570\u4F4D" : `\u4FDD\u7559 ${balancePrecision} \u4F4D`,
-                  onPointerDown: (event) => {
-                    precisionDragging.current = true;
-                    movePrecisionTooltip(event);
-                  },
-                  onPointerMove: movePrecisionTooltip,
-                  onPointerUp: hidePrecisionTooltip,
-                  onPointerCancel: hidePrecisionTooltip,
-                  onBlur: hidePrecisionTooltip,
-                  onChange: (event) => {
-                    const next = BALANCE_PRECISIONS[Number(event.target.value)];
-                    setBalancePrecision(next);
-                    void persistSetting("balancePrecision", next);
-                  }
-                }),
-                import_react.default.createElement(
-                  "span",
-                  { className: "bm-precision-ticks", "aria-hidden": true },
-                  ...BALANCE_PRECISIONS.map(
-                    (value) => import_react.default.createElement("span", { key: value })
-                  )
-                )
-              ),
-              import_react.default.createElement("span", { className: "bm-precision-end" }, "\u7CBE\u786E")
-            ),
-            import_react.default.createElement("span", {
-              className: "bm-precision-tooltip",
-              ref: precisionTooltip,
-              role: "tooltip",
-              hidden: true
-            })
-          ),
-          field("\u4FA7\u8FB9\u680F\u6E20\u9053", channelPicker),
-          credentialField({
-            channel: "deepseek",
-            label: "DeepSeek API Key",
-            placeholder: "sk-...",
-            value: deepseekKey,
-            setValue: setDeepseekKey
-          }),
-          credentialField({
-            channel: "kimi",
-            label: "Kimi API Key",
-            placeholder: "sk-...",
-            value: kimiKey,
-            setValue: setKimiKey
-          }),
-          credentialField({
-            channel: "zhipu",
-            label: "\u667A\u8C31 GLM API Key",
-            placeholder: "\u8BF7\u8F93\u5165 API Key",
-            value: zhipuKey,
-            setValue: setZhipuKey
-          }),
-          credentialField({
-            channel: "teamo",
-            label: "TeamoRouter API Key",
-            placeholder: "sk-teamo-...",
-            value: teamoKey,
-            setValue: setTeamoKey
-          }),
-          message ? import_react.default.createElement(
-            "div",
-            { className: "bm-message", "data-error": String(failed) },
-            message
-          ) : null
-        );
-        const updateStatus = updatePresentation(update);
-        const updateNotice = updateStatus ? import_react.default.createElement(
-          "div",
-          { className: "bm-settings-update" },
-          import_react.default.createElement("span", null, `\u5F53\u524D\u7248\u672C ${VERSION}`),
-          updateStatus.state === "restart-required" ? import_react.default.createElement(
+          { className: "bm-field-label" },
+          import_react.default.createElement("label", null, label),
+          websiteChannel ? channelWebsiteReactLink(websiteChannel) : null,
+          indicator === void 0 ? null : import_react.default.createElement(
             "span",
             {
-              className: "bm-update-pill",
-              "data-state": updateStatus.state,
-              title: updateStatus.title ?? updateStatus.label
-            },
-            updateStatus.label
-          ) : import_react.default.createElement(
+              className: "bm-credential-dot",
+              "data-status": indicator,
+              role: "img",
+              "aria-label": indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25",
+              title: indicator === "success" ? "\u6570\u636E\u83B7\u53D6\u6B63\u5E38" : "\u6570\u636E\u83B7\u53D6\u5931\u8D25"
+            }
+          ),
+          action
+        ),
+        import_react.default.createElement(
+          "div",
+          { className: "bm-field-row" },
+          control,
+          refresh ? import_react.default.createElement(
             "button",
             {
+              className: `bm-field-refresh${refreshingChannels.has(refresh.channel) ? " bm-spinning" : ""}`,
               type: "button",
-              className: "bm-update-pill",
-              "data-state": updateStatus.state,
-              disabled: updateStatus.disabled,
-              title: updateStatus.title ?? updateStatus.label,
-              onClick: triggerUpdate
+              title: `\u5237\u65B0 ${label}`,
+              "aria-label": `\u5237\u65B0 ${label}`,
+              disabled: saving || refreshingChannels.has(refresh.channel),
+              onClick: () => void refreshCredential(refresh.channel, refresh.value, refresh.clearValue)
             },
-            updateStatus.label
-          )
-        ) : null;
-        return import_react.default.createElement(
-          "li",
+            import_react.default.createElement(RefreshIcon)
+          ) : null
+        )
+      );
+      const toggleSidebarChannel = (id) => {
+        const next = sidebarChannels.includes(id) ? sidebarChannels.length > 1 ? sidebarChannels.filter((value) => value !== id) : sidebarChannels : sidebarChannels.length >= MAX_SIDEBAR_CHANNELS ? sidebarChannels : [...sidebarChannels, id];
+        if (next === sidebarChannels) return;
+        setSidebarChannels(next);
+        stageSetting("sidebarChannels");
+      };
+      const optionsById = new Map(CHANNEL_OPTIONS.map((channel) => [channel.id, channel]));
+      const orderedOptions = channelOrder.map((id) => optionsById.get(id)).filter(Boolean);
+      const selectedLabels = orderedOptions.filter((channel) => sidebarChannels.includes(channel.id)).map((channel) => channel.label).join("\u3001");
+      const moveLimitTooltip = (event) => {
+        const tooltip = limitTooltip.current;
+        if (!tooltip) return;
+        tooltip.textContent = event.currentTarget.dataset.limitMessage ?? "";
+        tooltip.hidden = false;
+        const gap = 12;
+        const edge = 8;
+        const rect = tooltip.getBoundingClientRect();
+        let left = event.clientX + gap;
+        let top = event.clientY + gap;
+        if (left + rect.width > window.innerWidth - edge) {
+          left = event.clientX - rect.width - gap;
+        }
+        if (top + rect.height > window.innerHeight - edge) {
+          top = event.clientY - rect.height - gap;
+        }
+        tooltip.style.left = `${Math.max(edge, left)}px`;
+        tooltip.style.top = `${Math.max(edge, top)}px`;
+      };
+      const hideLimitTooltip = () => {
+        if (limitTooltip.current) limitTooltip.current.hidden = true;
+      };
+      const movePrecisionTooltip = (event) => {
+        if (!precisionDragging.current || !precisionTooltip.current) return;
+        const tooltip = precisionTooltip.current;
+        const value = BALANCE_PRECISIONS[Number(event.currentTarget.value)];
+        tooltip.textContent = balancePrecisionLabel(value);
+        tooltip.hidden = false;
+        tooltip.style.left = `${event.clientX}px`;
+        const height = tooltip.getBoundingClientRect().height;
+        const above = event.clientY - height - 12;
+        tooltip.style.top = `${above >= 8 ? above : event.clientY + 14}px`;
+      };
+      const hidePrecisionTooltip = () => {
+        precisionDragging.current = false;
+        if (precisionTooltip.current) precisionTooltip.current.hidden = true;
+      };
+      const channelPicker = import_react.default.createElement(
+        "div",
+        { className: "bm-multi", "data-open": String(pickerOpen) },
+        import_react.default.createElement(
+          "button",
           {
-            className: "bm-settings",
-            "data-open": String(open),
-            "data-dsh-plugin": NS,
-            "data-dsh-part": "settings-card"
+            type: "button",
+            className: "bm-multi-trigger",
+            "aria-expanded": pickerOpen,
+            "aria-haspopup": "listbox",
+            onClick: () => setPickerOpen((value) => !value)
           },
+          import_react.default.createElement("span", { className: "bm-multi-value" }, selectedLabels),
+          import_react.default.createElement(
+            "span",
+            { className: "bm-multi-count" },
+            `${sidebarChannels.length}/${MAX_SIDEBAR_CHANNELS}`
+          ),
+          import_react.default.createElement(
+            "svg",
+            { className: "bm-chevron", viewBox: "0 0 14 14", "aria-hidden": true },
+            import_react.default.createElement("path", { d: "m3 5.25 4 4 4-4" })
+          )
+        ),
+        pickerOpen ? import_react.default.createElement(
+          "div",
+          {
+            className: "bm-multi-menu",
+            ref: pickerMenu,
+            role: "listbox",
+            "aria-multiselectable": true
+          },
+          ...orderedOptions.map((channel) => {
+            const checked = sidebarChannels.includes(channel.id);
+            const disabled = !checked && sidebarChannels.length >= MAX_SIDEBAR_CHANNELS;
+            return import_react.default.createElement(
+              "div",
+              {
+                key: channel.id,
+                className: "bm-multi-option",
+                "data-channel-id": channel.id,
+                "data-disabled": String(disabled),
+                "aria-disabled": disabled,
+                "data-limit-message": disabled ? "\u4FA7\u8FB9\u680F\u6700\u591A\u4EC5\u5C55\u793A 3 \u4E2A" : void 0,
+                onPointerMove: disabled ? moveLimitTooltip : void 0,
+                onPointerLeave: disabled ? hideLimitTooltip : void 0
+              },
+              import_react.default.createElement(
+                "label",
+                { className: "bm-multi-option-select" },
+                import_react.default.createElement("input", {
+                  type: "checkbox",
+                  checked,
+                  disabled,
+                  onChange: () => toggleSidebarChannel(channel.id)
+                }),
+                import_react.default.createElement("span", null, channel.label)
+              ),
+              import_react.default.createElement(
+                "button",
+                {
+                  className: "bm-drag-handle",
+                  type: "button",
+                  title: `\u62D6\u52A8\u8C03\u6574 ${channel.label} \u987A\u5E8F`,
+                  "aria-label": `\u62D6\u52A8\u8C03\u6574 ${channel.label} \u987A\u5E8F`
+                },
+                import_react.default.createElement(DragHandleIcon)
+              )
+            );
+          })
+        ) : null,
+        pickerOpen ? import_react.default.createElement("div", {
+          className: "bm-limit-tooltip",
+          ref: limitTooltip,
+          role: "tooltip",
+          hidden: true
+        }) : null
+      );
+      const teamoSettings = import_react.default.createElement(
+        "div",
+        { className: "bm-source-settings", "data-bm-source-settings": "" },
+        import_react.default.createElement(
+          "button",
+          {
+            type: "button",
+            className: "bm-source-settings-trigger",
+            title: "TeamoRouter \u8BBE\u7F6E",
+            "aria-label": "TeamoRouter \u8BBE\u7F6E",
+            "aria-expanded": sourceSettingsOpen,
+            "data-open": String(sourceSettingsOpen),
+            disabled: saving,
+            onClick: () => setSourceSettingsOpen((value) => !value)
+          },
+          import_react.default.createElement(SettingsIcon)
+        ),
+        sourceSettingsOpen ? import_react.default.createElement(
+          "div",
+          { className: "bm-source-popover", role: "dialog", "aria-label": "TeamoRouter \u8BBE\u7F6E" },
+          import_react.default.createElement("div", { className: "bm-source-popover-title" }, "TeamoRouter \u8BBE\u7F6E"),
+          import_react.default.createElement(
+            "div",
+            { className: "bm-source-popover-field" },
+            import_react.default.createElement("label", null, "\u7EDF\u8BA1\u5929\u6570"),
+            import_react.default.createElement("input", {
+              type: "number",
+              min: 2,
+              max: 90,
+              step: 1,
+              value: teamoRangeDays,
+              disabled: saving,
+              onChange: (event) => setTeamoRangeDays(event.target.value)
+            })
+          ),
+          import_react.default.createElement(
+            "div",
+            { className: "bm-source-popover-actions" },
+            import_react.default.createElement(
+              "button",
+              {
+                className: "bm-button",
+                type: "button",
+                disabled: saving,
+                onClick: () => setSourceSettingsOpen(false)
+              },
+              "\u53D6\u6D88"
+            ),
+            import_react.default.createElement(
+              "button",
+              {
+                className: "bm-button bm-button-primary",
+                type: "button",
+                disabled: saving || snapshot.status !== "ready" || !snapshot.writable,
+                onClick: () => void saveTeamoSettings()
+              },
+              saving ? "\u4FDD\u5B58\u4E2D" : "\u4FDD\u5B58"
+            )
+          )
+        ) : null
+      );
+      const credentialField = ({
+        channel,
+        label,
+        placeholder,
+        value,
+        setValue
+      }) => {
+        const presentation = credentialPresentation(balanceSnapshot, channel);
+        const editable = presentation.kind === "user" || presentation.kind === "none";
+        const control = editable ? import_react.default.createElement(
+          "div",
+          { className: "bm-credential-control" },
+          import_react.default.createElement("input", {
+            type: "text",
+            className: "bm-secret-input",
+            name: `dsh-balance-monitor-${channel}-credential`,
+            value,
+            autoComplete: "off",
+            spellCheck: false,
+            "data-form-type": "other",
+            "data-1p-ignore": true,
+            "data-lpignore": "true",
+            placeholder: presentation.configured ? "\u5DF2\u914D\u7F6E\u2014\u2014\u8F93\u5165\u65B0\u503C\u53EF\u66FF\u6362" : placeholder,
+            disabled: saving,
+            onChange: (event) => setValue(event.target.value)
+          }),
+          presentation.kind === "user" ? import_react.default.createElement(
+            "button",
+            {
+              className: "bm-credential-clear",
+              type: "button",
+              title: `\u79FB\u9664 ${label}`,
+              "aria-label": `\u79FB\u9664 ${label}`,
+              disabled: saving,
+              onClick: () => void removeCredential(channel, () => setValue(""))
+            },
+            import_react.default.createElement("span", { "aria-hidden": true }, "\xD7")
+          ) : null
+        ) : import_react.default.createElement(
+          "div",
+          { className: "bm-credential-readonly", "aria-disabled": true },
+          presentation.readonly
+        );
+        return field(
+          label,
+          control,
+          presentation.indicator,
+          channel === "teamo" ? teamoSettings : void 0,
+          { channel, value, clearValue: () => setValue("") },
+          channel
+        );
+      };
+      const form = import_react.default.createElement(
+        "div",
+        { className: "bm-form" },
+        import_react.default.createElement(
+          "div",
+          { className: "bm-checkbox-field" },
+          import_react.default.createElement("input", {
+            type: "checkbox",
+            checked: showSidebar,
+            "aria-label": "\u5C55\u793A\u4FA7\u8FB9\u680F",
+            onChange: (event) => {
+              const next = event.target.checked;
+              setShowSidebar(next);
+              stageSetting("showSidebar");
+            }
+          }),
+          import_react.default.createElement("span", null, "\u5C55\u793A\u4FA7\u8FB9\u680F")
+        ),
+        import_react.default.createElement(
+          "div",
+          { className: "bm-precision-setting" },
+          import_react.default.createElement(
+            "label",
+            { className: "bm-precision-title", htmlFor: "bm-balance-precision" },
+            "\u4F59\u989D\u4FDD\u7559\u4F4D\u6570",
+            import_react.default.createElement(
+              "span",
+              { className: "bm-precision-current" },
+              balancePrecisionLabel(balancePrecision)
+            )
+          ),
+          import_react.default.createElement(
+            "div",
+            { className: "bm-precision-control" },
+            import_react.default.createElement("span", { className: "bm-precision-end" }, "\u65E0\u5C0F\u6570\u4F4D"),
+            import_react.default.createElement(
+              "div",
+              { className: "bm-precision-track" },
+              import_react.default.createElement("input", {
+                id: "bm-balance-precision",
+                type: "range",
+                className: "bm-precision-slider",
+                min: 0,
+                max: BALANCE_PRECISIONS.length - 1,
+                step: 1,
+                value: BALANCE_PRECISIONS.indexOf(balancePrecision),
+                style: {
+                  "--bm-precision-progress": `${BALANCE_PRECISIONS.indexOf(balancePrecision) / 7 * 100}%`
+                },
+                "aria-valuetext": balancePrecision === "exact" ? "\u7CBE\u786E" : balancePrecision === "0" ? "\u65E0\u5C0F\u6570\u4F4D" : `\u4FDD\u7559 ${balancePrecision} \u4F4D`,
+                onPointerDown: (event) => {
+                  precisionDragging.current = true;
+                  movePrecisionTooltip(event);
+                },
+                onPointerMove: movePrecisionTooltip,
+                onPointerUp: hidePrecisionTooltip,
+                onPointerCancel: hidePrecisionTooltip,
+                onBlur: hidePrecisionTooltip,
+                onChange: (event) => {
+                  const next = BALANCE_PRECISIONS[Number(event.target.value)];
+                  setBalancePrecision(next);
+                  stageSetting("balancePrecision");
+                }
+              }),
+              import_react.default.createElement(
+                "span",
+                { className: "bm-precision-ticks", "aria-hidden": true },
+                ...BALANCE_PRECISIONS.map(
+                  (value) => import_react.default.createElement("span", { key: value })
+                )
+              )
+            ),
+            import_react.default.createElement("span", { className: "bm-precision-end" }, "\u7CBE\u786E")
+          ),
+          import_react.default.createElement("span", {
+            className: "bm-precision-tooltip",
+            ref: precisionTooltip,
+            role: "tooltip",
+            hidden: true
+          })
+        ),
+        field("\u4FA7\u8FB9\u680F\u6E20\u9053", channelPicker),
+        import_react.default.createElement(
+          "div",
+          { className: "bm-buttons" },
           import_react.default.createElement(
             "button",
             {
+              className: "bm-button",
               type: "button",
-              className: "bm-settings-header",
-              "aria-expanded": open,
-              onClick: () => setOpen((value) => !value)
+              disabled: saving || dirtyFields.size === 0,
+              onClick: resetDisplaySettings
             },
-            import_react.default.createElement(
-              "span",
-              { className: "bm-settings-head" },
-              import_react.default.createElement(
-                "span",
-                { className: "bm-settings-title-row" },
-                import_react.default.createElement("span", { className: "bm-settings-title" }, "\u4F59\u989D\u76D1\u63A7"),
-                import_react.default.createElement("span", { className: "bm-version" }, VERSION)
-              ),
-              import_react.default.createElement(
-                "span",
-                { className: "bm-settings-description" },
-                "\u67E5\u770B\u4F59\u989D\u6E20\u9053\u3001\u51ED\u636E\u4E0E\u7528\u91CF\u8BBE\u7F6E\u3002"
-              )
-            ),
-            import_react.default.createElement(
-              "svg",
-              { className: "bm-chevron bm-card-chevron", viewBox: "0 0 14 14", "aria-hidden": true },
-              import_react.default.createElement("path", { d: "m3 5.25 4 4 4-4" })
-            )
+            "\u64A4\u9500\u663E\u793A\u4FEE\u6539"
           ),
-          open ? import_react.default.createElement(
-            "div",
-            { className: "bm-settings-body" },
-            updateNotice,
-            form
-          ) : null
-        );
-      };
+          import_react.default.createElement(
+            "button",
+            {
+              className: "bm-button bm-button-primary",
+              type: "button",
+              disabled: saving || dirtyFields.size === 0 || snapshot.status !== "ready" || !snapshot.writable,
+              onClick: () => void saveDisplaySettings()
+            },
+            "\u4FDD\u5B58\u663E\u793A\u8BBE\u7F6E"
+          )
+        ),
+        credentialField({
+          channel: "deepseek",
+          label: "DeepSeek API Key",
+          placeholder: "sk-...",
+          value: deepseekKey,
+          setValue: setDeepseekKey
+        }),
+        credentialField({
+          channel: "kimi",
+          label: "Kimi API Key",
+          placeholder: "sk-...",
+          value: kimiKey,
+          setValue: setKimiKey
+        }),
+        credentialField({
+          channel: "zhipu",
+          label: "\u667A\u8C31 GLM API Key",
+          placeholder: "\u8BF7\u8F93\u5165 API Key",
+          value: zhipuKey,
+          setValue: setZhipuKey
+        }),
+        credentialField({
+          channel: "teamo",
+          label: "TeamoRouter API Key",
+          placeholder: "sk-teamo-...",
+          value: teamoKey,
+          setValue: setTeamoKey
+        }),
+        message ? import_react.default.createElement(
+          "div",
+          { className: "bm-message", "data-error": String(failed) },
+          message
+        ) : null
+      );
+      const updateStatus = updatePresentation(update);
+      const updateNotice = updateStatus ? import_react.default.createElement(
+        "div",
+        { className: "bm-settings-update" },
+        import_react.default.createElement("span", null, `\u5F53\u524D\u7248\u672C ${VERSION}`),
+        updateStatus.state === "restart-required" ? import_react.default.createElement(
+          "span",
+          {
+            className: "bm-update-pill",
+            "data-state": updateStatus.state,
+            title: updateStatus.title ?? updateStatus.label
+          },
+          updateStatus.label
+        ) : import_react.default.createElement(
+          "button",
+          {
+            type: "button",
+            className: "bm-update-pill",
+            "data-state": updateStatus.state,
+            disabled: updateStatus.disabled,
+            title: updateStatus.title ?? updateStatus.label,
+            onClick: triggerUpdate
+          },
+          updateStatus.label
+        )
+      ) : null;
+      return import_react.default.createElement(
+        "section",
+        {
+          className: "bm-settings-page",
+          "data-dsh-plugin": NS,
+          "data-dsh-part": "plugin-config"
+        },
+        updateNotice,
+        form
+      );
+    }
+    function DshBalanceMonitorConfig({ view, form }) {
+      if (view === "summary") return "\u67E5\u770B\u4F59\u989D\u6E20\u9053\u3001\u51ED\u636E\u4E0E\u7528\u91CF\u8BBE\u7F6E\u3002";
+      return import_react.default.createElement(DshBalanceMonitorSettings, { form });
     }
     function apply(ctx) {
       installStyle();
       const scope = ctx.configForms.get(NS);
-      const SettingsCard = createSettingsCard(scope);
-      ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
-        name: "settings.plugin.item",
-        key: NS,
-        order: 1e3
-      }, SettingsCard));
+      ctx.slots.inject("plugins.row.config", () => ctx.slots.register({
+        name: "plugins.row.config",
+        key: ROW_CONFIG_KEY
+      }, DshBalanceMonitorConfig));
       ctx.effect(() => setupSidebarPanel(ctx, scope), "dsh-balance-monitor: sidebar panel");
     }
 

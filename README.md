@@ -8,7 +8,7 @@
   <a href="https://github.com/ShawnKung/dsh-balance-monitor/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ShawnKung/dsh-balance-monitor" /></a>
   <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
   <br /><br />
-  <a href="https://www.npmjs.com/package/@deepseek-ai/dsh?activeTab=versions"><img alt="DSH 0.1.2-rc.1+" src="https://img.shields.io/badge/DSH-0.1.2--rc.1%2B-4d6bfe" /></a>
+  <a href="https://www.npmjs.com/package/@deepseek-ai/dsh?activeTab=versions"><img alt="DSH 0.1.7-rc.1+" src="https://img.shields.io/badge/DSH-0.1.7--rc.1%2B-4d6bfe" /></a>
   <img alt="多渠道" src="https://img.shields.io/badge/-多渠道-4d6bfe" />
   <img alt="余额与用量" src="https://img.shields.io/badge/-余额与用量-4d6bfe" />
   <img alt="主题适配" src="https://img.shields.io/badge/-主题适配-4d6bfe" />
@@ -97,7 +97,7 @@ dsh plugin --profile web list
 
 ## 配置
 
-进入 DSH 的“设置 → 插件 → DSH Balance Monitor”：
+进入 DSH 侧边栏的“插件”，打开 `@shawnkung/dsh-balance-monitor`，再点击 `dsh-balance-monitor` 行的“配置”：
 
 - **侧边栏展示渠道**：默认仅展示 DeepSeek，可多选，最多展示 3 个渠道。
 - **余额保留位数**：通过滑块统一控制侧边栏、弹窗余额明细和消费金额的显示精度，默认保留 2 位，可选无小数位、1 至 6 位或精确。
@@ -132,9 +132,9 @@ Host 快照带有单调递增的 revision，前端会拒绝迟到的旧快照，
 ## 兼容性
 
 - Node.js：`>=20`。
-- DSH：`>=0.1.2-rc.1 <0.2.0`。
+- DSH：`>=0.1.7-rc.1 <0.2.0`。
 - Profile：仅支持 `web`。
-- 已验证版本：`0.1.2-rc.1`、`0.1.5-rc.1`。其他版本只有完成一次性 Profile 的安装、配置加载、Web 冷启动和卸载验证后，才会在 manifest 中标记为兼容。
+- 已验证版本：`0.1.7-rc.1`、`0.1.7-rc.2`。其他版本只有完成一次性 Profile 的安装、配置加载、Web 冷启动和卸载验证后，才会在 manifest 中标记为兼容。
 
 ## 运行边界
 
