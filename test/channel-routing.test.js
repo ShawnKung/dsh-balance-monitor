@@ -23,7 +23,14 @@ function runtime(
       listConfigurableProviders: () => entries,
     },
     settings: {
-      get: namespace => namespaces[namespace],
+      describe: () => Object.entries(namespaces).map(([ns, value]) => ({
+        ns,
+        value,
+        autoGenerate: true,
+        schema: undefined,
+        revision: 0,
+        applies: 'live',
+      })),
     },
   }
 }
