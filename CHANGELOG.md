@@ -2,6 +2,17 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+## [0.2.3] - 2026-09-29
+
+### 修复
+
+- 将插件配置页迁移到 DSH 0.1.7 官方 `plugins.row.config` 扩展点；配置入口现在位于侧边栏“插件”中对应组件行的“配置”，不再注册已经移除的 `settings.plugin.item`。
+- 配置页直接使用 Plugin Manager 提供的带 revision 栅栏表单，以暂存、保存和撤销动作提交显示设置，并移除由外层详情页重复提供的标题与折叠卡片 chrome。
+- 让“展示侧边栏”真正控制 `sidebar.panellist` 注册生命周期；展开时按用户顺序逐行显示左侧渠道和右对齐余额，折叠时保留居中的钱包图标。
+- 恢复渠道刷新完成后的侧边栏余额反馈动画；即使余额数值未变化，也会对成功和失败结果分别闪烁提示。
+
 ## [0.2.2] - 2026-09-28
 
 ### 变更

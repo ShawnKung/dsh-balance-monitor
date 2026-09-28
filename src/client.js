@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useSyncExternalStore, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Sortable from 'sortablejs'
 import {
   BALANCE_PRECISIONS,
   formatMoney,
   normalizeBalancePrecision,
 } from '../lib/balance-format.js'
-import { popupChannels } from '../lib/channel-display.js'
+import { popupChannels, selectedSidebarChannels } from '../lib/channel-display.js'
 
 export const inject = ['slots', 'configForms']
 
 const NS = 'dsh-balance-monitor'
+const PACKAGE_NAME = '@shawnkung/dsh-balance-monitor'
+const ROW_CONFIG_KEY = `${PACKAGE_NAME}#${NS}`
 const VERSION = __DSH_BALANCE_MONITOR_VERSION_LABEL__
 const FEEDBACK_DURATION_MS = 2_400
 const POPOVER_EXIT_MS = 160
@@ -59,8 +61,8 @@ const STYLE = `
 body{--bm-feedback-success:#15803d;--bm-feedback-error:var(--dsw-alias-state-error-primary,#dc2626)}
 body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-primary,#22c55e);--bm-feedback-error:var(--dsw-alias-state-error-primary,#f25a5a)}
 .bm-icon-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.bm-panel-glyph{display:inline-flex;align-items:center;justify-content:center}
-.bm-panel-glyph svg{display:block}
+.bm-panel-glyph{display:inline-flex;align-items:center;justify-content:center}.bm-panel-glyph svg{display:block}
+.bm-panel-button[data-bm-balance-wide=true]{position:relative;height:auto!important;min-height:calc(var(--bm-panel-row-count,1)*17px + 14px)!important;align-items:center!important;padding-top:7px!important;padding-bottom:7px!important}.bm-panel-button[data-bm-balance-wide=true]>span:has(>.bm-panel-glyph)~span{display:none!important}.bm-panel-button[data-bm-balance-wide=true] .bm-panel-glyph{width:16px;align-items:center;justify-content:center}.bm-panel-wallet{width:16px;height:17px;flex:none;display:inline-flex;align-items:center;justify-content:center}.bm-panel-balances{position:absolute;top:7px;right:8px;left:32px;min-width:0;display:grid;gap:1px}.bm-panel-balance-row{width:100%;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:baseline;column-gap:8px;font-size:12px;line-height:17px}.bm-panel-channel{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bm-panel-value{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
 .bm-popover{position:fixed;z-index:10000;width:min(390px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 24px));overflow:auto;border:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#0f1115);box-shadow:var(--dsw-elevation-prominent,0 12px 32px rgba(0,0,0,.14));font-family:inherit;transform-origin:left top;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}
 .bm-popover[hidden]{display:none}.bm-popover-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;padding:12px 14px;border-bottom:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16));background:inherit}
 .bm-popover[data-closing=true]{pointer-events:none;animation:bm-popover-out .16s var(--ds-ease-in,cubic-bezier(.4,0,1,1)) forwards}
@@ -72,8 +74,7 @@ body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-pri
 .bm-period-label,.bm-detail-label{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-period-value{font-size:14px;font-weight:600;margin-top:3px}.bm-period-meta{font-size:10px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:2px}
 .bm-details{display:grid;gap:7px}.bm-detail{display:flex;justify-content:space-between;gap:14px;font-size:12px}.bm-detail-value{text-align:right;font-variant-numeric:tabular-nums}.bm-error{color:var(--dsw-alias-state-error-primary,#ef4444)}
 .bm-note{font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af);margin-top:10px}.bm-empty{padding:16px;font-size:12px;color:var(--dsw-alias-label-tertiary,#9ca3af)}
-.bm-settings{list-style:none;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:12px;background:var(--dsw-alias-bg-layer-3,transparent);color:inherit;transition:border-color .16s,background .16s}.bm-settings:hover{border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}.bm-settings[data-open=true]{background:var(--dsw-alias-bg-layer-2,transparent);border-color:var(--dsw-alias-label-dimmed,rgba(127,127,127,.45))}
-.bm-settings-header{appearance:none;box-sizing:border-box;width:100%;border:0;border-radius:12px;background:transparent;color:inherit;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer}.bm-settings-head{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.bm-settings-title-row{display:flex;align-items:baseline;gap:6px;min-width:0}.bm-settings-title{font-size:15px;font-weight:600;line-height:1.4}.bm-settings-description{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-secondary,#9ca3af)}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-settings[data-open=true] .bm-card-chevron,.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-body{border-top:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.2));margin:0 16px;padding:4px 0 8px}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 2px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
+.bm-settings-page{display:grid;gap:14px;color:inherit}.bm-chevron{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .16s}.bm-multi[data-open=true] .bm-chevron{transform:rotate(180deg)}.bm-settings-update{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--dsw-alias-label-secondary,#9ca3af)}
 .bm-form{display:grid;gap:14px}.bm-field{display:grid;gap:6px;padding-top:8px}.bm-field-label{position:relative;display:flex;align-items:center;min-height:28px;gap:8px}.bm-field-label>label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550}.bm-field-row{display:flex;gap:8px;align-items:center}.bm-field input,.bm-field select{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);color:inherit;padding:0 10px;font:inherit;font-size:12px}.bm-credential-control{position:relative;display:flex;min-width:0;flex:1}.bm-credential-control>input{width:100%;padding-right:34px}.bm-secret-input{-webkit-text-security:disc}.bm-credential-clear{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary,#9ca3af);display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1;cursor:pointer}.bm-credential-clear:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh{box-sizing:border-box;width:34px;height:34px;flex:none;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.28));border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);display:grid;place-items:center;padding:0;cursor:pointer}.bm-field-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#111827)}.bm-field-refresh:disabled,.bm-credential-clear:disabled{opacity:.45;cursor:default}.bm-field-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .bm-precision-setting{display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,300px);align-items:center;gap:16px;min-height:34px;padding-top:8px}.bm-precision-title{display:flex;align-items:baseline;gap:10px;min-width:0;font-size:12px;font-weight:550;white-space:nowrap}.bm-precision-current{font-size:11px;font-weight:400;color:var(--dsw-alias-label-secondary,#6b7280);font-variant-numeric:tabular-nums}.bm-precision-control{display:flex;align-items:center;justify-self:end;gap:10px;width:100%;min-width:0}.bm-precision-end{box-sizing:border-box;flex:none;font-size:10px;line-height:14px;color:var(--dsw-alias-label-secondary,#6b7280);white-space:nowrap}.bm-precision-end:last-child{text-align:right}.bm-precision-track{position:relative;flex:1;min-width:90px;height:20px}.bm-precision-slider{-webkit-appearance:none;appearance:none;position:absolute;z-index:2;inset:0;box-sizing:border-box;width:100%;height:20px;margin:0;border:0;background:transparent;padding:0;cursor:pointer}.bm-precision-slider::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(to right,var(--dsw-alias-state-info-primary,#2563eb) 0 var(--bm-precision-progress),var(--dsw-alias-border-l2,rgba(127,127,127,.22)) var(--bm-precision-progress) 100%)}.bm-precision-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:12px;height:12px;margin-top:-4.5px;border:1.5px solid var(--dsw-alias-bg-layer-2,#fff);border-radius:50%;background:var(--dsw-alias-state-info-primary,#2563eb);box-shadow:0 1px 2px rgba(0,0,0,.12)}.bm-precision-slider::-moz-range-track{height:3px;border:0;border-radius:2px;background:var(--dsw-alias-border-l2,rgba(127,127,127,.22))}.bm-precision-slider::-moz-range-progress{height:3px;border-radius:2px;background:var(--dsw-alias-state-info-primary,#2563eb)}.bm-precision-slider::-moz-range-thumb{box-sizing:border-box;width:12px;height:12px;border:1.5px solid var(--dsw-alias-bg-layer-2,#fff);border-radius:50%;background:var(--dsw-alias-state-info-primary,#2563eb);box-shadow:0 1px 2px rgba(0,0,0,.12)}.bm-precision-ticks{position:absolute;z-index:1;left:6px;right:6px;top:9px;display:flex;justify-content:space-between;pointer-events:none}.bm-precision-ticks span{opacity:.5;width:2px;height:2px;border-radius:50%;background:var(--dsw-alias-label-tertiary,#9ca3af)}.bm-precision-tooltip{position:fixed;z-index:10002;transform:translateX(-50%);padding:4px 7px;border-radius:5px;background:var(--dsw-alias-bg-tooltip,#1f2937);color:var(--dsw-alias-label-primary-foreground,#fff);box-shadow:0 4px 12px rgba(0,0,0,.18);font-size:11px;font-weight:550;line-height:16px;white-space:nowrap;pointer-events:none}
 .bm-credential-readonly{box-sizing:border-box;min-width:0;flex:1;height:34px;border:1px solid var(--dsw-alias-border-l3,rgba(127,127,127,.18));border-radius:6px;background:var(--dsw-alias-bg-disabled,rgba(127,127,127,.06));color:var(--dsw-alias-label-tertiary,#9ca3af);padding:0 10px;display:flex;align-items:center;font-size:12px}
@@ -383,13 +384,22 @@ function channelView(channel, refresh, feedback, loading, precision) {
   return section
 }
 
-function WalletGlyph({ size = 18 }) {
+function WalletGlyph({ size = 18, rows = [], ariaLabel = '余额监控' }) {
   const ref = React.useRef(null)
   React.useEffect(() => {
     const el = ref.current
     if (!el) return undefined
+    const host = el.parentElement
     const button = el.closest('button')
     if (!button) return undefined
+    const frameworkTitle = host?.nextElementSibling
+    host?.classList.add('bm-panel-host')
+    frameworkTitle?.setAttribute('hidden', '')
+    button.classList.add('bm-panel-button')
+    button.dataset.bmBalanceWide = String(size === 16)
+    button.style.setProperty('--bm-panel-row-count', String(Math.max(1, rows.length)))
+    button.setAttribute('aria-label', ariaLabel)
+    button.title = ariaLabel
     const handler = event => {
       event.stopPropagation()
       event.preventDefault()
@@ -397,16 +407,42 @@ function WalletGlyph({ size = 18 }) {
       if (typeof toggle === 'function') toggle(button)
     }
     button.addEventListener('click', handler, { capture: true })
-    return () => button.removeEventListener('click', handler, { capture: true })
-  }, [])
-  return React.createElement('span', {
-    ref,
-    className: 'bm-panel-glyph',
-    'data-dsh-plugin': NS,
+    return () => {
+      button.removeEventListener('click', handler, { capture: true })
+      host?.classList.remove('bm-panel-host')
+      frameworkTitle?.removeAttribute('hidden')
+      button.classList.remove('bm-panel-button')
+      delete button.dataset.bmBalanceWide
+      button.style.removeProperty('--bm-panel-row-count')
+      button.removeAttribute('title')
+    }
+  }, [ariaLabel, rows.length, size])
+  const wallet = React.createElement('span', {
+    className: 'bm-panel-wallet',
     dangerouslySetInnerHTML: {
       __html: `<svg viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>`,
     },
   })
+  const balances = size === 16 && rows.length > 0
+    ? React.createElement(
+      'span',
+      { className: 'bm-panel-balances' },
+      ...rows.map(row => React.createElement(
+        'span',
+        { className: 'bm-panel-balance-row', key: row.id },
+        React.createElement('span', { className: 'bm-panel-channel' }, row.label),
+        React.createElement('span', {
+          className: `bm-panel-value${row.feedback ? ` bm-value-${row.feedback}` : ''}`,
+        }, row.value),
+      )),
+    )
+    : null
+  return React.createElement(
+    'span',
+    { ref, className: 'bm-panel-glyph', 'data-dsh-plugin': NS },
+    wallet,
+    balances,
+  )
 }
 
 function setupSidebarPanel(ctx, scope) {
@@ -439,6 +475,26 @@ function setupSidebarPanel(ctx, scope) {
     return normalizeBalancePrecision(
       settings.status === 'ready' ? settings.value?.balancePrecision : undefined,
     )
+  }
+
+  const sidebarRows = () => {
+    const settings = scope.getSnapshot()
+    const values = settings.status === 'ready' ? settings.value ?? {} : {}
+    const order = normalizeChannelOrder(values.channelOrder)
+    const selected = selectedSidebarChannels(
+      snapshot.channels,
+      values.sidebarChannels ?? ['deepseek'],
+      order,
+    )
+    return selected.map(channel => {
+      const label = CHANNEL_BY_ID.get(channel.id)?.label ?? channel.id
+      return {
+        id: channel.id,
+        label,
+        value: formatBalance(channel, balancePrecision()),
+        feedback: feedback.get(channel.id),
+      }
+    })
   }
 
   const configuredPopupChannels = () => {
@@ -575,7 +631,36 @@ function setupSidebarPanel(ctx, scope) {
     requestAnimationFrame(positionPopup)
   }
 
+  let disposeSlot = () => {}
+  let registeredSignature
+
+  const syncSidebarSlot = () => {
+    if (!sidebarVisible()) {
+      if (registeredSignature !== undefined) {
+        disposeSlot()
+        disposeSlot = () => {}
+        registeredSignature = undefined
+      }
+      return
+    }
+    const rows = sidebarRows()
+    const label = rows.length === 0
+      ? '余额监控'
+      : `余额监控：${rows.map(row => `${row.label} ${row.value}`).join('；')}`
+    const signature = `${label}\0${rows.map(row => `${row.id}:${row.feedback ?? ''}`).join('|')}`
+    if (registeredSignature === signature) return
+    disposeSlot()
+    disposeSlot = ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+      name: 'sidebar.panellist',
+      id: NS,
+      order: 200,
+      label: '',
+    }, props => React.createElement(WalletGlyph, { ...props, rows, ariaLabel: label })))
+    registeredSignature = signature
+  }
+
   const render = () => {
+    syncSidebarSlot()
     if (!sidebarVisible()) {
       closePopup(true)
       return
@@ -665,12 +750,7 @@ function setupSidebarPanel(ctx, scope) {
   document.addEventListener('keydown', escape)
   window.addEventListener('resize', positionPopup)
 
-  const disposeSlot = ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name: 'sidebar.panellist',
-    id: NS,
-    order: 200,
-    label: () => '余额监控',
-  }, WalletGlyph))
+  syncSidebarSlot()
 
   return () => {
     if (window.__dshBalanceMonitorTogglePopup === togglePopup) {
@@ -770,15 +850,15 @@ function channelWebsiteReactLink(channelId) {
   )
 }
 
-function createSettingsCard(scope) {
-  return function DshBalanceMonitorSettings() {
-    const snapshot = useSyncExternalStore(
-      listener => scope.subscribe(listener),
-      () => scope.getSnapshot(),
-    )
+function DshBalanceMonitorSettings({ form: configForm }) {
+    const snapshot = configForm?.state ?? {
+      status: 'unavailable',
+      value: undefined,
+      revision: undefined,
+      writable: false,
+    }
     const [update, setUpdate] = useState()
     const values = snapshot.status === 'ready' ? snapshot.value ?? {} : {}
-    const [open, setOpen] = useState(false)
     const [pickerOpen, setPickerOpen] = useState(false)
     const [sourceSettingsOpen, setSourceSettingsOpen] = useState(false)
     const [showSidebar, setShowSidebar] = useState(values.showSidebar ?? true)
@@ -803,23 +883,22 @@ function createSettingsCard(scope) {
     const [refreshingChannels, setRefreshingChannels] = useState(() => new Set())
     const [message, setMessage] = useState('')
     const [failed, setFailed] = useState(false)
-    const settingsWrites = useRef(Promise.resolve())
+    const [dirtyFields, setDirtyFields] = useState(() => new Set())
 
     useEffect(() => {
       if (snapshot.status !== 'ready') return
-      setShowSidebar(values.showSidebar ?? true)
-      setBalancePrecision(normalizeBalancePrecision(values.balancePrecision))
-      setSidebarChannels(values.sidebarChannels ?? CHANNEL_IDS)
-      setChannelOrder(normalizeChannelOrder(values.channelOrder))
+      if (!dirtyFields.has('showSidebar')) setShowSidebar(values.showSidebar ?? true)
+      if (!dirtyFields.has('balancePrecision')) {
+        setBalancePrecision(normalizeBalancePrecision(values.balancePrecision))
+      }
+      if (!dirtyFields.has('sidebarChannels')) {
+        setSidebarChannels(values.sidebarChannels ?? CHANNEL_IDS)
+      }
+      if (!dirtyFields.has('channelOrder')) {
+        setChannelOrder(normalizeChannelOrder(values.channelOrder))
+      }
       setTeamoRangeDays(values.teamoRangeDays ?? 7)
     }, [snapshot.revision])
-
-    useEffect(() => {
-      if (!open) {
-        setPickerOpen(false)
-        setSourceSettingsOpen(false)
-      }
-    }, [open])
 
     useEffect(() => {
       if (!pickerOpen) return undefined
@@ -860,24 +939,55 @@ function createSettingsCard(scope) {
       setBalanceSnapshot(next)
     }), [])
 
-    const persistSetting = (path, value) => {
+    const stageSetting = path => {
       setFailed(false)
       setMessage('')
-      settingsWrites.current = settingsWrites.current
-        .then(async () => {
-          const current = scope.getSnapshot()
-          if (current.status !== 'ready' || !current.writable) {
-            throw new Error('设置暂不可保存')
-          }
-          await scope.mutate([
-            { op: 'set', path: [path], value },
-          ], current.revision)
-        })
-        .catch(error => {
-          setFailed(true)
-          setMessage(error.message)
-        })
-      return settingsWrites.current
+      setDirtyFields(current => new Set(current).add(path))
+    }
+
+    const resetDisplaySettings = () => {
+      const current = snapshot.status === 'ready' ? snapshot.value ?? {} : {}
+      setShowSidebar(current.showSidebar ?? true)
+      setBalancePrecision(normalizeBalancePrecision(current.balancePrecision))
+      setSidebarChannels(current.sidebarChannels ?? CHANNEL_IDS)
+      setChannelOrder(normalizeChannelOrder(current.channelOrder))
+      setDirtyFields(new Set())
+      setPickerOpen(false)
+      setFailed(false)
+      setMessage('')
+    }
+
+    const saveDisplaySettings = async () => {
+      if (dirtyFields.size === 0) return
+      const current = configForm?.state
+      if (configForm === undefined || current?.status !== 'ready' || !current.writable) {
+        setFailed(true)
+        setMessage('设置暂不可保存')
+        return
+      }
+      const valuesByField = {
+        showSidebar,
+        balancePrecision,
+        sidebarChannels,
+        channelOrder,
+      }
+      setSaving(true)
+      setFailed(false)
+      setMessage('')
+      try {
+        const accepted = await configForm.mutate(
+          [...dirtyFields].map(path => ({ op: 'set', path: [path], value: valuesByField[path] })),
+          current.revision,
+        )
+        if (!accepted) throw new Error('设置已发生变化，请检查后重试')
+        setDirtyFields(new Set())
+        setMessage('显示设置已保存')
+      } catch (error) {
+        setFailed(true)
+        setMessage(error.message)
+      } finally {
+        setSaving(false)
+      }
     }
 
     useEffect(() => {
@@ -903,7 +1013,7 @@ function createSettingsCard(scope) {
           const next = normalizeChannelOrder(channelOrder)
           next.splice(to, 0, next.splice(from, 1)[0])
           setChannelOrder(next)
-          void persistSetting('channelOrder', next)
+          stageSetting('channelOrder')
         },
       })
       return () => sortable.destroy()
@@ -918,7 +1028,10 @@ function createSettingsCard(scope) {
         if (!Number.isInteger(rangeDays) || rangeDays < 2 || rangeDays > 90) {
           throw new Error('统计天数必须是 2 到 90 的整数')
         }
-        await scope.mutate([
+        if (snapshot.status !== 'ready' || !snapshot.writable || configForm === undefined) {
+          throw new Error('设置暂不可保存')
+        }
+        await configForm.mutate([
           { op: 'set', path: ['teamoRangeDays'], value: rangeDays },
         ], snapshot.revision)
         await api('/api/dsh-balance-monitor/refresh', {
@@ -1036,7 +1149,7 @@ function createSettingsCard(scope) {
           : [...sidebarChannels, id]
       if (next === sidebarChannels) return
       setSidebarChannels(next)
-      void persistSetting('sidebarChannels', next)
+      stageSetting('sidebarChannels')
     }
 
     const optionsById = new Map(CHANNEL_OPTIONS.map(channel => [channel.id, channel]))
@@ -1303,7 +1416,7 @@ function createSettingsCard(scope) {
           onChange: event => {
             const next = event.target.checked
             setShowSidebar(next)
-            void persistSetting('showSidebar', next)
+            stageSetting('showSidebar')
           },
         }),
         React.createElement('span', null, '展示侧边栏'),
@@ -1356,7 +1469,7 @@ function createSettingsCard(scope) {
               onChange: event => {
                 const next = BALANCE_PRECISIONS[Number(event.target.value)]
                 setBalancePrecision(next)
-                void persistSetting('balancePrecision', next)
+                stageSetting('balancePrecision')
               },
             }),
             React.createElement(
@@ -1377,6 +1490,30 @@ function createSettingsCard(scope) {
         }),
       ),
       field('侧边栏渠道', channelPicker),
+      React.createElement(
+        'div',
+        { className: 'bm-buttons' },
+        React.createElement(
+          'button',
+          {
+            className: 'bm-button',
+            type: 'button',
+            disabled: saving || dirtyFields.size === 0,
+            onClick: resetDisplaySettings,
+          },
+          '撤销显示修改',
+        ),
+        React.createElement(
+          'button',
+          {
+            className: 'bm-button bm-button-primary',
+            type: 'button',
+            disabled: saving || dirtyFields.size === 0 || snapshot.status !== 'ready' || !snapshot.writable,
+            onClick: () => void saveDisplaySettings(),
+          },
+          '保存显示设置',
+        ),
+      ),
       credentialField({
         channel: 'deepseek',
         label: 'DeepSeek API Key',
@@ -1441,60 +1578,28 @@ function createSettingsCard(scope) {
     ) : null
 
     return React.createElement(
-      'li',
+      'section',
       {
-        className: 'bm-settings',
-        'data-open': String(open),
+        className: 'bm-settings-page',
         'data-dsh-plugin': NS,
-        'data-dsh-part': 'settings-card',
+        'data-dsh-part': 'plugin-config',
       },
-      React.createElement(
-        'button',
-        {
-          type: 'button',
-          className: 'bm-settings-header',
-          'aria-expanded': open,
-          onClick: () => setOpen(value => !value),
-        },
-        React.createElement(
-          'span',
-          { className: 'bm-settings-head' },
-          React.createElement(
-            'span',
-            { className: 'bm-settings-title-row' },
-            React.createElement('span', { className: 'bm-settings-title' }, '余额监控'),
-            React.createElement('span', { className: 'bm-version' }, VERSION),
-          ),
-          React.createElement(
-            'span',
-            { className: 'bm-settings-description' },
-            '查看余额渠道、凭据与用量设置。',
-          ),
-        ),
-        React.createElement(
-          'svg',
-          { className: 'bm-chevron bm-card-chevron', viewBox: '0 0 14 14', 'aria-hidden': true },
-          React.createElement('path', { d: 'm3 5.25 4 4 4-4' }),
-        ),
-      ),
-      open ? React.createElement(
-        'div',
-        { className: 'bm-settings-body' },
-        updateNotice,
-        form,
-      ) : null,
+      updateNotice,
+      form,
     )
-  }
+}
+
+function DshBalanceMonitorConfig({ view, form }) {
+  if (view === 'summary') return '查看余额渠道、凭据与用量设置。'
+  return React.createElement(DshBalanceMonitorSettings, { form })
 }
 
 export function apply(ctx) {
   installStyle()
   const scope = ctx.configForms.get(NS)
-  const SettingsCard = createSettingsCard(scope)
-  ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
-    name: 'settings.plugin.item',
-    key: NS,
-    order: 1_000,
-  }, SettingsCard))
+  ctx.slots.inject('plugins.row.config', () => ctx.slots.register({
+    name: 'plugins.row.config',
+    key: ROW_CONFIG_KEY,
+  }, DshBalanceMonitorConfig))
   ctx.effect(() => setupSidebarPanel(ctx, scope), 'dsh-balance-monitor: sidebar panel')
 }

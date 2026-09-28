@@ -38,3 +38,12 @@ test('official DSH libraries are peer and development dependencies', () => {
   assert.equal(manifest.peerDependencies?.[packageName], '^3.18.4')
   assert.equal(manifest.devDependencies?.[packageName], '^3.18.4')
 })
+
+test('client loads the official plugin manager configuration surface', () => {
+  assert.equal(
+    manifest.dsh?.client?.inject?.includes(
+      '@deepseek-ai/dsh-client-ui-plugin-manager',
+    ),
+    true,
+  )
+})
