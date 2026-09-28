@@ -3,7 +3,9 @@ import test from 'node:test'
 import { balanceSourceSignature, Config } from '../index.js'
 
 test('sidebar defaults to DeepSeek only', () => {
-  assert.deepEqual(Config({}).sidebarChannels, ['deepseek'])
+  const value = Config({}).sidebarChannels
+  const resolved = typeof value?.get === 'function' ? value.get() : value
+  assert.deepEqual(resolved, ['deepseek'])
 })
 
 test('presentation settings do not change the balance source signature', () => {

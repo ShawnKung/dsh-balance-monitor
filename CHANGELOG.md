@@ -2,6 +2,18 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 和 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [0.2.2] - 2026-09-28
+
+### 变更
+
+- 侧边栏入口迁移至 DSH 框架的 `sidebar.panellist` slot，作为独立 PanelRow 渲染在任务看板之后（order=200），交由框架统一管理图标对齐、hover / active 样式与折叠动画；点击图标仍弹出余额面板，不切换到 panel 路由。
+- 服务端配置改由 `configForms` 的 volatile 快照驱动：所有字段声明为 `.volatile()`，通过 `settings.describe()` + `settings/document-updated` 事件同步命名空间快照，取代已弃用的 `settings.installSection` 流程。
+- 将 `@deepseek-ai/schemastery` 的 peer 与开发依赖同步至 `^3.18.4`，以支持 volatile schema。
+
+### 移除
+
+- 移除手写 `sidebarRoot` / `newSessionRow` / `placeEntry` 定位逻辑与 MutationObserver 贴片，同步删除入口专用的 `[data-dsh-balance-monitor-entry]` CSS 规则。
+
 ## [0.2.1] - 2026-09-28
 
 ### 修复

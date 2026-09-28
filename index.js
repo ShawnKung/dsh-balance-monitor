@@ -16,16 +16,16 @@ export const name = 'dsh-balance-monitor'
 export const inject = ['webServer', 'credentials']
 
 export const Config = z.object({
-  showSidebar: z.boolean().default(true),
-  balancePrecision: z.union(['0', '1', '2', '3', '4', '5', '6', 'exact']).default('2'),
-  sidebarChannels: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(3).default(['deepseek']),
-  channelOrder: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(4).default(['deepseek', 'kimi', 'zhipu', 'teamo']),
-  deepseekApiKeyRef: z.string().role('credential-ref').default('DEEPSEEK_API_KEY'),
-  kimiApiKeyRef: z.string().role('credential-ref').default('KIMI_API_KEY'),
-  zhipuApiKeyRef: z.string().role('credential-ref').default('ZAI_API_KEY'),
-  teamoApiKeyRef: z.string().role('credential-ref').default('TEAMO_API_KEY'),
-  teamoBaseUrl: z.string().default('https://teamorouter.cn'),
-  teamoRangeDays: z.number().step(1).min(2).max(90).default(7),
+  showSidebar: z.boolean().default(true).volatile(),
+  balancePrecision: z.union(['0', '1', '2', '3', '4', '5', '6', 'exact']).default('2').volatile(),
+  sidebarChannels: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(3).default(['deepseek']).volatile(),
+  channelOrder: z.array(z.union(['deepseek', 'kimi', 'zhipu', 'teamo'])).min(1).max(4).default(['deepseek', 'kimi', 'zhipu', 'teamo']).volatile(),
+  deepseekApiKeyRef: z.string().role('credential-ref').default('DEEPSEEK_API_KEY').volatile(),
+  kimiApiKeyRef: z.string().role('credential-ref').default('KIMI_API_KEY').volatile(),
+  zhipuApiKeyRef: z.string().role('credential-ref').default('ZAI_API_KEY').volatile(),
+  teamoApiKeyRef: z.string().role('credential-ref').default('TEAMO_API_KEY').volatile(),
+  teamoBaseUrl: z.string().default('https://teamorouter.cn').volatile(),
+  teamoRangeDays: z.number().step(1).min(2).max(90).default(7).volatile(),
 })
 
 const DEFAULT_CONFIG = Object.freeze({
@@ -58,8 +58,8 @@ export function balanceSourceSignature(value = {}) {
 }
 
 export function apply(ctx, entry = {}) {
-  let source = () => withDefaults(entry)
-  let sourceSignature = balanceSourceSignature(entry)
+  let source = () => DEFAULT_CONFIG
+  let sourceSignature = balanceSourceSignature(DEFAULT_CONFIG)
   const noProviderCredentials = () => []
   let providerCredentialRefs = noProviderCredentials
   const service = new BalanceService({
@@ -128,22 +128,26 @@ export function apply(ctx, entry = {}) {
   })
 
   ctx.inject(['settings'], settingsCtx => {
-    settingsCtx.settings.installSection(
-      ctx,
-      'dsh-balance-monitor',
-      Config,
-      withDefaults(entry),
-      {
-        setSource(next) {
-          source = next
-        },
-        onChange() {
-          const nextSignature = balanceSourceSignature(source())
-          if (nextSignature === sourceSignature) return
-          sourceSignature = nextSignature
-          void service.refreshAllAfterCurrent()
-        },
-      },
-    )
+    const NS = 'dsh-balance-monitor'
+    const readNamespaceValue = () => {
+      const descriptor = settingsCtx.settings
+        .describe({ redactSecrets: false })
+        .find(entry => entry.ns === NS)
+      return descriptor?.value
+    }
+    const applyLatest = () => {
+      const next = readNamespaceValue()
+      if (next === undefined) return
+      source = () => withDefaults(next)
+      const nextSignature = balanceSourceSignature(source())
+      if (nextSignature === sourceSignature) return
+      sourceSignature = nextSignature
+      void service.refreshAllAfterCurrent()
+    }
+    applyLatest()
+    settingsCtx.effect(() => settingsCtx.on('settings/document-updated', ns => {
+      if (ns !== NS) return
+      applyLatest()
+    }, { global: true }), 'dsh-balance-monitor: settings sync')
   })
 }
