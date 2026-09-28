@@ -35,6 +35,6 @@ test('browser-only libraries are build dependencies', () => {
 test('official DSH libraries are peer and development dependencies', () => {
   const packageName = '@deepseek-ai/schemastery'
   assert.equal(manifest.dependencies?.[packageName], undefined)
-  assert.equal(manifest.peerDependencies?.[packageName], '^3.18.2')
-  assert.equal(manifest.devDependencies?.[packageName], '^3.18.2')
+  assert.equal(manifest.peerDependencies?.[packageName], '^3.18.4')
+  assert.equal(manifest.devDependencies?.[packageName], '^3.18.4')
 })

@@ -2300,7 +2300,7 @@ window.__ModuleLoader__.load({
     // src/client.js
     var inject = ["slots", "configForms"];
     var NS = "dsh-balance-monitor";
-    var VERSION = "v0.2.1";
+    var VERSION = "v0.2.2";
     var FEEDBACK_DURATION_MS = 2400;
     var POPOVER_EXIT_MS = 160;
     var MAX_SIDEBAR_CHANNELS = 3;
@@ -2328,7 +2328,6 @@ window.__ModuleLoader__.load({
     ]);
     var CHANNEL_IDS = CHANNEL_OPTIONS.map((channel) => channel.id);
     var CHANNEL_BY_ID = new Map(CHANNEL_OPTIONS.map((channel) => [channel.id, channel]));
-    var WALLET_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>';
     var REFRESH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>';
     var EXTERNAL_LINK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="m10 14 11-11"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
     function normalizeChannelOrder(value) {
@@ -2341,21 +2340,13 @@ window.__ModuleLoader__.load({
       return `${value} \u4F4D`;
     }
     var STYLE = `
-    [data-dsh-balance-monitor-entry][hidden]{display:none}
     .bm-checkbox-field{display:flex;align-items:center;gap:8px;padding-top:8px;font-size:12px;font-weight:550}.bm-checkbox-field input{width:14px!important;height:14px!important;flex:none!important;margin:0;cursor:pointer}
     .bm-sortable-ghost{opacity:.28;background:var(--dsw-alias-interactive-bg-active,rgba(127,127,127,.16))}.bm-sortable-chosen{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}.bm-sortable-drag{opacity:.96;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-3,#fff));box-shadow:var(--dsw-elevation-panel,0 8px 24px rgba(0,0,0,.16))}
     body{--bm-feedback-success:#15803d;--bm-feedback-error:var(--dsw-alias-state-error-primary,#dc2626)}
     body[data-ds-dark-theme]{--bm-feedback-success:var(--dsw-alias-state-success-primary,#22c55e);--bm-feedback-error:var(--dsw-alias-state-error-primary,#f25a5a)}
-    [data-dsh-balance-monitor-entry]{box-sizing:border-box;width:100%;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,#d6d9df);display:flex;align-items:center;gap:8px;min-height:36px;padding:5px 10px;cursor:pointer;font:inherit;text-align:left}
-    [data-dsh-balance-monitor-entry]:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,#eef0f3)}[data-dsh-balance-monitor-entry][data-active]{background:var(--dsw-alias-interactive-bg-active,rgba(127,127,127,.16));color:var(--dsw-alias-label-primary,#eef0f3);font-weight:600}
-    [data-dsh-balance-monitor-entry] .bm-icon{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none}
-    [data-dsh-balance-monitor-entry] .bm-icon svg{display:block;width:18px;height:18px}.bm-icon.bm-loading svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.bm-icon-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    [data-dsh-balance-monitor-entry] .bm-summary{display:grid;gap:1px;min-width:0;flex:1}
-    [data-dsh-balance-monitor-entry] .bm-line{display:flex;justify-content:space-between;gap:8px;min-width:0;font-size:12px;line-height:17px}
-    [data-dsh-balance-monitor-entry] .bm-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:inherit}
-    [data-dsh-balance-monitor-entry] .bm-value{--bm-feedback-rest:var(--dsw-alias-label-secondary,#61666b);white-space:nowrap;font-variant-numeric:tabular-nums}[data-dsh-balance-monitor-entry]:hover .bm-value,[data-dsh-balance-monitor-entry][data-active] .bm-value{--bm-feedback-rest:var(--dsw-alias-label-primary,#0f1115)}
-    [data-dsh-frame][data-sidebar-collapsed] [data-dsh-balance-monitor-entry],[data-sidebar-collapsed] [data-dsh-balance-monitor-entry]{justify-content:center;padding:0;width:36px;height:36px;min-height:36px;margin:0 auto 12px;border-radius:50%}
-    [data-dsh-frame][data-sidebar-collapsed] [data-dsh-balance-monitor-entry] .bm-summary,[data-sidebar-collapsed] [data-dsh-balance-monitor-entry] .bm-summary{display:none}
+    .bm-icon-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .bm-panel-glyph{display:inline-flex;align-items:center;justify-content:center}
+    .bm-panel-glyph svg{display:block}
     .bm-popover{position:fixed;z-index:10000;width:min(390px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 24px));overflow:auto;border:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.25));border-radius:8px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#0f1115);box-shadow:var(--dsw-elevation-prominent,0 12px 32px rgba(0,0,0,.14));font-family:inherit;transform-origin:left top;animation:bm-popover-in .18s var(--ds-ease-out,cubic-bezier(0,0,.2,1))}
     .bm-popover[hidden]{display:none}.bm-popover-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;padding:12px 14px;border-bottom:.5px solid var(--dsw-alias-border-l2,rgba(127,127,127,.16));background:inherit}
     .bm-popover[data-closing=true]{pointer-events:none;animation:bm-popover-out .16s var(--ds-ease-in,cubic-bezier(.4,0,1,1)) forwards}
@@ -2526,28 +2517,6 @@ window.__ModuleLoader__.load({
       }
       return control;
     }
-    function sidebarRoot() {
-      const column = document.querySelector('[data-pane="sidebar"], [class*="sidebarCol"]');
-      if (!column) return void 0;
-      return column.querySelector('[class*="logoRow"]')?.parentElement ?? column.firstElementChild ?? void 0;
-    }
-    function newSessionRow(root) {
-      const button = root.querySelector('button[class*="newSession"]');
-      if (!button) return void 0;
-      const row = button.closest('[class*="logoRow"]');
-      return row?.parentElement === root ? row : button;
-    }
-    function placeEntry(root, entry) {
-      const base = newSessionRow(root);
-      if (!base) return false;
-      if (entry.parentElement === root) return true;
-      const siblings = Array.from(root.children).filter((element) => element.matches(
-        "[data-dsh-taskboard-entry],[data-dsh-ssh-entry],[data-dsh-better-sidebar-entry],[data-dsh-balance-monitor-entry]"
-      ));
-      const anchor = siblings.length ? siblings.at(-1).nextElementSibling : base.nextElementSibling;
-      root.insertBefore(entry, anchor);
-      return true;
-    }
     function setButtonIcon(button, icon) {
       button.innerHTML = icon;
     }
@@ -2663,21 +2632,33 @@ window.__ModuleLoader__.load({
       }
       return section;
     }
-    function mountMonitor(scope) {
+    function WalletGlyph({ size = 18 }) {
+      const ref = import_react.default.useRef(null);
+      import_react.default.useEffect(() => {
+        const el = ref.current;
+        if (!el) return void 0;
+        const button = el.closest("button");
+        if (!button) return void 0;
+        const handler = (event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          const toggle = window.__dshBalanceMonitorTogglePopup;
+          if (typeof toggle === "function") toggle(button);
+        };
+        button.addEventListener("click", handler, { capture: true });
+        return () => button.removeEventListener("click", handler, { capture: true });
+      }, []);
+      return import_react.default.createElement("span", {
+        ref,
+        className: "bm-panel-glyph",
+        "data-dsh-plugin": NS,
+        dangerouslySetInnerHTML: {
+          __html: `<svg viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.75h10.25a.75.75 0 0 1 .75.75v7a1 1 0 0 1-1 1h-9a1.5 1.5 0 0 1-1.5-1.5V4a1.5 1.5 0 0 1 1.5-1.5h8"/><path d="M10.25 8h3.25v2.5h-3.25a1.25 1.25 0 0 1 0-2.5Z"/></svg>`
+        }
+      });
+    }
+    function setupSidebarPanel(ctx, scope) {
       installStyle();
-      const entry = document.createElement("button");
-      entry.type = "button";
-      entry.dataset.dshBalanceMonitorEntry = "";
-      entry.dataset.dshPlugin = "dsh-balance-monitor";
-      entry.dataset.dshPart = "sidebar-entry";
-      entry.setAttribute("aria-haspopup", "dialog");
-      entry.setAttribute("aria-label", "\u4F59\u989D\u76D1\u63A7");
-      const icon = document.createElement("span");
-      icon.className = "bm-icon";
-      icon.innerHTML = WALLET_ICON;
-      const summary = document.createElement("span");
-      summary.className = "bm-summary";
-      entry.append(icon, summary);
       const popup = document.createElement("div");
       popup.className = "bm-popover";
       popup.hidden = true;
@@ -2686,40 +2667,13 @@ window.__ModuleLoader__.load({
       document.body.append(popup);
       let snapshot = { revision: -1, channels: [] };
       let updateSnapshot;
-      let root;
       let popupCloseTimer;
+      let currentAnchor = null;
       const refreshing = /* @__PURE__ */ new Set();
       const feedback = /* @__PURE__ */ new Map();
       const feedbackTimers = /* @__PURE__ */ new Map();
       const feedbackStarted = /* @__PURE__ */ new Map();
       const pendingFeedback = /* @__PURE__ */ new Map();
-      const setSidebarLoading = (loading) => {
-        if (loading === (icon.dataset.loading === "true")) return;
-        if (loading) {
-          icon.dataset.loading = "true";
-          icon.classList.add("bm-loading", "bm-spinning");
-          icon.innerHTML = REFRESH_ICON;
-          entry.disabled = true;
-          entry.setAttribute("aria-label", "\u4F59\u989D\u76D1\u63A7\u6B63\u5728\u52A0\u8F7D");
-          return;
-        }
-        delete icon.dataset.loading;
-        icon.classList.remove("bm-loading", "bm-spinning");
-        icon.innerHTML = WALLET_ICON;
-        entry.disabled = false;
-        entry.setAttribute("aria-label", "\u4F59\u989D\u76D1\u63A7");
-      };
-      const selectedChannels = () => {
-        const settings = scope.getSnapshot();
-        const selected = settings.status === "ready" ? settings.value?.sidebarChannels : void 0;
-        const selectedSet = new Set(
-          Array.isArray(selected) && selected.length ? selected.slice(0, MAX_SIDEBAR_CHANNELS) : CHANNEL_IDS
-        );
-        const order = normalizeChannelOrder(
-          settings.status === "ready" ? settings.value?.channelOrder : void 0
-        );
-        return order.filter((id) => selectedSet.has(id));
-      };
       const sidebarVisible = () => {
         const settings = scope.getSnapshot();
         return settings.status !== "ready" || settings.value?.showSidebar !== false;
@@ -2745,47 +2699,9 @@ window.__ModuleLoader__.load({
         snapshot = next;
         return true;
       };
-      const renderSummary = () => {
-        summary.replaceChildren();
-        const settings = scope.getSnapshot();
-        if (settings.status !== "ready") {
-          setSidebarLoading(true);
-          entry.hidden = false;
-          summary.textContent = "\u6B63\u5728\u52A0\u8F7D";
-          popup.hidden = true;
-          delete popup.dataset.closing;
-          delete entry.dataset.active;
-          return;
-        }
-        setSidebarLoading(false);
-        const visible = sidebarVisible();
-        entry.hidden = !visible;
-        if (!visible) {
-          popup.hidden = true;
-          delete popup.dataset.closing;
-          delete entry.dataset.active;
-          return;
-        }
-        const byId = new Map(snapshot.channels.map((channel) => [channel.id, channel]));
-        const channels = selectedChannels().map((id) => byId.get(id)).filter(Boolean);
-        for (const channel of channels) {
-          const row = document.createElement("span");
-          row.className = "bm-line";
-          const label = document.createElement("span");
-          label.className = "bm-label";
-          label.textContent = channel.label;
-          const value = document.createElement("span");
-          const result = feedback.get(channel.id);
-          value.className = `bm-value${result ? ` bm-value-${result}` : ""}`;
-          value.textContent = formatBalance(channel, balancePrecision());
-          row.append(label, value);
-          summary.append(row);
-        }
-        if (!channels.length) summary.textContent = "\u4F59\u989D\u76D1\u63A7";
-      };
       const positionPopup = () => {
-        if (popup.hidden) return;
-        const rect = entry.getBoundingClientRect();
+        if (popup.hidden || !currentAnchor || !currentAnchor.isConnected) return;
+        const rect = currentAnchor.getBoundingClientRect();
         const width = Math.min(390, window.innerWidth - 24);
         const left = Math.min(window.innerWidth - width - 12, Math.max(12, rect.right + 10));
         const top = Math.min(window.innerHeight - popup.offsetHeight - 12, Math.max(12, rect.top));
@@ -2892,20 +2808,38 @@ window.__ModuleLoader__.load({
         requestAnimationFrame(positionPopup);
       };
       const render = () => {
-        renderSummary();
+        if (!sidebarVisible()) {
+          closePopup(true);
+          return;
+        }
         if (!popup.hidden) renderPopup();
       };
-      const openPopup = () => {
+      const openPopup = (anchor) => {
+        if (!sidebarVisible()) return;
+        if (anchor) currentAnchor = anchor;
         window.clearTimeout(popupCloseTimer);
         popupCloseTimer = void 0;
         delete popup.dataset.closing;
         popup.hidden = false;
-        entry.dataset.active = "true";
         renderPopup();
       };
-      const closePopup = () => {
-        if (popup.hidden || popup.dataset.closing) return;
-        delete entry.dataset.active;
+      function closePopup(immediate) {
+        if (popup.hidden || popup.dataset.closing) {
+          if (immediate) {
+            popup.hidden = true;
+            delete popup.dataset.closing;
+            window.clearTimeout(popupCloseTimer);
+            popupCloseTimer = void 0;
+          }
+          return;
+        }
+        if (immediate) {
+          popup.hidden = true;
+          delete popup.dataset.closing;
+          window.clearTimeout(popupCloseTimer);
+          popupCloseTimer = void 0;
+          return;
+        }
         popup.dataset.closing = "true";
         window.clearTimeout(popupCloseTimer);
         popupCloseTimer = window.setTimeout(() => {
@@ -2913,39 +2847,23 @@ window.__ModuleLoader__.load({
           delete popup.dataset.closing;
           popupCloseTimer = void 0;
         }, POPOVER_EXIT_MS);
-      };
-      entry.addEventListener("click", () => {
-        if (popup.hidden || popup.dataset.closing) openPopup();
+      }
+      const togglePopup = (anchor) => {
+        if (!sidebarVisible()) return;
+        if (popup.hidden || popup.dataset.closing) openPopup(anchor);
         else closePopup();
-      });
-      const place = () => {
-        if (root && !root.isConnected) root = void 0;
-        root ??= sidebarRoot();
-        if (root) placeEntry(root, entry);
       };
-      const observer = new MutationObserver(place);
-      observer.observe(document.body, { childList: true, subtree: true });
-      const unsubscribe = scope.subscribe(render);
+      window.__dshBalanceMonitorTogglePopup = togglePopup;
+      const unsubscribeSettings = scope.subscribe(render);
       const unsubscribeUpdates = subscribeUpdateState((next) => {
         updateSnapshot = next;
         if (next.status === "updating" || next.status === "restart-required") {
-          openPopup();
+          const anchor = currentAnchor ?? document.querySelector('button [data-dsh-plugin="dsh-balance-monitor"].bm-panel-glyph')?.closest("button");
+          if (anchor) openPopup(anchor);
           return;
         }
         render();
       });
-      const outside = (event) => {
-        if (!popup.hidden && !popup.contains(event.target) && !entry.contains(event.target)) {
-          closePopup();
-        }
-      };
-      const escape = (event) => {
-        if (event.key === "Escape") closePopup();
-      };
-      document.addEventListener("pointerdown", outside);
-      document.addEventListener("keydown", escape);
-      window.addEventListener("resize", positionPopup);
-      place();
       const unsubscribeBalance = subscribeBalanceState((payload) => {
         if (!acceptSnapshot(payload.snapshot)) return;
         if (payload.channel) {
@@ -2959,17 +2877,37 @@ window.__ModuleLoader__.load({
         }
         render();
       });
+      const outside = (event) => {
+        if (popup.hidden) return;
+        if (popup.contains(event.target)) return;
+        if (currentAnchor?.contains(event.target)) return;
+        closePopup();
+      };
+      const escape = (event) => {
+        if (event.key === "Escape") closePopup();
+      };
+      document.addEventListener("pointerdown", outside);
+      document.addEventListener("keydown", escape);
+      window.addEventListener("resize", positionPopup);
+      const disposeSlot = ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({
+        name: "sidebar.panellist",
+        id: NS,
+        order: 200,
+        label: () => "\u4F59\u989D\u76D1\u63A7"
+      }, WalletGlyph));
       return () => {
-        observer.disconnect();
-        unsubscribeBalance();
-        unsubscribe();
+        if (window.__dshBalanceMonitorTogglePopup === togglePopup) {
+          delete window.__dshBalanceMonitorTogglePopup;
+        }
+        disposeSlot();
+        unsubscribeSettings();
         unsubscribeUpdates();
+        unsubscribeBalance();
         window.clearTimeout(popupCloseTimer);
         for (const timeout of feedbackTimers.values()) window.clearTimeout(timeout);
         document.removeEventListener("pointerdown", outside);
         document.removeEventListener("keydown", escape);
         window.removeEventListener("resize", positionPopup);
-        entry.remove();
         popup.remove();
       };
     }
@@ -3717,7 +3655,7 @@ window.__ModuleLoader__.load({
         key: NS,
         order: 1e3
       }, SettingsCard));
-      ctx.effect(() => mountMonitor(scope), "dsh-balance-monitor: sidebar");
+      ctx.effect(() => setupSidebarPanel(ctx, scope), "dsh-balance-monitor: sidebar panel");
     }
 
     return module.exports;
